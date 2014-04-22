@@ -1,0 +1,18 @@
+<div class="scrollable">  
+  <div class="scrollable-content">
+
+    <div class="list-group">
+      <div class="list-group-item">
+        <h1>Welcome<br/>
+        <small>Submissions</small>
+        </h1>
+      </div>
+
+      <a ng-repeat="item in scrollItems" href="#" class="list-group-item">
+        {{ item }} <i class="fa fa-chevron-right pull-right"></i>
+      </a>
+
+    </div>
+<table> <tr ng-repeat="sub in submissions"> <td> <a href="submission/submission.html?_id={{sub.timeStamp}}">{{sub.timeStamp}}</a> </td> <td> {{ sub.xml }} </td> </tr> </table>
+  </div>
+</div>

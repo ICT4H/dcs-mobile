@@ -16,34 +16,101 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var app = {
-    // Application Constructor
-    initialize: function() {
-        this.bindEvents();
-    },
-    // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicity call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
-        app.receivedEvent('deviceready');
-    },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
+define(function (require) {
+    var app = {
+        // Application Constructor
+        initialize: function() {
+            this.bindEvents();
+        },
+        // Bind Event Listeners
+        //
+        // Bind any events that are required on startup. Common events are:
+        // 'load', 'deviceready', 'offline', and 'online'.
+        bindEvents: function() {
+            document.addEventListener('deviceready', this.onDeviceReady, false);
+        },
+        // deviceready Event Handler
+        //
+        // The scope of 'this' is the event. In order to call the 'receivedEvent'
+        // function, we must explicity call 'app.receivedEvent(...);'
+        onDeviceReady: function() {
+            app.receivedEvent('deviceready');
+        },
+        // Update DOM on a Received Event
+        receivedEvent: function(id) {
+            // var parentElement = document.getElementById(id);
+            // var listeningElement = parentElement.querySelector('.listening');
+            // var receivedElement = parentElement.querySelector('.received');
 
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
+            // listeningElement.setAttribute('style', 'display:none;');
+            // receivedElement.setAttribute('style', 'display:block;');
 
-        console.log('Received Event: ' + id);
-    }
-};
+
+            var projectsApp = angular.module('projectsApp', [
+              "ngRoute",
+              "mobile-angular-ui",
+              "mobile-angular-ui.touch",
+              "mobile-angular-ui.scrollable"
+            ]);
+
+
+            projectsApp.controller("SubmissionListCtrl", function($scope, ProjectService) {
+                console.log('in controller');
+                ProjectService.list().then(function(responce){
+                    $scope.$apply(function () {
+                        $scope.submissions = responce;
+                    });
+                }, function(err){
+                    console.log('error');
+                });
+            });
+
+
+            projectsApp.service('ProjectService', function() {
+                // JS standard pattern defining Project service.
+                return ProjectStore;
+            });
+
+            projectsApp.config(function($routeProvider, $locationProvider) {
+              $routeProvider.when('/',{
+                templateUrl: "partials/project-list.html",
+                controller: 'MainController'
+              });
+              $routeProvider.when('/submission-list',{
+                templateUrl: "partials/submission-list.html",
+                controller: 'SubmissionListCtrl'
+              }); 
+            });
+
+
+            projectsApp.controller('MainController', function($rootScope, $scope){
+
+              $rootScope.$on("$routeChangeStart", function(){
+                $rootScope.loading = true;
+              });
+
+              $rootScope.$on("$routeChangeSuccess", function(){
+                $rootScope.loading = false;
+              });
+
+              //$scope.userAgent =  navigator.userAgent;
+
+              var scrollItems = [];
+              for (var i=1; i<=20; i++) {
+                scrollItems.push("Project " + i);
+              }
+              $scope.scrollItems = scrollItems;
+            });
+
+            ProjectStore.init().then(function(){
+                angular.bootstrap( document.getElementsByTagName("body")[0], [ 'projectsApp' ]);
+            }, function(err){
+                // store failed
+                console.log('Error: init'+ err);
+            });
+                
+            console.log('Received Event: ' + id);
+        }
+    };
+    return app;
+});
