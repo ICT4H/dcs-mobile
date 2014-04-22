@@ -24,6 +24,7 @@ var ProjectStore = (function(window){
 			var request = indexedDB.open(PROJECT, version);
 
 			request.onupgradeneeded = function(e) {
+				console.log('DB upgrade event');
 				var db = e.target.result;
 
 				e.target.transaction.onerror = onerror;
@@ -39,8 +40,7 @@ var ProjectStore = (function(window){
 
 			request.onsuccess = function(e) {
 				projectStore.indexedDB.db = e.target.result;
-				//indexedDB.getAllTodoItems();
-				resolve();
+				resolve(projectStore);
 				console.log('Project db cerated');
 			};
 

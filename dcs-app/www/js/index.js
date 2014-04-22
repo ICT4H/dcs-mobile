@@ -65,24 +65,31 @@ define(function (require) {
                 });
             });
 
-
             projectsApp.service('ProjectService', function() {
-                // JS standard pattern defining Project service.
                 return ProjectStore;
             });
 
             projectsApp.config(function($routeProvider, $locationProvider) {
               $routeProvider.when('/',{
                 templateUrl: "partials/project-list.html",
-                controller: 'MainController'
+                controller: 'MainController',
+                resolve: {
+                   'ProjectService': function(ProjectService) {
+                     return ProjectService.init();
+                   }
+               }
               });
               $routeProvider.when('/submission-list',{
                 templateUrl: "partials/submission-list.html",
-                controller: 'SubmissionListCtrl'
+                controller: 'SubmissionListCtrl',
+                resolve: {
+                   'ProjectService': function(ProjectService) {
+                     return ProjectService.init();
+                   }
+               }
               }); 
             });
-
-
+            
             projectsApp.controller('MainController', function($rootScope, $scope){
 
               $rootScope.$on("$routeChangeStart", function(){
@@ -102,13 +109,14 @@ define(function (require) {
               $scope.scrollItems = scrollItems;
             });
 
-            ProjectStore.init().then(function(){
-                angular.bootstrap( document.getElementsByTagName("body")[0], [ 'projectsApp' ]);
-            }, function(err){
-                // store failed
-                console.log('Error: init'+ err);
-            });
-                
+            angular.bootstrap( document.getElementsByTagName("body")[0], [ 'projectsApp' ]);
+            // ProjectStore.init().then(function(){
+            //     angular.bootstrap( document.getElementsByTagName("body")[0], [ 'projectsApp' ]);
+            // }, function(err){
+            //     // store failed
+            //     console.log('Error: init'+ err);
+            // });
+
             console.log('Received Event: ' + id);
         }
     };

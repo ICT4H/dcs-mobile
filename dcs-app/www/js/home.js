@@ -1,12 +1,17 @@
 
 requirejs.config({
 	baseUrl: '/lib',
+	waitSeconds: 400,
 	paths: {
 	    'angular': 'angular',
 	    'angular-route': 'angular-route',
 	    'promise': 'promise-4.0.0',
-	    'data_store': '../js/data_store',
-	    'index': '../js/index'
+	    'mobile-angular-ui': 'mobile-angular-ui',
+	    'mobile-angular-ui-touch-fastclick': 'mobile-angular-ui-touch-fastclick',
+		'mobile-angular-ui-scrollable-overthrow': 'mobile-angular-ui-scrollable-overthrow',
+
+		'data_store': '../js/data_store',
+		'index': '../js/index'
 	},
 	shim: {
 		'angular': {
@@ -25,7 +30,8 @@ requirejs.config({
 	// ,deps['app']
 });
 
-require(["index","angular","angular-route", "data_store", "promise"], function(index) {
+require(["index","angular","angular-route", 'mobile-angular-ui', 'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow',
+	"data_store", "promise"], function(index) {
     
 	index.initialize();
 
