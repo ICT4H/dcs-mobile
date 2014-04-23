@@ -1,0 +1,12 @@
+{
+    "name" : "DCSGrunt",
+    "version" : "0.1.0",
+    "author" : "Team DCS",
+    "private" : true,
+
+    "devDependencies" : {
+        "grunt" :                       "*",
+        "grunt-contrib-watch":          "*",
+        "grunt-exec":					"*"
+    }
+}
