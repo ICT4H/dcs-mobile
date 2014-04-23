@@ -1,6 +1,6 @@
 
 requirejs.config({
-	baseUrl: '/lib',
+	baseUrl: 'lib',
 	waitSeconds: 400,
 	paths: {
 	    'angular': 'angular',
