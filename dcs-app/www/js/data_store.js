@@ -135,6 +135,7 @@ var ProjectStore = (function(window){
 
 
 
+// Utils for Dev purpose
 
 function insertDummySubmission() {
 	var form_html = '<root xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"> <model> <instance> <repeat_sample-119 id="repeat_sample-119"> <familyname/> <city/> <family template=""> <name/> <age/> </family> <meta> <instanceID/> </meta> <form_code> 119 </form_code> <eid> rep276 </eid> </repeat_sample-119> </instance> </model> <form autocomplete="off" class="or clearfix" id="repeat_sample-119" novalidate="novalidate"> <!--This form was created by transforming a OpenRosa-flavored (X)Form using an XSLT sheet created by Enketo LLC.--> <section class="form-logo"> </section> <h3 id="form-title"> repeat_sample-119 </h3> <label class="question non-select "> <span class="question-label active" lang=""> What is the family name? </span> <input autocomplete="off" data-type-xml="string" name="/repeat_sample-119/familyname" type="text"/> </label> <label class="question non-select "> <span class="question-label active" lang=""> City name? </span> <input autocomplete="off" data-type-xml="string" name="/repeat_sample-119/city" type="text"/> </label> <section class="or-group " name="/repeat_sample-119/family"> <h4> <span class="question-label active" lang=""> Family </span> </h4> <section class="or-repeat " name="/repeat_sample-119/family"> <label class="question non-select "> <span class="question-label active" lang=""> What is the member name? </span> <input autocomplete="off" data-type-xml="string" name="/repeat_sample-119/family/name" type="text"/> </label> <label class="question non-select "> <span class="question-label active" lang=""> Enter age </span> <input autocomplete="off" data-type-xml="int" name="/repeat_sample-119/family/age" type="number"/> </label> </section> <!--end of repeat fieldset with name /repeat_sample-119/family--> </section> <!--end of group --> <fieldset id="or-calculated-items" style="display:none;"> <label class="calculation non-select "> <input autocomplete="off" data-calculate="concat(\'uuid:\', uuid())" data-type-xml="string" name="/repeat_sample-119/meta/instanceID" type="hidden"/> </label> </fieldset> </form> </root>';
@@ -155,7 +156,7 @@ function insertDummySubmission() {
 				console.log('Error: listing');
 			});
 		},function(err){
-			console.log('Error: creating');
+			console.log('Error: creating'+err);
 		});
 
 	}, function(err){
@@ -179,6 +180,4 @@ function listAll() {
 	});	
 }
 
-
- insertDummySubmission();
- insertDummySubmission();
+insertDummySubmission();
