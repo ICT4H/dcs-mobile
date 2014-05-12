@@ -1,18 +1,69 @@
 <div class="scrollable">  
   <div class="scrollable-content">
-
     <div class="list-group">
       <div class="list-group-item">
-        <h1>Welcome<br/>
-        <small>Submissions</small>
-        </h1>
+        <h4>Submission list
+          <a href="submission/submission.html?_id={{form_code}}" class="pull-right">
+            <img src="../img/create.png" width="20" class="fa fa-chevron-right pull-right"/>
+          </a>
+        </h4>
       </div>
-
-      <a ng-repeat="item in scrollItems" href="#" class="list-group-item">
-        {{ item }} <i class="fa fa-chevron-right pull-right"></i>
-      </a>
-
+      <div class="panel-group" id="accordion">
+          <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
+          <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText">
+            <div ng-If="item.inBrowser == true">
+              <div class="panel-heading" toggle target="{{ item.id }} ">
+                <h4 class="panel-title" style="display:inline-block;">
+                    {{ item.created }} 
+                    
+                </h4>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="../img/delete.png" width="20" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item.id)"/>
+                </a>
+                <a onclick='window.location=this.href' href="submission/submission.html?_id={{form_code}}&_surveyResponse={{item.id}}" class= "pull-right" style="display:inline-block;float:right;">
+                      <img src="../img/edit.png" width="15" style="margin-top:10px;"/>
+                </a>
+              </div>
+              <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
+                <div class="panel-body">
+                  {{item.xml}}
+                </div>
+              </div>
+            </div>
+            <div ng-If="item.inServer == true">
+              <div class="panel-heading" toggle target="{{ item.id }} ">
+                <h4 class="panel-title" style="display:inline-block;">
+                    {{ item.created }} 
+                    
+                </h4>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="../img/download.png" width="20" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
+                </a>
+              </div>
+              <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
+                <div class="panel-body">
+                  {{item.xml}}
+                </div>
+              </div>
+            </div>
+            <div ng-If="item.inBoth == true">
+              <div class="panel-heading" toggle target="{{ item.id }} ">
+                <h4 class="panel-title" style="display:inline-block;">
+                    {{ item.created }} 
+                    
+                </h4>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="../img/edit.png" width="20" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
+                </a>
+              </div>
+              <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
+                <div class="panel-body">
+                  {{item.xml}}
+                </div>
+              </div>
+            </div>
+          </div>  
+      </div>
     </div>
-<table> <tr ng-repeat="sub in submissions"> <td> <a href="submission/submission.html?_id={{sub.timeStamp}}">{{sub.timeStamp}}</a> </td> <td> {{ sub.xml }} </td> </tr> </table>
   </div>
 </div>

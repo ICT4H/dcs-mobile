@@ -1,18 +1,26 @@
-<div class="scrollable">  
+ 
+ <div class="scrollable">  
   <div class="scrollable-content">
 
     <div class="list-group">
       <div class="list-group-item">
-        <h1>Welcome<br/>
-        <small>Projects</small>
-        </h1>
+        <h4>Project list
+        </h4>
+      </div>
+      <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
+      <div ng-repeat="item in project  | filter:searchText" href="#submission-list" class="list-group-item" >
+        <div ng-If="item.isStored == true">
+          <a href="#"><img src="../img/delete.png" width="20" class="fa fa-chevron-right pull-right" ng-click="deleteProject(item)"/></a>
+          <a href="#submission-list/{{item.id}}">
+            {{ item.name }} 
+          </a>
+        </div>
+        <div ng-If="item.isStored == false">
+          <a href="#"><img src="../img/download.png" width="20" class="fa fa-chevron-right pull-right" ng-click="downloadProject(item)"/></a>
+            {{ item.name }} 
+        </div>
       </div>
 
-      <a ng-repeat="item in scrollItems" href="#submission-list" class="list-group-item">
-        {{ item }} <i class="fa fa-chevron-right pull-right"></i>
-      </a>
-
     </div>
-
   </div>
 </div>

@@ -1,45 +1,35 @@
 
 requirejs.config({
-	baseUrl: 'lib',
+	baseUrl: 'js',
 	waitSeconds: 400,
 	paths: {
-	    'angular': 'angular',
-	    'angular-route': 'angular-route',
-	    'promise': 'promise-4.0.0',
-	    'mobile-angular-ui': 'mobile-angular-ui',
-	    'mobile-angular-ui-touch-fastclick': 'mobile-angular-ui-touch-fastclick',
-		'mobile-angular-ui-scrollable-overthrow': 'mobile-angular-ui-scrollable-overthrow',
-
-		'angular-app': '../js/angular-app',
-		'data_store': '../js/data_store',
-		'cordova-index': '../js/cordova-index'
+	    'angular': 'lib/angular',
+	    'angular-route': 'lib/angular-route',
+	    'promise': 'lib/promise-4.0.0',
+	    'mobile-angular-ui': 'lib/mobile-angular-ui',
+	    'mobile-angular-ui-touch-fastclick': 'lib/mobile-angular-ui-touch-fastclick',
+		'mobile-angular-ui-scrollable-overthrow': 'lib/mobile-angular-ui-scrollable-overthrow',
+		'cordova-index': '/js/cordova-index',
+		'idbstore': 'lib/idbstore.min',
+		'dbService': 'services/dbService'
 	},
 	shim: {
 		'angular': {
-			'exports': 'angular'
+			exports: 'angular'
 		},
 		'angular-route': {
 			deps:['angular'],
-			export:'ngRoute'
 		},
 		'mobile-angular-ui': ['angular'],
 		'mobile-angular-ui-touch-fastclick': ['angular'],
 		'mobile-angular-ui-scrollable-overthrow': ['angular'],
-		
-		'angular-app': ['angular', 'data_store', 'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow'],
-		'cordova-index': ['angular-app'],
-		'data_store':['promise']
 	}
-	// ,deps['app']
 });
 
-require(['cordova-index', 'angular-app', 'angular','angular-route', 'mobile-angular-ui', 'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow',
-	'data_store', 'promise'], function(cordovaIndex) {
-    
-	cordovaIndex.initialize();
-
+require(['angular','angular-route', 'dcsApp', 'routes', 'mobile-angular-ui', 
+	'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow'], function(angular){
+	 angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
 });
-
 
 
 

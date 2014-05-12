@@ -38,7 +38,6 @@ define(function (require) {
         },
         // Update DOM on a Received Event
         receivedEvent: function(id) {
-            DCS.intAngularApp();
             console.log('Received Event: ' + id);
         }
     };
