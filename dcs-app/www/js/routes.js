@@ -1,4 +1,4 @@
-define(['dcsApp','controllers/projectListController', 'controllers/submissionListController', 'dbService'], function(dcsApp, projectListController, submissionListController, dbService){
+define(['dcsApp','controllers/project-list-controller', 'controllers/submission-list-controller', 'dbService'], function(dcsApp, projectListController, submissionListController, dbService){
   'use strict';
   dcsApp.config(['$routeProvider', function ($routeProvider) {
           $routeProvider

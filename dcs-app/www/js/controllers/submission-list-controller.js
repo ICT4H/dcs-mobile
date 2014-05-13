@@ -1,6 +1,6 @@
 'use strict';
 
-define(['dcsApp', 'services/dcsService', '../dao/submissionDao'], function(dcsApp, dcsService, submissionDao){
+define(['dcsApp', 'services/dcs-service', '../dao/submission-dao'], function(dcsApp, dcsService, submissionDao){
     var submissionListController = function($rootScope, $scope, $routeParams, dcsService, submissionDao){
     	$scope.init = function(){
     		$scope.form_code = $routeParams.projectId;

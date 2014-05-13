@@ -11,7 +11,7 @@ requirejs.config({
 		'mobile-angular-ui-scrollable-overthrow': 'lib/mobile-angular-ui-scrollable-overthrow',
 		'cordova-index': '/js/cordova-index',
 		'idbstore': 'lib/idbstore.min',
-		'dbService': 'services/dbService'
+		'dbService': 'services/db-service'
 	},
 	shim: {
 		'angular': {

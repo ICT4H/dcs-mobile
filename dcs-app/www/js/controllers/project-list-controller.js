@@ -1,6 +1,6 @@
 'use strict';
 
-define(['dcsApp', 'services/dcsService', '../dao/projectDao'], function(dcsApp, dcsService, projectDao){
+define(['dcsApp', 'services/dcs-service', '../dao/project-dao'], function(dcsApp, dcsService, projectDao){
     var projectListController = function($rootScope, $scope, dcsService, projectDao){
 
         $rootScope.loading = true;
