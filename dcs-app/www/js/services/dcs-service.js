@@ -3,13 +3,18 @@ define(['dcsApp'], function(dcsApp){
     	var dcsService = {};
 
     	dcsService.getQuestionnaires = function(){
-    	  	return $http.jsonp('http://localhost:8000/client/questionnaires/?callback=JSON_CALLBACK');
+    		return $http({
+                method: "JSONP",
+                url: "http://localhost:8000/client/questionnaires/?callback=JSON_CALLBACK",
+            });	
   		};
 
   		dcsService.getSubmissions = function(surveyId){
-  			return $http.jsonp('http://localhost:8000/client/submissions/'+ surveyId +'/?callback=JSON_CALLBACK');
+  			return $http({
+                method: "JSONP",
+                url: "http://localhost:8000/client/submissions/"+ surveyId +"/?callback=JSON_CALLBACK",
+            });	
   		};
-
   		return dcsService;
  	};
   	dcsApp.service('dcsService', ['$http', dcsService]);
