@@ -39,6 +39,8 @@ define(function (require) {
         // Update DOM on a Received Event
         receivedEvent: function(id) {
             console.log('Received Event: ' + id);
+            angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
+            console.log('app loaded');
         }
     };
     return app;

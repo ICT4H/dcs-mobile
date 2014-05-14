@@ -1,17 +1,21 @@
 'use strict';
 
 define(['dcsApp', 'services/dcs-service', '../dao/project-dao'], function(dcsApp, dcsService, projectDao){
-    var projectListController = function($rootScope, $scope, dcsService, projectDao){
+    var projectListController = function($rootScope, $scope, dcsService, projectDao, $http){
 
         $rootScope.loading = true;
-
+        $http.defaults.headers.common.Authorization = 'Basic yyy';
         $scope.init = function(){
             var serverProjects = null;
              dcsService.getQuestionnaires().success(function(projects){
+                console.log('resolved');
+
                 serverProjects = projects;
             }).error(function(error){
                 serverProjects =[];
+                console.log('Error in project list');
             }).finally(function(){
+                console.log('i am in finally');
                 projectDao.getAllProject(function(localProjects){
                     $scope.$apply(function(){
                         $scope.project = manageProjects(localProjects, serverProjects);
@@ -57,5 +61,5 @@ define(['dcsApp', 'services/dcs-service', '../dao/project-dao'], function(dcsApp
         
         $scope.init();
     };
-    dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', projectListController]);
+    dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', '$http', projectListController]);
 }); 

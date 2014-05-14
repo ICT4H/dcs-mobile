@@ -9,9 +9,10 @@ requirejs.config({
 	    'mobile-angular-ui': 'lib/mobile-angular-ui',
 	    'mobile-angular-ui-touch-fastclick': 'lib/mobile-angular-ui-touch-fastclick',
 		'mobile-angular-ui-scrollable-overthrow': 'lib/mobile-angular-ui-scrollable-overthrow',
-		'cordova-index': '/js/cordova-index',
+		'cordova-index': 'cordova-index',
 		'idbstore': 'lib/idbstore.min',
-		'dbService': 'services/db-service'
+		'dbService': 'services/db-service',
+		'dcsApp': 'dcsApp'
 	},
 	shim: {
 		'angular': {
@@ -20,15 +21,17 @@ requirejs.config({
 		'angular-route': {
 			deps:['angular'],
 		},
+		'cordova-index': ['dcsApp'],
 		'mobile-angular-ui': ['angular'],
 		'mobile-angular-ui-touch-fastclick': ['angular'],
 		'mobile-angular-ui-scrollable-overthrow': ['angular'],
 	}
 });
 
-require(['angular','angular-route', 'dcsApp', 'routes', 'mobile-angular-ui', 
-	'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow'], function(angular){
-	 angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
+require(['angular','cordova-index', 'angular-route', 'dcsApp', 'routes', 'mobile-angular-ui', 
+	'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow'], function(angular, cordovaIndex){
+	 
+	 cordovaIndex.initialize();
 });
 
 

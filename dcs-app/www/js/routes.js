@@ -10,7 +10,11 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
                           templateUrl: "partials/submission-list.html",
                           controller: 'submissionListController',
                         });  
-          $httpProvider.defaults.headers.common['Authorization'] = 'Basic dGVzdGVyMTUwNDExQGdtYWlsLmNvbTp0ZXN0ZXIxNTA0MTE=';
+          
+          //$httpProvider.defaults.headers.common['Authorization'] = 'Basic dGVzdGVyMTUwNDExQGdtYWlsLmNvbTp0ZXN0ZXIxNTA0MTE=';
+          //$httpProvider.defaults.headers.get = { 'My-Header' : 'value' };
+
+          //console.log($httpProvider.defaults.headers);
         }]);
   dcsApp.factory('dbService', function(){
     return dbService;
