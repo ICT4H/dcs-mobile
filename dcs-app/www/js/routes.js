@@ -3,7 +3,7 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
   dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
           $routeProvider
                         .when('/',{
-                          templateUrl: "../partials/project-list.html",
+                          templateUrl: "partials/project-list.html",
                           controller: 'projectListController'
                          })
                         .when('/submission-list/:projectId',{

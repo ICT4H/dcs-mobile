@@ -16,11 +16,15 @@ define(['dcsApp', 'services/dcs-service', '../dao/project-dao'], function(dcsApp
                 console.log('Error in project list');
             }).finally(function(){
                 console.log('i am in finally');
-                projectDao.getAllProject(function(localProjects){
-                    $scope.$apply(function(){
-                        $scope.project = manageProjects(localProjects, serverProjects);
-                    });
-                },function(error){console.log(error);});
+                $scope.project = manageProjects([], serverProjects);
+                $rootScope.loading = false;
+
+
+                // projectDao.getAllProject(function(localProjects){
+                //     $scope.$apply(function(){
+                //         $scope.project = manageProjects(localProjects, serverProjects);
+                //     });
+                // },function(error){console.log(error);});
             });
         };
 
