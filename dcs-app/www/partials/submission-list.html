@@ -4,24 +4,27 @@
       <div class="list-group-item">
         <h4>Submission list
           <a href="submission/submission.html?_id={{form_code}}" class="pull-right">
-            <img src="../img/create.png" width="20" class="fa fa-chevron-right pull-right"/>
+            <img src="img/create.png" width="16" class="fa fa-chevron-right pull-right"/>
           </a>
         </h4>
       </div>
       <div class="panel-group" id="accordion">
           <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
           <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText">
-            <div ng-If="item.inBrowser == true">
+            <div ng-If="item.in =='browser'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
                     {{ item.created }} 
                     
                 </h4>
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                      <img src="../img/delete.png" width="20" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item.id)"/>
+                      <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item.id)"/>
+                </a>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click=""/>
                 </a>
                 <a onclick='window.location=this.href' href="submission/submission.html?_id={{form_code}}&_surveyResponse={{item.id}}" class= "pull-right" style="display:inline-block;float:right;">
-                      <img src="../img/edit.png" width="15" style="margin-top:10px;"/>
+                      <img src="img/edit.png" width="16" style="margin-top:10px;"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
@@ -30,14 +33,14 @@
                 </div>
               </div>
             </div>
-            <div ng-If="item.inServer == true">
+            <div ng-If="item.in == 'server'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
                     {{ item.created }} 
                     
                 </h4>
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                      <img src="../img/download.png" width="20" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
+                      <img src="img/download.png" width="16" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
@@ -46,14 +49,14 @@
                 </div>
               </div>
             </div>
-            <div ng-If="item.inBoth == true">
+            <div ng-If="item.in == 'both'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
                     {{ item.created }} 
                     
                 </h4>
-                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                      <img src="../img/edit.png" width="20" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
+                <a onclick='window.location=this.href' href="submission/submission.html?_id={{form_code}}&_surveyResponse={{item.id}}" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">

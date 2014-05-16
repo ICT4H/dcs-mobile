@@ -25,6 +25,18 @@ define(['idbstore'], function(IDBStore){
 		return promise;
 	};
 
+	dbService.getCredentails =function(){
+		var promise = new Promise(function(resolve, reject){
+			// db.put(item,function(id){
+				login = 'tester150411@gmail.com';
+				password = 'tester150411';
+				resolve('Basic ' + btoa(login + ':' + password));
+			// },function(error){
+				// reject(error);
+		});
+		return promise;
+	};
+
 	dbService.getByDoucmentType = function(documentType){
 		var promise = new Promise(function(resolve, reject){
 			var items = [];

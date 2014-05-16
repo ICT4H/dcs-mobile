@@ -22,9 +22,7 @@ define(['dcsApp', 'services/dcs-service', '../dao/submission-dao'], function(dcs
             var submissions =[];
             if(serverSubmissions.length == 0){
                 localSubmissions.forEach(function(localSubmission){
-                    localSubmission.inBrowser = true;
-                    localSubmission.inBoth = false;
-                    localSubmission.inServer = false;
+                    localSubmission['in'] = 'browser';
                     submissions.push(localSubmission);
                 }); 
                 return submissions;
@@ -32,24 +30,19 @@ define(['dcsApp', 'services/dcs-service', '../dao/submission-dao'], function(dcs
 
             serverSubmissions.forEach(function(serverSubmission){
                 submissions.push(serverSubmission);
-                serverSubmission.inServer = true;
-                serverSubmission.inBrowser = false;
-                serverSubmission.inBoth =false;
+                serverSubmission['in'] = 'server';
             });
 
             localSubmissions.forEach(function(localSubmission){
                 var flag = false;
                 submissions.forEach(function(submission){
                     if(localSubmission.id == submission.id){
-                        submission.inBoth = true;
+                        submission['in'] = 'both';
                         flag = true;
-                        submission.inServer = false;
                     }
                 });
                 if(!flag){
-                    localSubmission.inBoth = false;
-                    localSubmission.inServer = false;
-                    localSubmission.inBrowser = true;
+                    localSubmission['in'] = 'browser';
                     submissions.push(localSubmission);
                 }
             });

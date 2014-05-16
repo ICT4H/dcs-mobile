@@ -28,9 +28,8 @@ requirejs.config({
 	}
 });
 
-require(['angular','cordova-index', 'angular-route', 'dcsApp', 'routes', 'mobile-angular-ui', 
-	'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow'], function(angular, cordovaIndex){
-	 
+require(['cordova-index', 'angular', 'angular-route', 'dcsApp', 'routes', 'mobile-angular-ui', 
+	'mobile-angular-ui-touch-fastclick', 'mobile-angular-ui-scrollable-overthrow', 'promise'], function(cordovaIndex){
 	 cordovaIndex.initialize();
 });
 
