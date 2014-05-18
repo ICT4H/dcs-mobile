@@ -1,15 +1,13 @@
 'use strict';
 
-define(['dcsApp', 'services/dcs-service', '../dao/submission-dao'], function(dcsApp, dcsService, submissionDao){
+define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsService, submissionDao){
     var submissionListController = function($rootScope, $scope, $routeParams, dcsService, submissionDao){
+    
     	$scope.init = function(){
     		$scope.form_code = $routeParams.projectId;
-            var serverSubmissions = null;
-            dcsService.getSubmissions($scope.form_code).success(function(submissions){
-                serverSubmissions = submissions;
-            }).error(function(error){
-                serverSubmissions =[];
-            }).finally(function(){
+            $rootScope.loading = true;
+            var serverSubmissions = [];
+            dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
                 submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
                     $scope.$apply(function(){
                         $scope.submissions = manageSubmissions(localSubmissions, serverSubmissions);
@@ -17,6 +15,7 @@ define(['dcsApp', 'services/dcs-service', '../dao/submission-dao'], function(dcs
                 },function(error){console.log(error);});
             });
         };
+
         var manageSubmissions = function(localSubmissions, serverSubmissions){
             $rootScope.loading = false;
             var submissions =[];

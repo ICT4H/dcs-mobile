@@ -12,6 +12,7 @@ requirejs.config({
 		'cordova-index': 'cordova-index',
 		'idbstore': 'lib/idbstore.min',
 		'dbService': 'services/db-service',
+		'dcsService': 'services/dcs-service',
 		'dcsApp': 'dcsApp'
 	},
 	shim: {
@@ -21,6 +22,7 @@ requirejs.config({
 		'angular-route': {
 			deps:['angular'],
 		},
+		'dcsService':['dcsApp'],
 		'cordova-index': ['dcsApp'],
 		'mobile-angular-ui': ['angular'],
 		'mobile-angular-ui-touch-fastclick': ['angular'],

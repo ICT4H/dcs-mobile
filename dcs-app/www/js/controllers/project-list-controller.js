@@ -1,20 +1,16 @@
 'use strict';
 
-define(['dcsApp', 'services/dcs-service', '../dao/project-dao'], function(dcsApp, dcsService, projectDao){
+define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsService, projectDao){
     var projectListController = function($rootScope, $scope, dcsService, projectDao){
-
+       
         $rootScope.loading = true;
         $scope.init = function(){
-            var serverProjects = null;
-             dcsService.getQuestionnaires().success(function(projects){
-                serverProjects = projects;
-            }).error(function(error){
-                serverProjects =[];
-            }).finally(function(){
-               
+            var serverProjects = [];
+            console.log('coming');
+             dcsService.getQuestionnaires().then(function(serverProjects){
                 projectDao.getAllProject(function(localProjects){
+                    $rootScope.loading = false;
                     $scope.$apply(function(){
-                        $rootScope.loading = false;
                         $scope.project = manageProjects(localProjects, serverProjects);
                     });
                 },function(error){console.log(error);});
