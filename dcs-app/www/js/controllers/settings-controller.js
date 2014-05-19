@@ -22,8 +22,8 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
             $scope.serverDetails.id = 'credentials';
             dbService.put($scope.serverDetails).then(function(saveId){
                 console.log(saveId);
-                // $scope.$apply();
-                // displayMessage("saved!");
+                $scope.$apply();
+                displayMessage("saved!");
             });
         }
 

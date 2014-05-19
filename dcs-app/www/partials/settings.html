@@ -1,4 +1,12 @@
 <div class="scrollable-content section">
+     <div id="message" class="bg-success  panel-title" ng-show=showMessage class ="container-fluid" >
+      <div class="panel-heading">
+        <h2 class="panel-title">
+          {{message_to_display}}
+          <button type="button" class="close" ng-click="showMessage=false">&times;</button>
+        </h2>
+      </div>
+    </div>
      <div class="panel" bs-panel="">
         <div class="panel-heading">
         <h2 class="panel-title">
