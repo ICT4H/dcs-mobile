@@ -29,7 +29,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="yes" />
 
-    <title>DCS Data Collection as Service</title>
+    <title>Data Collection as Service</title>
 
     <!--
     Yogesh find the index.css usage. It breaks ui. It's part of phonegap
@@ -60,10 +60,26 @@
   <div class="app">
     <!-- Navbar -->
     <div class="navbar navbar-app navbar-absolute-top">
-
+      
+      <div class="navbar navbar-app navbar-absolute-top">
         <div class="navbar-brand navbar-brand-center" yield-to="title">
-          <span>Data Collection as Service</span>
+          <span >Data Collection Service</span>
         </div>
+
+        <div class="btn-group pull-left">
+          <div ng-click="toggle('mainSidebar')" class="btn btn-navbar sidebar-toggle">
+            <i class="fa fa-bars"></i> 
+          </div>
+        </div>
+
+        <!-- <div class="btn-group pull-right" yield-to="navbarAction">
+          <div ng-click="toggle('rightSidebar')" class="btn btn-navbar ng-scope">
+            <a href="#settings-list">
+            <img src="img/settings.png" width="16"/>
+          </a>
+          </div>
+        </div> -->
+    </div>
 
         <!--
         <div class="btn-group pull-left">

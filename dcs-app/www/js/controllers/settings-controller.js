@@ -18,7 +18,7 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
             });
         };
 
-        $scope.saveDetails = function(){
+        $scope.saveDetails = function(){ 
             $scope.serverDetails.id = 'credentials';
             dbService.put($scope.serverDetails).then(function(saveId){
                 console.log(saveId);
@@ -28,7 +28,7 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
             });
         };
 
-        $scope.isFormValid =function(){
+        $scope.isFormValid = function(){
             return (!$scope.serverDetails.serverUrl) || 
                     (!$scope.serverDetails.username) ||
                     (!$scope.serverDetails.password) ||

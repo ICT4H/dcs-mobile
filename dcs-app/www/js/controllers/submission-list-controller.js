@@ -7,12 +7,14 @@ define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsSe
     		$scope.form_code = $routeParams.projectId;
             $rootScope.loading = true;
             var serverSubmissions = [];
+            $rootScope.displayInfo('Updating submission list........');
             dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
                 submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
                     $scope.$apply(function(){
+                        $rootScope.disableMessage();
                         $scope.submissions = manageSubmissions(localSubmissions, serverSubmissions);
                     });
-                },function(error){console.log(error);});
+                },function(error){$rootScope.displayError(error);});
             });
         };
 

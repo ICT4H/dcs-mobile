@@ -6,13 +6,15 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
         $rootScope.loading = true;
         $scope.init = function(){
             var serverProjects = [];
+            $rootScope.displayInfo('Updating project list.......');
              dcsService.getQuestionnaires().then(function(serverProjects){
                 projectDao.getAllProject(function(localProjects){
                     $rootScope.loading = false;
                     $scope.$apply(function(){
+                        $rootScope.disableMessage();
                         $scope.project = manageProjects(localProjects, serverProjects);
                     });
-                },function(error){console.log(error);});
+                },function(error){$rootScope.displayError(error);});
             });
         };
         
@@ -37,7 +39,7 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
         $scope.deleteProject = function(project){
             projectDao.deleteProject(project.id, function(id){
                 projectDao.deleteRelatedSubmission(id, function(deletedId){
-                    console.log(deletedId + ' deleted.')
+                    $rootScope.displaySuccess('Project deleted!')
                 });
             });
         };
@@ -46,29 +48,32 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
             project.document_type = 'survey';
             delete project["isStored"];
             projectDao.createProject(project, function(downloadedId){
-                console.log(downloadedId + ' downloaded.')
+               $rootScope.displaySuccess('Project downloaded!')
             });
         };
-            
-        $rootScope.displaySuccess = function(message){
-            $rootScope.showMessage = true;
-            $rootScope.message_to_display = message;
-            $rootScope.css = "alert-success";
-            $scope.$apply();
+
+        $rootScope.disableMessage = function(){
+            $rootScope.showMessage = false;
         };
 
-        $rootScope.displayInfo = function(message){
-            $rootScope.showMessage = true;
+        var enableMessage = function(MessageType,message){
+            $rootScope.css = MessageType;
             $rootScope.message_to_display = message;
-            $rootScope.css = "alert-info";
-            $scope.$apply();
+            $rootScope.showMessage = true;
+            if(!$scope.$$phase)
+                $scope.$apply();
+        };
+        
+        $rootScope.displaySuccess = function(message){
+            enableMessage("alert-success", message);
+        };
+             
+        $rootScope.displayInfo = function(message){
+            enableMessage("alert-info",message);
         };
 
         $rootScope.displayError = function(message){
-            $rootScope.showMessage = true;
-            $rootScope.message_to_display = message;
-            $rootScope.css = "alert-error";
-            $scope.$apply();
+            enableMessage("alert-error",message);
         };
 
         $scope.init();
