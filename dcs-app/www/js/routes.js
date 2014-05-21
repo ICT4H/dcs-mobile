@@ -14,7 +14,9 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
                           templateUrl: "partials/settings.html",
                           controller: 'settingsController'
                         });  
+          $httpProvider.defaults.timeout = 1000;
         }]);
+
   dcsApp.factory('dbService', function(){
     return dbService;
   });

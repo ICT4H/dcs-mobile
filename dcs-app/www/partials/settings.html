@@ -1,12 +1,4 @@
 <div class="scrollable-content section">
-     <div id="message" class="bg-success  panel-title" ng-show=showMessage class ="container-fluid" >
-      <div class="panel-heading">
-        <h2 class="panel-title">
-          {{message_to_display}}
-          <button type="button" class="close" ng-click="showMessage=false">&times;</button>
-        </h2>
-      </div>
-    </div>
      <div class="panel" bs-panel="">
         <div class="panel-heading">
         <h2 class="panel-title">
@@ -37,12 +29,12 @@
        <div class="form-group row">
         <label  class="control-label col-xs-3 col-sm-2 col-lg-1">Confirm password:</label>
         <div class="form-control-wrapper col-xs-9 col-sm-10 col-lg-11">
-          <input bs-form-control="" type="password" ng-model="serverDetails.password" label="Customer" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" placeholder="confirm password">
+          <input bs-form-control="" type="password" label="Customer" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" ng-model="serverDetails.confirmPassword" placeholder="confirm password">
         </div>
       </div>
       <div class="panel-body">
       <div content-for="navbarAction" duplicate="" class="ng-scope">
-      <input type ="submit" bs-form-control class = 'btn btn-primary' value="Save" ng-click="saveDetails()">
+      <button bs-form-control class = 'btn btn-primary' ng-click="saveDetails()" ng-disabled='isFormValid()'>Save</button>
       </div>
     </div>
   </div>

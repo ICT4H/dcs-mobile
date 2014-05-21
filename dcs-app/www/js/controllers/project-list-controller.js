@@ -6,7 +6,6 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
         $rootScope.loading = true;
         $scope.init = function(){
             var serverProjects = [];
-            console.log('coming');
              dcsService.getQuestionnaires().then(function(serverProjects){
                 projectDao.getAllProject(function(localProjects){
                     $rootScope.loading = false;
@@ -16,7 +15,7 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
                 },function(error){console.log(error);});
             });
         };
-
+        
         var manageProjects = function(localProjects, serverProjects){
             if(serverProjects.length == 0){
                 localProjects.forEach(function(localProject){
@@ -50,7 +49,28 @@ define(['dcsApp', 'dcsService', '../dao/project-dao'], function(dcsApp, dcsServi
                 console.log(downloadedId + ' downloaded.')
             });
         };
-        
+            
+        $rootScope.displaySuccess = function(message){
+            $rootScope.showMessage = true;
+            $rootScope.message_to_display = message;
+            $rootScope.css = "alert-success";
+            $scope.$apply();
+        };
+
+        $rootScope.displayInfo = function(message){
+            $rootScope.showMessage = true;
+            $rootScope.message_to_display = message;
+            $rootScope.css = "alert-info";
+            $scope.$apply();
+        };
+
+        $rootScope.displayError = function(message){
+            $rootScope.showMessage = true;
+            $rootScope.message_to_display = message;
+            $rootScope.css = "alert-error";
+            $scope.$apply();
+        };
+
         $scope.init();
     };
     dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', projectListController]);

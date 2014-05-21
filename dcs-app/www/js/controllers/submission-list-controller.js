@@ -1,7 +1,7 @@
 'use strict';
 
 define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsService, submissionDao){
-    var submissionListController = function($rootScope, $scope, $routeParams, dcsService, submissionDao){
+    var submissionListController = function($rootScope, $scope, $routeParams, $location, dcsService, submissionDao){
     
     	$scope.init = function(){
     		$scope.form_code = $routeParams.projectId;
@@ -47,20 +47,33 @@ define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsSe
             });
             return submissions;
         };
-        $scope.deleteSurveyResponse = function(surveyResponseId){
-            submissionDao.deleteSurveyResponse(surveyResponseId, function(deletedId){
-                console.log(deletedId + " deleted");
+        $scope.deleteSurveyResponse = function(surveyResponse){
+            var form_code = surveyResponse.form_code;
+            submissionDao.deleteSurveyResponse(surveyResponse.id, function(deletedId){
+                $location.path('/submission-list/' + form_code);
+                $rootScope.displaySuccess("Submission deleted!");
             });
         };
 
         $scope.downloadSurveyResponse = function(surveyResponse){
             submissionDao.storeSubmission(surveyResponse, function(storedId){
-                console.log(storedId+ " stored");
+                $location.path('/submission-list/' + surveyResponse.form_code);
+                $rootScope.displaySuccess("Submission downloaded!");
             });
         };
 
+        $scope.postSubmission = function(surveyResponse){
+            dcsService.postSubmission(surveyResponse).then(function(updatedSurveyResponse){
+                submissionDao.updateSurveyResponse(surveyResponse, updatedSurveyResponse,function(id){
+                    $location.path('/submission-list/' + updatedSurveyResponse.form_code);
+                    $rootScope.displaySuccess('Submitted successfully!');
+                });
+            },function(error){
+                console.log(error);
+            });
+        };
         $scope.init();
   };
-    return dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', 'dcsService',  'submissionDao', submissionListController]);
+    return dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService',  'submissionDao', submissionListController]);
 }); 
 

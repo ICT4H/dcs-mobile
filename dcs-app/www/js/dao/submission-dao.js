@@ -18,6 +18,19 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
 			dbService.remove(surveyResponseId).then(onSuccess);
 		};
 
+		submissionDao.updateSurveyResponse = function(surveyResponse, updatedSurveyResponse, onSuccess){
+			submissionDao.storeSubmission(copySubmissions(surveyResponse,updatedSurveyResponse), function(id){
+				submissionDao.deleteSurveyResponse(surveyResponse.id, onSuccess);
+			});
+		};
+
+		var copySubmissions = function(surveyResponse, updatedSurveyResponse){
+			console.log('created '+ updatedSurveyResponse.created);
+			updatedSurveyResponse.form_code = surveyResponse.form_code;
+			updatedSurveyResponse.type = surveyResponse.type;
+			updatedSurveyResponse.xml = surveyResponse.xml;
+			return updatedSurveyResponse;
+		};
 		return submissionDao;
 	};
 	dcsApp.factory('submissionDao', ['dbService', submissionDao]);

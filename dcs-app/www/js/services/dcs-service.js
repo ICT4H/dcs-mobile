@@ -6,12 +6,10 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
     	dcsService.getQuestionnaires = function(){
         var promise = new Promise(function(resolve, reject){
           dbService.get('credentials').then(function(credentials){ 
-            console.log(credentials);
               $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
               $http.get(credentials.serverUrl +"/client/questionnaires/").success(function(serverProjects){
                 resolve(serverProjects);
               }).error(function(error){
-                console.log('error');
                 resolve([]);
               });
           });
@@ -32,6 +30,20 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
         });
         return promise;
   		};
+
+      dcsService.postSubmission = function(surveyResponse){
+        var promise = new Promise(function(resolve, reject){
+          dbService.get('credentials').then(function(credentials){
+              $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
+              $http.post(credentials.serverUrl +"/client/submissions/upload/", 'form_data=' + surveyResponse.xml).success(function(updatedSurveyResponse){
+                resolve(updatedSurveyResponse);
+              }).error(function(error){
+                reject(error);
+              });
+          });
+        });
+        return promise;
+      };
 
   		return dcsService;
  	};
