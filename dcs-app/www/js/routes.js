@@ -10,6 +10,10 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
                           templateUrl: "partials/submission-list.html",
                           controller: 'submissionListController',
                         })
+                        .when('/about',{
+                          templateUrl: "partials/about.html",
+                          controller: 'projectListController',
+                        })
                         .when('/settings-list',{
                           templateUrl: "partials/settings.html",
                           controller: 'settingsController'
