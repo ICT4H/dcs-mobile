@@ -3,8 +3,8 @@
     <div class="list-group">
       <div class="list-group-item">
         <h4>Submission list
-          <a href="submission/submission.html?_id={{form_code}}" class="pull-right">
-            <img src="img/create.png" width="16" class="fa fa-chevron-right pull-right"/>
+          <a class="pull-right">
+            <img src="img/create.png" width="16" class="fa fa-chevron-right pull-right" ng-click="createSurveyResponse(form_code)"/>
           </a>
         </h4>
       </div>
@@ -23,8 +23,8 @@
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                       <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
                 </a>
-                <a onclick='window.location=this.href' href="submission/submission.html?_id={{form_code}}&_surveyResponse={{item.id}}" class= "pull-right" style="display:inline-block;float:right;">
-                      <img src="img/edit.png" width="16" style="margin-top:10px;"/>
+                <a href="#" class= "pull-right" style="display:inline-block;float:right;">
+                      <img src="img/edit.png" width="16" style="margin-top:10px;" ng-click="editSurveyResponse(item)"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
@@ -55,8 +55,11 @@
                     {{ item.created }} 
                     
                 </h4>
-                <a onclick='window.location=this.href' href="submission/submission.html?_id={{form_code}}&_surveyResponse={{item.id}}" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                      <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="downloadSurveyResponse(item)"/>
+                <a href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="editSurveyResponse(item)"/>
+                </a>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item)"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">

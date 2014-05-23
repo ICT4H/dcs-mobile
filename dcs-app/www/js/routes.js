@@ -1,4 +1,4 @@
-define(['dcsApp','controllers/project-list-controller', 'controllers/submission-list-controller', 'controllers/settings-controller', 'dbService'], function(dcsApp, projectListController, submissionListController, settingsController, dbService){
+define(['dcsApp','controllers/project-list-controller', 'controllers/submission-list-controller', 'controllers/settings-controller', 'controllers/submission-controller', 'dbService'], function(dcsApp, projectListController, submissionListController, settingsController, submissionController, dbService){
   'use strict';
   dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
           $routeProvider
@@ -17,6 +17,10 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
                         .when('/settings-list',{
                           templateUrl: "partials/settings.html",
                           controller: 'settingsController'
+                        })
+                        .when('/submission/:surveyId/surveyResponse/:surveyResponseId', {
+                          templateUrl: "partials/submission.html",
+                          controller: 'submissionController'
                         });  
           $httpProvider.defaults.timeout = 1000;
         }]);
@@ -24,4 +28,5 @@ define(['dcsApp','controllers/project-list-controller', 'controllers/submission-
   dcsApp.factory('dbService', function(){
     return dbService;
   });
+
 });

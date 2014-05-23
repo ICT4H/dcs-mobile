@@ -49,6 +49,15 @@ define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsSe
             });
             return submissions;
         };
+
+        $scope.createSurveyResponse = function(surveyId){
+            $location.path('/submission/' + surveyId + '/surveyResponse/' + null);
+        };
+
+        $scope.editSurveyResponse = function(surveyResponse){
+            $location.path('/submission/' + surveyResponse.form_code + '/surveyResponse/' + surveyResponse.id);
+        };
+
         $scope.deleteSurveyResponse = function(surveyResponse){
             var form_code = surveyResponse.form_code;
             submissionDao.deleteSurveyResponse(surveyResponse.id, function(deletedId){
@@ -74,6 +83,7 @@ define(['dcsApp', 'dcsService', '../dao/submission-dao'], function(dcsApp, dcsSe
                 console.log(error);
             });
         };
+
         $scope.init();
   };
     return dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService',  'submissionDao', submissionListController]);
