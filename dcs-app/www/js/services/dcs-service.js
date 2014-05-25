@@ -6,6 +6,9 @@ define(['dcsApp', 'dbService'], function(dcsApp, dbService){
     	dcsService.getQuestionnaires = function(){
         var promise = new Promise(function(resolve, reject){
           dbService.get('credentials').then(function(credentials){ 
+              if (typeof(credentials) == 'undefined') {
+                resolve([]); //TODO redirect to setting
+              }
               $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
               $http.get(credentials.serverUrl +"/client/questionnaires/").success(function(serverProjects){
                 resolve(serverProjects);
