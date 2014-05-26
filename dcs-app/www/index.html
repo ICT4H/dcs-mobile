@@ -85,12 +85,14 @@
 
     <script type="text/javascript" src="js/lib/angular.js"></script>
     <script type="text/javascript" src="js/lib/angular-route.js"></script>
+    <script type="text/javascript" src="js/lib/angular-sanitize.js"></script>
     <script type="text/javascript" src="js/lib/promise-4.0.0.js"></script>
     <script type="text/javascript" src="js/lib/mobile-angular-ui.js"></script>
     <script type="text/javascript" src="js/lib/mobile-angular-ui-touch-fastclick.js"></script>
     <script type="text/javascript" src="js/lib/mobile-angular-ui-scrollable-overthrow.js"></script>
     
     <script type="text/javascript" src="js/lib/idbstore.min.js"></script>
+    <script type="text/javascript" src="js/lib/xml2json.min.js"></script>
     <!-- endbuild -->
 
     <!-- build:js scripts/scripts.js -->
@@ -115,6 +117,7 @@
     <script src="js/enketo.min.js"></script>   
 
     <script type="text/javascript">
+        var xmlToJson = new X2JS();
         app.initialize();
     </script>
     
