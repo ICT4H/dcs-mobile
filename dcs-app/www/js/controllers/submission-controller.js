@@ -1,17 +1,14 @@
-'use strict';
+dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'dbService', function($rootScope, $routeParams, dbService){
+    
+    var surveyResponseId = $routeParams.surveyResponseId;
 
-define(['dcsApp', 'dbService'], function(dcsApp, dbService){
-    var submissionController = function($rootScope, $scope, $routeParams, $location, dbService){
-        var surveyResponseId = $routeParams.surveyResponseId;
-
-        var onSuccess = function(message){
-        	$rootScope.displaySuccess(message);
-        };
-        var onError = function(message){
-        	$rootScope.displayError(message);
-        };	
-
-        loadEnketo(dbService, $routeParams.surveyId, surveyResponseId, onSuccess, onError);
+    var onSuccess = function(message){
+    	$rootScope.displaySuccess(message);
     };
-    dcsApp.controller('submissionController', ['$rootScope', '$scope', '$routeParams', '$location', 'dbService', submissionController]);
-}); 
+    var onError = function(message){
+    	$rootScope.displayError(message);
+    };	
+
+    loadEnketo(dbService, $routeParams.surveyId, surveyResponseId, onSuccess, onError);
+
+}]);
