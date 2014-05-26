@@ -1,0 +1,5 @@
+node_modules
+dcs-app/www/bower_components
+**/.DS_Store
+.tmp/
+

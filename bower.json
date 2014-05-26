@@ -1,0 +1,10 @@
+{
+  "name": "mobile-app",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "~1.2.1",
+    "angular-touch": "~1.2.2",
+    "angular-route": "~1.2.2",
+    "mobile-angular-ui": "09b8792c950fe6fb0e2f4d64b4426721c409b072"
+  }
+}
