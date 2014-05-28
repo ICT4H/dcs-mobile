@@ -1,14 +1,5 @@
 ## Dev box setup for dcs-app
 
-Clone github repo
-
-dcs-app
- enketo-core
- dcs-app
- cp-enketo-build.sh
-
-## Dev setup
-
 If you are going to change enketo-core the see section "Making changes to enketo-core".
 
 Download and install android SDK and add the following to your bash_profile and run source ~/.bash_profile
