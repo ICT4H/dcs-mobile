@@ -5,7 +5,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $rootScope.loading = true;
     var serverSubmissions = [];
 
-    $rootScope.displayInfo('Updating submission list........');
+    $rootScope.displayInfo('Updating submission list...');
 
     dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
         submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
@@ -17,32 +17,34 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     });
 
     var manageSubmissions = function(localSubmissions, serverSubmissions){
+
+        //TODO needs to be improved
         $rootScope.loading = false;
         var submissions =[];
         if(serverSubmissions.length == 0){
             localSubmissions.forEach(function(localSubmission){
-                localSubmission['in'] = 'browser';
+                localSubmission['in'] = 'local';
                 submissions.push(localSubmission);
             }); 
             return submissions;
         }
 
-        serverSubmissions.forEach(function(serverSubmission){
-            submissions.push(serverSubmission);
-            serverSubmission['in'] = 'server';
+        localSubmissions.forEach(function(localSubmission){
+            submissions.push(localSubmission);
+            localSubmission['in'] = 'local';
         });
 
-        localSubmissions.forEach(function(localSubmission){
+        serverSubmissions.forEach(function(serverSubmission){
             var flag = false;
             submissions.forEach(function(submission){
-                if(localSubmission.id == submission.id){
+                if(serverSubmission.id == submission.id){
                     submission['in'] = 'both';
                     flag = true;
                 }
             });
             if(!flag){
-                localSubmission['in'] = 'browser';
-                submissions.push(localSubmission);
+                serverSubmission['in'] = 'server';
+                submissions.push(serverSubmission);
             }
         });
         return submissions;
@@ -59,6 +61,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $scope.deleteSurveyResponse = function(surveyResponse){
         var form_code = surveyResponse.form_code;
         submissionDao.deleteSurveyResponse(surveyResponse.id, function(deletedId){
+            //TODO hack to move back to submission list
             $location.path('/submission-list/' + form_code);
             $rootScope.displaySuccess("Submission deleted!");
         });

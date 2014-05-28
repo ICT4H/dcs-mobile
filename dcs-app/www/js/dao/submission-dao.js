@@ -28,6 +28,7 @@
 		updatedSurveyResponse.form_code = surveyResponse.form_code;
 		updatedSurveyResponse.type = surveyResponse.type;
 		updatedSurveyResponse.xml = surveyResponse.xml;
+		updatedSurveyResponse.html = surveyResponse.html;
 		return updatedSurveyResponse;
 	};
 	return submissionDao;

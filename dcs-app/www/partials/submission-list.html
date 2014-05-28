@@ -11,11 +11,11 @@
       <div class="panel-group" id="accordion">
           <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
           <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText">
-            <div ng-If="item.in =='browser'">
+            <!-- local -->
+            <div ng-If="item.in =='local'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
-                    {{ item.created }} 
-                    
+                   {{ item.created }} 
                 </h4>
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                       <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item)"/>
@@ -28,9 +28,10 @@
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
-                <div class="panel-body" ng-bind-html="item.json"></div>
+                <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
+            <!-- server only -->
             <div ng-If="item.in == 'server'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
@@ -42,16 +43,17 @@
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
-                <div class="panel-body" ng-bind-html="item.json"></div>
+                <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
+            <!-- server & local -->
             <div ng-If="item.in == 'both'">
               <div class="panel-heading" toggle target="{{ item.id }} ">
                 <h4 class="panel-title" style="display:inline-block;">
                     {{ item.created }} 
                     
                 </h4>
-                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                       <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="editSurveyResponse(item)"/>
                 </a>
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
@@ -59,7 +61,7 @@
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
-                <div class="panel-body" ng-bind-html="item.json"></div>
+                <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
           </div>  
