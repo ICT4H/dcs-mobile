@@ -1,43 +1,30 @@
 <div class="scrollable-content section">
-     <div class="panel" bs-panel="">
-        <div class="panel-heading">
-        <h2 class="panel-title">
-          Server Url
-        </h2>
-      </div>
-  <div class="panel-body">
-       <div class="form-group row"><label  class="control-label col-xs-3 col-sm-2 col-lg-1">Url:</label><div class="form-control-wrapper col-xs-9 col-sm-10 col-lg-11"><input bs-form-control="" type="text" ng-model="serverDetails.serverUrl" label="Customer" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" placeholder="server url" id="invoice_customer_input"></div></div>
-  </div>
-</div>
+   <div class="panel" bs-panel="">
+       
+       <h2 class="panel-title"align ="center" >Server url</h2>
+       <label>Url</label>
+       <div class="form-group">
+           <input class=" form-control" type ="text" ng-model="serverDetails.serverUrl" autofocus>
+       </div>
 
-<div class="panel" bs-panel="">
-  <div class="panel-heading">
-  <h2 class="panel-title">
-    User credentials
-  </h2>
+       <h2 class="panel-title" align ="center">User credentials</h2>
+       <div class="container-fluid">
+           <div class ="form-group">
+               <label>Username</label>
+               <input class="form-control" type ="text" ng-model="serverDetails.username">
+           </div>
+           <div class ="form-group">
+               <label>Password</label>
+               <input class="form-control" type ="password" ng-model="serverDetails.password">
+           </div>
+           <div class ="form-group">
+               <label>Confirm password</label>
+               <input class="form-control" type ="password" ng-model="serverDetails.confirmPassword">
+           </div>
+           <div class="form-group">
+               <button class="btn btn-primary" ng-click="saveDetails()" ng-disabled='isFormValid()'>Save</button>
+           </div>
+       </div>
+   </div>
 </div>
-  <div class="panel-body">
-       <div class="form-group row"><label  class="control-label col-xs-3 col-sm-2 col-lg-1">Username:</label><div class="form-control-wrapper col-xs-9 col-sm-10 col-lg-11"><input bs-form-control="" type="text" ng-model="serverDetails.username" label="Customer" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" placeholder="username" ></div></div>
-
-       <div class="form-group row">
-        <label  class="control-label col-xs-3 col-sm-2 col-lg-1">Password:</label>
-        <div class="form-control-wrapper col-xs-9 col-sm-10 col-lg-11">
-          <input bs-form-control="" type="password" ng-model="serverDetails.password" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" placeholder="password" >
-        </div>
-      </div>
-
-       <div class="form-group row">
-        <label  class="control-label col-xs-3 col-sm-2 col-lg-1">Confirm password:</label>
-        <div class="form-control-wrapper col-xs-9 col-sm-10 col-lg-11">
-          <input bs-form-control="" type="password" label="Customer" label-class="col-xs-3 col-sm-2 col-lg-1" class="ng-scope ng-pristine ng-valid needsclick form-control" ng-model="serverDetails.confirmPassword" placeholder="confirm password">
-        </div>
-      </div>
-      <div class="panel-body">
-      <div content-for="navbarAction" duplicate="" class="ng-scope">
-      <button bs-form-control class = 'btn btn-primary' ng-click="saveDetails()" ng-disabled='isFormValid()'>Save</button>
-      </div>
-    </div>
-  </div>
-  </div>
-</div>
-</div>
+ 

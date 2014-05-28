@@ -1,27 +1,25 @@
-dcsApp.service('dcsService', ['$http', 'dbService', function($http, dbService) {
+var dcsService = function($location, $http, dbService) {
 
+  var dcsService = {};
 
-    //TODO change dcsService to this
-    //var dcsService = {};
+  dcsService.getQuestionnaires = function() {
+      var promise = new Promise(function(resolve, reject) {
+          dbService.get('credentials').then(function(credentials) { 
+              if (typeof(credentials) == 'undefined') {
+                 resolve([]); //TODO redirect to setting
+              }
+              $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
+              $http.get(credentials.serverUrl +"/client/questionnaires/").success(function(serverProjects){
+                  resolve(serverProjects);
+              }).error(function(error){
+                  resolve([]);
+              });
+          });
+      });
+      return promise;
+  };
 
-    this.getQuestionnaires = function() {
-        var promise = new Promise(function(resolve, reject) {
-            dbService.get('credentials').then(function(credentials) { 
-                if (typeof(credentials) == 'undefined') {
-                   resolve([]); //TODO redirect to setting
-                }
-                $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
-                $http.get(credentials.serverUrl +"/client/questionnaires/").success(function(serverProjects){
-                    resolve(serverProjects);
-                }).error(function(error){
-                    resolve([]);
-                });
-            });
-        });
-        return promise;
-    };
-
-    this.getSubmissions = function(surveyId){
+  dcsService.getSubmissions = function(surveyId){
     var promise = new Promise(function(resolve, reject){
       dbService.get('credentials').then(function(credentials){ 
           $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
@@ -33,9 +31,9 @@ dcsApp.service('dcsService', ['$http', 'dbService', function($http, dbService) {
       });
     });
     return promise;
-    };
+  };
 
-    this.postSubmission = function(surveyResponse){
+  dcsService.postSubmission = function(surveyResponse){
     var promise = new Promise(function(resolve, reject){
       dbService.get('credentials').then(function(credentials){
           $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
@@ -47,6 +45,9 @@ dcsApp.service('dcsService', ['$http', 'dbService', function($http, dbService) {
       });
     });
     return promise;
-    };
-    
-}]);
+  };
+
+  return dcsService; 
+};
+
+dcsApp.service('dcsService', ['$location', '$http', 'dbService', dcsService]);

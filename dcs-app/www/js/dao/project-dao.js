@@ -1,27 +1,30 @@
-dcsApp.service('projectDao', ['dbService', function(dbService) {
-
-	this.createProject = function(project, onSuccess){
+var projectDao = function(dbService) {
+	var projectDao = {};
+	
+	projectDao.createProject = function(project, onSuccess){
 		dbService.put(project).then(onSuccess);
 	};
 
-	this.getAllProject = function(onSuccess, onError){
+	projectDao.getAllProject = function(onSuccess, onError){
 		dbService.getByDoucmentType('survey').then(onSuccess, onError);
 	};
 
-	this.getById = function(id, onSuccess){
+	projectDao.getById = function(id, onSuccess){
 		dbService.get(id).then(onSuccess);
 	};
 
-	this.deleteProject = function(surveyId, onSuccess){
+	projectDao.deleteProject = function(surveyId, onSuccess){
 		dbService.remove(surveyId).then(onSuccess);
 	};
 
-	this.deleteRelatedSubmission = function(surveyId, onSuccess){
+	projectDao.deleteRelatedSubmission = function(surveyId, onSuccess){
 		dbService.getBySurveyId(surveyId).then(function(surveyResponses){
 			surveyResponses.forEach(function(surveyResponse){
 				dbService.remove(surveyResponse.id).then(function(deletedId){console.log('deleted :'+ deletedId)})
 			});
 		});
 	}
+	return projectDao;
+};
 
-}]);
+dcsApp.service('projectDao', ['dbService', projectDao]);
