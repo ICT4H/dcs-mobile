@@ -27,3 +27,12 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
 dcsApp.factory('dbService', function(){
     return dbService;
 });
+
+dcsApp.run(['$rootScope', function($rootScope) {
+
+    $rootScope.$back = function() {
+        console.log('back clicked');
+        window.history.back();
+    };
+
+}]);

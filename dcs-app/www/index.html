@@ -62,6 +62,13 @@
             <i class="fa fa-bars"></i>
           </div>
         </div>
+
+        <div ng-hide="isHome" class="btn-group pull-right ng-hide">
+            <div class="btn btn-navbar" ng-click="$back()" >
+                <a><i class="fa fa-arrow-left"></i></a>
+            </div>
+        </div>
+
     </div>
 
     <div class="app-body" ng-class="{loading: loading}">
