@@ -92,8 +92,18 @@ h1 {
   z-index: 1999;
 }
 
+.panel-title {
+  color: #007aff !important;
+  font-size: 14px !important;
+}
+
+.navbar-absolute-top {
+  background-color: #222 !important;
+  color: rgb(211, 193, 193) !important;
+}
+
 .server-content {
-  background-color:#d9edf7 !important;
+  background-color: #F6F7ED !important;
 }
 
 .btn-margin-reduced {

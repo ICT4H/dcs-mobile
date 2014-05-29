@@ -6,7 +6,8 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $rootScope.loading = true;
     var serverSubmissions = [];
 
-    $rootScope.displayInfo('Updating submission list...');
+    var fetchMsg = 'Fetching submission list...';
+    $rootScope.displayInfo(fetchMsg);
 
     submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
         $scope.$apply(function(){
@@ -17,7 +18,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
-        $rootScope.displayInfo('Updating submission list...');
+        $rootScope.displayInfo(fetchMsg);
         $rootScope.loading = true;
         dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
             $scope.$apply(function(){

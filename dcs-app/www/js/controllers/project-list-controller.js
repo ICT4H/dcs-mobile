@@ -30,7 +30,8 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         enableMessage("alert-error",message);
     };
 
-    $rootScope.displayInfo('Updating project list...');
+    var fetchMsg = 'Fetching project list...';
+    $rootScope.displayInfo(fetchMsg);
 
     projectDao.getAllProject(function(localProjects){
         $rootScope.loading = false;
@@ -42,7 +43,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
 
     $scope.$refreshContents = function() {
         console.log('projectListController refresh called');
-        $rootScope.displayInfo('Updating project list...');
+        $rootScope.displayInfo(fetchMsg);
         $rootScope.loading = true;
         dcsService.getQuestionnaires().then(function(serverProjects){
             $scope.$apply(function(){
