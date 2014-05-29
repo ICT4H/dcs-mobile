@@ -27,7 +27,7 @@
     <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi, minimal-ui" />
     
-    <title>Data Collection as Service</title>
+    <title>D Collector</title>
 
     <!--
     Yogesh find the index.css usage. It breaks ui. It's part of phonegap
@@ -54,7 +54,7 @@
     <!-- Navbar -->
       <div class="navbar-app navbar-absolute-top">
         <div class="navbar-brand navbar-brand-center" yield-to="title">
-          <span>Data Collection Service</span>
+          <span>D Collector</span>
         </div>
 
         <div class="btn-group pull-left">
@@ -66,6 +66,10 @@
         <div ng-hide="isHome" class="btn-group pull-right ng-hide">
             <div class="btn btn-navbar" ng-click="$back()" >
                 <a><i class="fa fa-arrow-left"></i></a>
+            </div>
+        </div>
+        <div class="btn-group pull-right" >
+            <div yield-to="refreshContents" class="btn btn-navbar">
             </div>
         </div>
 

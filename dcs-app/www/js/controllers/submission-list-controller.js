@@ -7,14 +7,25 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     $rootScope.displayInfo('Updating submission list...');
 
-    dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
-        submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
+    submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
+        $scope.$apply(function(){
+            $scope.submissions = manageSubmissions(localSubmissions, []);
+            $rootScope.disableMessage();
+        });
+    },function(error){$rootScope.displayError(error);});
+
+    $scope.$refreshContents = function() {
+        console.log('submissions refreshContents clicked');
+        $rootScope.displayInfo('Updating submission list...');
+        $rootScope.loading = true;
+        dcsService.getSubmissions($scope.form_code).then(function(serverSubmissions){
             $scope.$apply(function(){
+                $scope.submissions = manageSubmissions($scope.submissions, serverSubmissions);
                 $rootScope.disableMessage();
-                $scope.submissions = manageSubmissions(localSubmissions, serverSubmissions);
+                $rootScope.loading = false;
             });
         },function(error){$rootScope.displayError(error);});
-    });
+    }
 
     var manageSubmissions = function(localSubmissions, serverSubmissions){
 

@@ -29,17 +29,28 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         enableMessage("alert-error",message);
     };
 
-    $rootScope.displayInfo('Updating project list.......');
+    $rootScope.displayInfo('Updating project list...');
 
-    dcsService.getQuestionnaires().then(function(serverProjects){
-        projectDao.getAllProject(function(localProjects){
-            $rootScope.loading = false;
-            $scope.$apply(function(){
-                $rootScope.disableMessage();
-                $scope.project = manageProjects(localProjects, serverProjects);
-            });
+    projectDao.getAllProject(function(localProjects){
+        $rootScope.loading = false;
+        $scope.$apply(function(){
+            $rootScope.disableMessage();
+            $scope.project = manageProjects(localProjects, []);
         },function(error){$rootScope.displayError(error);});
     });
+
+    $scope.$refreshContents = function() {
+        console.log('projectListController refresh called');
+        $rootScope.displayInfo('Updating project list...');
+        $rootScope.loading = true;
+        dcsService.getQuestionnaires().then(function(serverProjects){
+            $scope.$apply(function(){
+                $scope.project = manageProjects($scope.project, serverProjects);
+                $rootScope.disableMessage();
+                $rootScope.loading = false;
+            });
+        },function(error){$rootScope.displayError(error);});
+    }
 
     var manageProjects = function(localProjects, serverProjects){
         if(serverProjects.length == 0){
