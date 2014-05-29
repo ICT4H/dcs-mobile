@@ -13,7 +13,8 @@
       </h4>
     </div>
     <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
-    <div ng-repeat="item in project  | filter:searchText" href="#submission-list" class="list-group-item" >
+    <div ng-repeat="item in project  | filter:searchText" href="#submission-list" class="list-group-item"
+        ng-class="{'server-content': !item.isStored}" >
       <div ng-If="item.isStored == true">
         <a href="#"><img src="img/delete.png" width="16" class="fa fa-chevron-right pull-right" ng-click="deleteProject(item)"/></a>
         <a href="#submission-list/{{item.id}}">

@@ -91,3 +91,7 @@ h1 {
 .carousel-inner>.item.active + .item {
   z-index: 1999;
 }
+
+.server-content {
+  background-color:#d9edf7 !important;
+}
