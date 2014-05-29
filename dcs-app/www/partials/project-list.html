@@ -1,6 +1,7 @@
+<span content-for="title">{{pageTitle}}</span>
 <div content-for="refreshContents">
     <div ng-click="$refreshContents()">
-        <a><i class="fa fa-refresh"></i></a>
+        <a><i class="fa fa-lg fa-refresh"></i></a>
     </div>
 </div>
 
@@ -8,11 +9,10 @@
 <div class="scrollable-content">
 
   <div class="list-group">
-    <div class="list-group-item">
-      <h4>Project list
-      </h4>
+    <div class="input-group">
+      <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
+      <span class="input-group-addon" ng-click="searchText = ''"><a><i class="fa fa-search-minus"></i></a></span>
     </div>
-    <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
     <div ng-repeat="item in project  | filter:searchText" href="#submission-list" class="list-group-item"
         ng-class="{'server-content': !item.isStored}" >
       <div ng-If="item.isStored == true">

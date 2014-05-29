@@ -95,3 +95,7 @@ h1 {
 .server-content {
   background-color:#d9edf7 !important;
 }
+
+.btn-margin-reduced {
+  margin-right: -9px !important;
+}

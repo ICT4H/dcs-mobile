@@ -53,23 +53,28 @@
   <div class="app">
     <!-- Navbar -->
       <div class="navbar-app navbar-absolute-top">
-        <div class="navbar-brand navbar-brand-center" yield-to="title">
-          <span>D Collector</span>
-        </div>
 
         <div class="btn-group pull-left">
           <div ng-click="toggle('mainSidebar')" class="btn btn-navbar sidebar-toggle">
-            <i class="fa fa-bars"></i>
+            <i class="fa fa-lg fa-bars"></i>
           </div>
+        </div>
+
+        <div class="navbar-brand navbar-brand-left" yield-to="title">
+          <span>D Collector</span>
         </div>
 
         <div ng-hide="isHome" class="btn-group pull-right ng-hide">
             <div class="btn btn-navbar" ng-click="$back()" >
-                <a><i class="fa fa-arrow-left"></i></a>
+                <a><i class="fa fa-lg fa-arrow-left"></i></a>
             </div>
         </div>
-        <div class="btn-group pull-right" >
+        <div class="btn-group pull-right btn-margin-reduced" >
             <div yield-to="refreshContents" class="btn btn-navbar">
+            </div>
+        </div>
+        <div class="btn-group pull-right btn-margin-reduced" >
+            <div yield-to="new" class="btn btn-navbar">
             </div>
         </div>
 

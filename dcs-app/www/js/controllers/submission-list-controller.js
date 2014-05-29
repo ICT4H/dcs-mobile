@@ -1,6 +1,7 @@
 dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService',  'submissionDao', 
     function($rootScope, $scope, $routeParams, $location, dcsService, submissionDao){
     
+    $scope.pageTitle = 'Submissions';
 	$scope.form_code = $routeParams.projectId;
     $rootScope.loading = true;
     var serverSubmissions = [];

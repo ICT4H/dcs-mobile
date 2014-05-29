@@ -1,6 +1,7 @@
 
 dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', function($rootScope, $scope, dcsService, projectDao) {
 
+    $scope.pageTitle = $rootScope.title + ' - Projects';
     $rootScope.loading = true;
     var serverProjects = [];
 

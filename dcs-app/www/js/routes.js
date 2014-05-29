@@ -30,6 +30,8 @@ dcsApp.factory('dbService', function(){
 
 dcsApp.run(['$rootScope', function($rootScope) {
 
+    $rootScope.title = 'D Collector';
+    
     $rootScope.$back = function() {
         console.log('back clicked');
         window.history.back();
