@@ -28,13 +28,26 @@ dcsApp.factory('dbService', function(){
     return dbService;
 });
 
-dcsApp.run(['$rootScope', function($rootScope) {
+dcsApp.run(['$http', '$rootScope', function($http, $rootScope) {
 
     $rootScope.title = 'D Collector';
     
     $rootScope.$back = function() {
         console.log('back clicked');
         window.history.back();
+    };
+
+    // TODO the password should be entered by the user every time app starts.
+    var credentials = {};
+    credentials.username = 'tester150411@gmail.com';
+    credentials.password = 'tester150411';
+    credentials.serverUrl= 'http://localhost:8000';
+
+    $rootScope.credentials = credentials;
+
+    $rootScope.httpRequest = function(url) {
+        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
+        return $http.get(credentials.serverUrl + url);
     };
 
 }]);

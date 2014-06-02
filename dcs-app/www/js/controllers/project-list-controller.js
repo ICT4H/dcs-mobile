@@ -5,7 +5,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     $rootScope.loading = true;
     var serverProjects = [];
 
-    //TODO move the message related methods to a beeter place
+    //TODO move the message related methods to a better place
     $rootScope.disableMessage = function(){
         $rootScope.showMessage = false;
     };
