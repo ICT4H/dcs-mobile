@@ -16,13 +16,13 @@
     <div ng-repeat="item in project  | filter:searchText" href="#submission-list" class="list-group-item"
         ng-class="{'server-content': !item.isStored}" >
       <div ng-If="item.isStored == true">
-        <a href="#"><img src="img/delete.png" width="16" class="fa fa-chevron-right pull-right" ng-click="deleteProject(item)"/></a>
+        <a><img src="img/delete.png" width="16" class="fa fa-chevron-right pull-right" ng-click="deleteProject(item)"/></a>
         <a href="#submission-list/{{item.id}}">
           {{ item.name }} 
         </a>
       </div>
       <div ng-If="item.isStored == false">
-        <a href="#"><img src="img/download.png" width="16" class="fa fa-chevron-right pull-right" ng-click="downloadProject(item)"/></a>
+        <a><img src="img/download.png" width="16" class="fa fa-chevron-right pull-right" ng-click="downloadProject(item)"/></a>
           {{ item.name }} 
       </div>
     </div>

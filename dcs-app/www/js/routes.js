@@ -28,7 +28,7 @@ dcsApp.factory('dbService', function(){
     return dbService;
 });
 
-dcsApp.run(['$http', '$rootScope', function($http, $rootScope) {
+dcsApp.run(['$http', '$rootScope', 'dbmService', function($http, $rootScope, dbmService) {
 
     $rootScope.title = 'D Collector';
     

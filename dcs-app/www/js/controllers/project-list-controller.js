@@ -1,5 +1,5 @@
 
-dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', function($rootScope, $scope, dcsService, projectDao) {
+dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'dbmService', function($rootScope, $scope, dcsService, dbm) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
     $rootScope.loading = true;
@@ -33,7 +33,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     var fetchMsg = 'Fetching project list...';
     $rootScope.displayInfo(fetchMsg);
 
-    projectDao.getAllProject(function(localProjects){
+    dbm.getAllLocalProjects().then(function(localProjects){
         $rootScope.loading = false;
         $scope.$apply(function(){
             $rootScope.disableMessage();
@@ -51,7 +51,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
                 $rootScope.disableMessage();
                 $rootScope.loading = false;
             });
-        },function(error){$rootScope.displayError(error);});
+        }, function(error){$rootScope.displayError(error);});
     }
 
     var manageProjects = function(localProjects, serverProjects){
@@ -64,7 +64,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         serverProjects.forEach(function(serverProject){
             serverProject.isStored = false;
             localProjects.forEach(function(localProject){
-                if(serverProject.id == localProject.id){
+                if(serverProject.id == localProject.server_id){
                     serverProject.isStored = true; 
                 }
             });
@@ -73,21 +73,14 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        projectDao.deleteProject(project.id, function(id){
-            projectDao.deleteRelatedSubmission(id, function(deletedId){
-                $rootScope.displaySuccess('Project deleted!')
-                $scope.$refreshContents();
-            });
-        });
+        dbm.deleteProject(project.id).then($rootScope.displaySuccess);
     };
 
     $scope.downloadProject = function(project){
-        project.document_type = 'survey';
-        delete project["isStored"];
-        projectDao.createProject(project, function(downloadedId){
-            $scope.$refreshContents();
-            $rootScope.displaySuccess('Project downloaded!')
-        });
+        //project.document_type = 'survey';
+        //delete project["isStored"];
+
+        dbm.createProject(project).then($rootScope.displaySuccess,$rootScope.displayError);
     };
 
 
