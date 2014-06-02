@@ -19,11 +19,15 @@ var projectDao = function(dbService) {
 
 	projectDao.deleteRelatedSubmission = function(surveyId, onSuccess){
 		dbService.getBySurveyId(surveyId).then(function(surveyResponses){
+			if (0 == surveyResponses.length) {
+				onSuccess();
+			}
 			surveyResponses.forEach(function(surveyResponse){
-				dbService.remove(surveyResponse.id).then(function(deletedId){console.log('deleted :'+ deletedId)})
+				dbService.remove(surveyResponse.id).then(onSuccess());
 			});
 		});
-	}
+	};
+
 	return projectDao;
 };
 

@@ -76,6 +76,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         projectDao.deleteProject(project.id, function(id){
             projectDao.deleteRelatedSubmission(id, function(deletedId){
                 $rootScope.displaySuccess('Project deleted!')
+                $scope.$refreshContents();
             });
         });
     };
@@ -84,7 +85,8 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         project.document_type = 'survey';
         delete project["isStored"];
         projectDao.createProject(project, function(downloadedId){
-           $rootScope.displaySuccess('Project downloaded!')
+            $scope.$refreshContents();
+            $rootScope.displaySuccess('Project downloaded!')
         });
     };
 

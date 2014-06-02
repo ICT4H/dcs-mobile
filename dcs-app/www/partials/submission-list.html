@@ -62,11 +62,14 @@
                     {{ item.created }} 
                     
                 </h4>
-                <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                      <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="editSurveyResponse(item)"/>
-                </a>
                 <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                       <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item)"/>
+                </a>
+                <a onclick='window.location=this.href' href="#" class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
+                </a>
+                <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
+                      <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="editSurveyResponse(item)"/>
                 </a>
               </div>
               <div id="{{ item.id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse">
