@@ -1,8 +1,6 @@
-var dcsService = function($location, $http, dbService) {
+dcsApp.service('dcsService', ['$location', '$http', 'dbService', function($location, $http, dbService) {
 
-  var dcsService = {};
-
-  dcsService.getQuestionnaires = function() {
+  this.getQuestionnaires = function() {
       var promise = new Promise(function(resolve, reject) {
           dbService.get('credentials').then(function(credentials) { 
               if (typeof(credentials) == 'undefined') {
@@ -19,7 +17,7 @@ var dcsService = function($location, $http, dbService) {
       return promise;
   };
 
-  dcsService.getSubmissions = function(surveyId){
+  this.getSubmissions = function(surveyId){
     var promise = new Promise(function(resolve, reject){
       dbService.get('credentials').then(function(credentials){ 
           $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
@@ -33,7 +31,7 @@ var dcsService = function($location, $http, dbService) {
     return promise;
   };
 
-  dcsService.postSubmission = function(surveyResponse){
+  this.postSubmission = function(surveyResponse){
     var promise = new Promise(function(resolve, reject){
       dbService.get('credentials').then(function(credentials){
           $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
@@ -47,7 +45,5 @@ var dcsService = function($location, $http, dbService) {
     return promise;
   };
 
-  return dcsService; 
-};
+}]);
 
-dcsApp.service('dcsService', ['$location', '$http', 'dbService', dcsService]);
