@@ -83,25 +83,18 @@ var localStore = function() {
 					'INSERT INTO submissions (submission_uuid, project_id, created, html, xml) VALUES (?,?,?,?,?)', 
 						[submission.submission_uuid, submission.project_id, submission.created, submission.html, submission.xml],
 					function(tx, resp){
-						resolve
+						resolve()
 					}, reject
 				);
 			});
 		});
 	}
 
-	store.updateSubmission = function(submission) {
-		// return new Promise(function(resolve, reject) {
-		// 	db.transaction (function(tx) {
-		// 		tx.executeSql(
-		// 			'UPDATE submissions set (submission_uuid, project_id, created, html, xml) VALUES (?,?,?,?,?)', 
-		// 				[submission.submission_uuid, submission.project_id, submission.created, submission.html, submission.xml],
-		// 			function(tx, resp){
-		// 				resolve
-		// 			}, reject
-		// 		);
-		// 	});
-		// });
+	store.updateSubmission = function(submission_id, submission_uuid, created) {
+		db.transaction (function(tx) {
+			tx.executeSql('UPDATE submissions set (submission_uuid, created) VALUES (?,?) where submission_id = ?', 
+					[submission_uuid, created, submission_id]);
+		});
 	}
 
 	store.getSubmissionById = function(submission_id) {
@@ -117,7 +110,7 @@ var localStore = function() {
 	store.deleteSubmission = function(submission_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
-				tx.executeSql('DELETE FROM submissions WHERE submission_id = ? ', [submission_id], function(tx, resp) {resolve}, reject);
+				tx.executeSql('DELETE FROM submissions WHERE submission_id = ? ', [submission_id], function(tx, resp) {resolve()}, reject);
 			});
 		});
 	}

@@ -1,5 +1,5 @@
-dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService',  'submissionDao', 'localStore', 
-    function($rootScope, $scope, $routeParams, $location, dcsService, submissionDao, localStore){
+dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 
+    function($rootScope, $scope, $routeParams, $location, dcsService, localStore){
     
     $scope.pageTitle = 'Submissions';
 	var project_id = $routeParams.project_id;
@@ -14,17 +14,11 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     localStore.getAllProjectSubmissions(project_id).then(function(localSubmissions) {
         $scope.$apply(function() {
-            $scope.submissions = manageSubmissions(localSubmissions, []);
+            $scope.submissions = localSubmissions || [];
             $rootScope.disableMessage();
+            $rootScope.loading = false;
         });
     }, $rootScope.displayError);
-
-    // submissionDao.getAllSubmission($scope.form_code, function(localSubmissions){
-    //     $scope.$apply(function(){
-    //         $scope.submissions = manageSubmissions(localSubmissions, []);
-    //         $rootScope.disableMessage();
-    //     });
-    // },function(error){$rootScope.displayError(error);});
 
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
@@ -32,45 +26,29 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         $rootScope.loading = true;
         dcsService.getSubmissions(project_uuid).then(function(serverSubmissions){
             $scope.$apply(function(){
-                $scope.submissions = manageSubmissions($scope.submissions, serverSubmissions);
+                updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
                 $rootScope.disableMessage();
                 $rootScope.loading = false;
             });
         },function(error){$rootScope.displayError(error);});
     }
 
-    var manageSubmissions = function(localSubmissions, serverSubmissions){
+    var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions){
+        var inScope;
 
-        //TODO needs to be improved
-        $rootScope.loading = false;
-        var submissions =[];
-        if(serverSubmissions.length == 0){
-            localSubmissions.forEach(function(localSubmission){
-                localSubmission['in'] = 'local';
-                submissions.push(localSubmission);
-            }); 
-            return submissions;
-        }
-
-        localSubmissions.forEach(function(localSubmission){
-            submissions.push(localSubmission);
-            localSubmission['in'] = 'local';
-        });
-
-        serverSubmissions.forEach(function(serverSubmission){
-            var flag = false;
-            submissions.forEach(function(submission){
-                if(submission.submission_uuid && serverSubmission.submission_uuid == submission.submission_uuid){
-                    submission['in'] = 'both';
-                    flag = true;
+        serverSubmissions.forEach(function(serverSubmission) {
+            inScope = false;
+            submissionsInScope.forEach(function(localSubmission){
+                if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
+                    inScope = true;
                 }
             });
-            if(!flag){
+
+            if(!inScope) {
                 serverSubmission['in'] = 'server';
-                submissions.push(serverSubmission);
+                $scope.submissions.push(serverSubmission);
             }
         });
-        return submissions;
     };
 
     $scope.createSurveyResponse = function(project_id){
@@ -81,33 +59,43 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         $location.path('/project/' + submission.project_id + '/submission/' + submission.submission_id);
     };
 
-    $scope.deleteSurveyResponse = function(submission){
+    $scope.deleteSubmission = function(submission){
 
         localStore.deleteSubmission(submission.submission_id).then(function() {
-            
             $rootScope.displaySuccess("Submission deleted.");
         }, function(error){
             $rootScope.displayError("Submission deletion failed.")
         });
+
+        if (submission['in'] == 'both') {
+            submission['in'] = 'server';
+        } else {
+            $scope.submissions.splice($scope.submissions.indexOf(submission), 1);
+        }
     };
 
     $scope.downloadSubmission = function(submission){
-        submission.project_id = project_id
+        submission.project_id = project_id;
+
         localStore.createSubmission(submission).then(function(storedId) {
             $rootScope.displaySuccess("Submission downloaded.");
         }, function(e) {
             $rootScope.displayError('Unable to download submission.');
         });
+        submission['in'] = 'both';
     };
 
     $scope.postSubmission = function(submission){
-        dcsService.postSubmission(submission).then(function(updatedSurveyResponse){
-            submissionDao.updateSurveyResponse(submission, updatedSurveyResponse,function(id){
-                $location.path('/submission-list/' + updatedSurveyResponse.form_code);
-                $rootScope.displaySuccess('Submitted successfully!');
-            });
-        },function(error){
-            console.log(error);
+        $rootScope.loading = true;
+        dcsService.postSubmission(submission).then(function(updatedSubmission){
+            $rootScope.loading = false;
+            $rootScope.displaySuccess('Submitted successfully!');
+            localStore.updateSubmission(submission.submission_id, updatedSubmission.submission_uuid, updatedSubmission.created);
+
+        }, function(error){
+            $rootScope.displayError('Unable to submit submission.');
         });
+
+        submission['in'] = 'both';
     };
 }]);

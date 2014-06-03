@@ -21,7 +21,7 @@
       <div class="panel-group" id="accordion">
           <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="{'server-content' : item.in == 'server'}">
             <!-- local -->
-            <div ng-If="item.in =='local'">
+            <div ng-If="item.in == undefined">
               <div class="panel-heading" >
                 
                 <div class="pull-left" toggle target="{{ item.submission_id }} ">
@@ -31,7 +31,7 @@
                 </div>
                 <div class="pull-right">
                   <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                        <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item)"/>
+                        <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSubmission(item)"/>
                   </a>
                   <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                         <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
@@ -48,7 +48,7 @@
             <!-- server only -->
             <div ng-If="item.in == 'server'">
               <div class="panel-heading" >
-                    <div class="pull-left" toggle target="{{ item.submission_id }} ">
+                    <div class="pull-left" toggle target="{{ item.submission_uuid }} ">
                         <h4 class="panel-title" style="display:inline-block;">
                             {{ item.created }} 
                         </h4>
@@ -60,21 +60,21 @@
                     </div>
               </div>
 
-              <div id="{{ item.submission_id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
+              <div id="{{ item.submission_uuid }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
             <!-- server & local -->
             <div ng-If="item.in == 'both'">
               <div class="panel-heading" >
-                <div class="pull-left" toggle target="{{ item.submission_id }} ">
+                <div class="pull-left" toggle target="{{ item.submission_uuid }} ">
                     <h4 class="panel-title" style="display:inline-block;">
                         {{ item.created }} 
                     </h4>
                 </div>
                 <div class="pull-right">
                     <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                          <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSurveyResponse(item)"/>
+                          <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSubmission(item)"/>
                     </a>
                     <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
                           <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
@@ -84,7 +84,7 @@
                     </a>
                 </div>
               </div>
-              <div id="{{ item.submission_id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
+              <div id="{{ item.submission_uuid }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>

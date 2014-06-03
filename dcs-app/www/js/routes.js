@@ -48,11 +48,14 @@ dcsApp.run(['$http', '$rootScope', function($http, $rootScope) {
     credentials.password = 'tester150411';
     credentials.serverUrl= 'http://localhost:8000';
 
-    $rootScope.credentials = credentials;
-
     $rootScope.httpRequest = function(url) {
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
         return $http.get(credentials.serverUrl + url);
     };
+    $rootScope.httpPostRequest = function(url, data) {
+        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
+        return $http.post(credentials.serverUrl + url, data);
+    };
+
 
 }]);

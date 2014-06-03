@@ -20,15 +20,12 @@ dcsApp.service('dcsService', ['$rootScope', 'dbService', function($rootScope, db
         });
     };
 
-    this.postSubmission = function(surveyResponse){
+    this.postSubmission = function(submission){
         return new Promise(function(resolve, reject){
-            $rootScope.httpRequest("/client/submissions/upload/", 'form_data=' + surveyResponse.xml).success(function(updatedSurveyResponse){
-                resolve(updatedSurveyResponse);
-            }).error(function(error){
-                reject(error);
-            });
+            $rootScope.httpPostRequest("/client/submissions/upload/", 'form_data=' + submission.xml).success(function(updatedSubmission){
+                resolve(updatedSubmission);
+            }).error(reject);
         });
     };
 
 }]);
-
