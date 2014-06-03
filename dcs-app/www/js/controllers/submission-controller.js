@@ -1,6 +1,7 @@
-dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'dbService', function($rootScope, $routeParams, dbService){
+dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'localStore', function($rootScope, $routeParams, localStore){
     
-    var surveyResponseId = $routeParams.surveyResponseId;
+    var submission_id = $routeParams.submission_id;
+    var project_id = $routeParams.project_id;
     var buttonLabel = 'Save';
     var onSuccess = function(message){
     	$rootScope.displaySuccess(message);
@@ -9,16 +10,16 @@ dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'dbServ
     	$rootScope.displayError(message);
     };	
 
-    if(surveyResponseId != "null")
+    if(submission_id != "null")
     	buttonLabel = 'Update';
 
     options = {
-    	'dbService' : dbService,
-    	'buttonLabel' : buttonLabel,
-		'surveyId' : $routeParams.surveyId,
-		'surveyResponseId' : surveyResponseId,
-		'onSuccess' : onSuccess,
-		'onError' : onError
+    	'localStore': localStore,
+    	'buttonLabel': buttonLabel,
+		'project_id': project_id,
+		'submission_id': submission_id,
+		'onSuccess': onSuccess,
+		'onError': onError
 	};
     loadEnketo(options);
 

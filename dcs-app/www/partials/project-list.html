@@ -17,7 +17,7 @@
         ng-class="{'server-content': !item.isStored}" >
       <div ng-If="item.isStored == true">
         <a><img src="img/delete.png" width="16" class="fa fa-chevron-right pull-right" ng-click="deleteProject(item)"/></a>
-        <a href="#submission-list/{{item.id}}">
+        <a href="#submission-list/{{item.project_id}}/project_uuid/{{item.project_uuid}}">
           {{ item.name }} 
         </a>
       </div>

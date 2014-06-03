@@ -1,10 +1,10 @@
-dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routeProvider, $httpProvider, $provide) {
     $routeProvider
         .when('/',{
           templateUrl: "partials/project-list.html",
           controller: 'projectListController'
          })
-        .when('/submission-list/:projectId',{
+        .when('/submission-list/:project_id/project_uuid/:project_uuid',{
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
         })
@@ -16,19 +16,24 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
           templateUrl: "partials/settings.html",
           controller: 'settingsController'
         })
-        .when('/submission/:surveyId/surveyResponse/:surveyResponseId', {
+        .when('/project/:project_id/submission/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
         }); 
 
     $httpProvider.defaults.timeout = 1000;
+
+    $provide.provider('localStore', function() {
+        this.$get = localStore;
+    });
+    
 }]);
 
 dcsApp.factory('dbService', function(){
     return dbService;
 });
 
-dcsApp.run(['$http', '$rootScope', 'dbmService', function($http, $rootScope, dbmService) {
+dcsApp.run(['$http', '$rootScope', function($http, $rootScope) {
 
     $rootScope.title = 'D Collector';
     

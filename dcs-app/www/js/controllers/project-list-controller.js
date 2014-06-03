@@ -1,5 +1,5 @@
 
-dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'dbmService', function($rootScope, $scope, dcsService, dbm) {
+dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', function($rootScope, $scope, dcsService, localStore) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
     $rootScope.loading = true;
@@ -33,7 +33,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     var fetchMsg = 'Fetching project list...';
     $rootScope.displayInfo(fetchMsg);
 
-    dbm.getAllLocalProjects().then(function(localProjects){
+    localStore.getAllLocalProjects().then(function(localProjects){
         $rootScope.loading = false;
         $scope.$apply(function(){
             $rootScope.disableMessage();
@@ -64,7 +64,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         serverProjects.forEach(function(serverProject){
             serverProject.isStored = false;
             localProjects.forEach(function(localProject){
-                if(serverProject.id == localProject.server_id){
+                if(serverProject.project_uuid == localProject.project_uuid){
                     serverProject.isStored = true; 
                 }
             });
@@ -73,14 +73,14 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        dbm.deleteProject(project.id).then($rootScope.displaySuccess);
+        localStore.deleteProject(project.project_id).then($rootScope.displaySuccess);
     };
 
     $scope.downloadProject = function(project){
         //project.document_type = 'survey';
         //delete project["isStored"];
 
-        dbm.createProject(project).then($rootScope.displaySuccess,$rootScope.displayError);
+        localStore.createProject(project).then($rootScope.displaySuccess,$rootScope.displayError);
     };
 
 
