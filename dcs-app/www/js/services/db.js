@@ -27,7 +27,7 @@ var localStore = function() {
 				tx.executeSql(
 					'INSERT INTO projects (project_uuid, name, xform) VALUES (?,?,?)', [project.project_uuid, project.name, project.xform],
 					function(tx, resp){
-						resolve('created project successfully');
+						resolve(resp.insertId);
 					}, reject
 				);
 			});
@@ -58,7 +58,7 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
-						resolve('Project deleted!');
+						resolve()
 					}, reject
 				);
 			});

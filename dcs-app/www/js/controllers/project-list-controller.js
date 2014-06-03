@@ -27,7 +27,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $rootScope.displayError = function(message){
-        enableMessage("alert-error",message);
+        enableMessage("alert-danger",message);
     };
 
     var fetchMsg = 'Fetching project list...';
@@ -37,7 +37,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         $rootScope.loading = false;
         $scope.$apply(function(){
             $rootScope.disableMessage();
-            $scope.project = manageProjects(localProjects, []);
+            $scope.projects = manageProjects(localProjects, []);
         },function(error){$rootScope.displayError(error);});
     });
 
@@ -47,7 +47,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         $rootScope.loading = true;
         dcsService.getQuestionnaires().then(function(serverProjects){
             $scope.$apply(function(){
-                $scope.project = manageProjects($scope.project, serverProjects);
+                $scope.projects = manageProjects($scope.projects, serverProjects);
                 $rootScope.disableMessage();
                 $rootScope.loading = false;
             });
@@ -73,14 +73,28 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        localStore.deleteProject(project.project_id).then($rootScope.displaySuccess);
+        
+        project.isStored = false;
+        
+        localStore.deleteProject(project.project_id).then(function() {
+            $rootScope.displaySuccess('Project deleted!');
+        }, function(e) {
+            project.isStored = true;
+            $rootScope.displayError('Project cannot be deleted.');
+        });
     };
 
     $scope.downloadProject = function(project){
-        //project.document_type = 'survey';
-        //delete project["isStored"];
+        
+        project.isStored = true;
+        
+        localStore.createProject(project).then(function(project_id) {
+            project.project_id = project_id;
 
-        localStore.createProject(project).then($rootScope.displaySuccess,$rootScope.displayError);
+            $rootScope.displaySuccess('Project downloaded.');
+
+        }, $rootScope.displayError);
+        
     };
 
 
