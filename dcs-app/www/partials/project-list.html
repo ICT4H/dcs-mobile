@@ -22,7 +22,7 @@
         </a>
       </div>
       <div ng-If="project.isStored == false">
-        <a><img src="img/download.png" width="16" class="fa fa-chevron-right pull-right" ng-click="downloadProject(project)"/></a>
+        <i class="fa fa-download fa-lg pull-right" ng-click="downloadProject(project)"></i>
           {{ project.name }} 
       </div>
     </div>

@@ -1,17 +1,13 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="new">
-    <div ng-click="createSurveyResponse(project_id)">
-        <a><i class="fa fa-lg fa-file"></i></a>
-    </div>
+    <i class="fa fa-lg fa-file" ng-click="createSurveyResponse(project_id)"></i>
 </div>
 <div content-for="refreshContents">
-    <div ng-click="$refreshContents()">
-        <a><i class="fa fa-lg fa-refresh"></i></a>
-    </div>
+    <i class="fa fa-lg fa-refresh" ng-click="$refreshContents()"></i>
 </div>
 
 <div class="scrollable">  
-  <div class="scrollable-content">
+   <div class="scrollable-content">
     <div class="list-group">
       <div class="input-group">
         <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
@@ -20,31 +16,6 @@
 
       <div class="panel-group" id="accordion">
           <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="{'server-content' : item.in == 'server'}">
-            <!-- local -->
-            <div ng-If="item.in == undefined">
-              <div class="panel-heading" >
-                
-                <div class="pull-left" toggle target="{{ item.submission_id }} ">
-                    <h4 class="panel-title" style="display:inline-block;">
-                       {{ item.created }} 
-                    </h4>
-                </div>
-                <div class="pull-right">
-                  <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                        <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSubmission(item)"/>
-                  </a>
-                  <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                        <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
-                  </a>
-                  <a class="pull-right" style="display:inline-block;float:right;">
-                        <img src="img/edit.png" width="16" style="margin-top:10px;" ng-click="editSurveyResponse(item)"/>
-                  </a>
-                </div>
-              </div>
-              <div id="{{ item.submission_id }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
-                <div class="panel-body" ng-bind-html="item.html"></div>
-              </div>
-            </div>
             <!-- server only -->
             <div ng-If="item.in == 'server'">
               <div class="panel-heading" >
@@ -53,10 +24,8 @@
                             {{ item.created }} 
                         </h4>
                     </div>
-                    <div class="pull-right">
-                        <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                              <img src="img/download.png" width="16" style="margin-top:10px;"  ng-click="downloadSubmission(item)"/>
-                        </a>
+                    <div class="panel-title pull-right">
+                        <i class="fa fa-download fa-lg" ng-click="downloadSubmission(item)"></i>
                     </div>
               </div>
 
@@ -64,27 +33,21 @@
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
-            <!-- server & local -->
-            <div ng-If="item.in == 'both'">
+            <!-- local -->
+            <div ng-If="item.in !='server'">
               <div class="panel-heading" >
-                <div class="pull-left" toggle target="{{ item.submission_uuid }} ">
+                <div class="pull-left" toggle target="{{item.submission_id ||item.submission_uuid}} ">
                     <h4 class="panel-title" style="display:inline-block;">
-                        {{ item.created }} 
+                       {{ item.created }}
                     </h4>
                 </div>
                 <div class="pull-right">
-                    <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                          <img src="img/delete.png" width="16" style="margin-top:10px;"  ng-click="deleteSubmission(item)"/>
-                    </a>
-                    <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                          <img src="img/upload.png" width="16" style="margin-top:10px;"  ng-click="postSubmission(item)"/>
-                    </a>
-                    <a class= "pull-right" style="display:inline-block;float:right;margin-right:5px;">
-                          <img src="img/edit.png" width="16" style="margin-top:10px;"  ng-click="editSurveyResponse(item)"/>
-                    </a>
+                  <i class=" panel-title fa fa-pencil fa-lg" ng-click="editSurveyResponse(item)"></i>
+                  <i class=" panel-title fa fa-upload fa-lg" ng-click="postSubmission(item)"></i>
+                  <i class=" panel-title fa fa-times fa-lg" ng-click="deleteSubmission(item)"></i>
                 </div>
               </div>
-              <div id="{{ item.submission_uuid }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
+              <div id="{{item.submission_id ||item.submission_uuid}}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>

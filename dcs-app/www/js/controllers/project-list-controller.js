@@ -37,7 +37,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         $rootScope.loading = false;
         $scope.$apply(function(){
             $rootScope.disableMessage();
-            $scope.projects = manageProjects(localProjects, []);
+            $scope.projects = localProjects || [];
         },function(error){$rootScope.displayError(error);});
     });
 
@@ -47,29 +47,24 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         $rootScope.loading = true;
         dcsService.getQuestionnaires().then(function(serverProjects){
             $scope.$apply(function(){
-                $scope.projects = manageProjects($scope.projects, serverProjects);
+                updateProjectsToDisplay($scope.projects, serverProjects);
                 $rootScope.disableMessage();
                 $rootScope.loading = false;
             });
         }, function(error){$rootScope.displayError(error);});
     }
 
-    var manageProjects = function(localProjects, serverProjects){
-        if(serverProjects.length == 0){
-            localProjects.forEach(function(localProject){
-                localProject.isStored = true;
-            }); 
-            return localProjects;
-        }
+    var updateProjectsToDisplay = function(projectsInScope, serverProjects){
         serverProjects.forEach(function(serverProject){
             serverProject.isStored = false;
-            localProjects.forEach(function(localProject){
+            projectsInScope.forEach(function(localProject){
                 if(serverProject.project_uuid == localProject.project_uuid){
                     serverProject.isStored = true; 
                 }
             });
+            if(!serverProject.isStored)
+                $scope.projects.push(serverProject);
         });
-        return serverProjects; 
     };
 
     $scope.deleteProject = function(project){
