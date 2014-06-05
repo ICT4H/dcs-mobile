@@ -63,7 +63,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
                 }
             });
             if(!serverProject.isStored)
-                $scope.projects.push(serverProject);
+                projectsInScope.push(serverProject);
         });
     };
 

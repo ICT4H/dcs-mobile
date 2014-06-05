@@ -14,9 +14,9 @@
       <span class="input-group-addon" ng-click="searchText = ''"><a><i class="fa fa-search-minus"></i></a></span>
     </div>
     <div ng-repeat="project in projects  | filter:searchText" href="#submission-list" class="list-group-item"
-        ng-class="{'server-content': !project.isStored}" >
-      <div ng-If="project.isStored == true">
-        <a><img src="img/delete.png" width="16" class="fa fa-chevron-right pull-right" ng-click="deleteProject(project)"/></a>
+        ng-class="{'server-content': project.isStored==false}" >
+      <div ng-If="project.isStored==undefined || project.isStored == true">
+        <i class="fa fa-times fa-lg pull-right" ng-click="deleteProject(project)"></i>
         <a href="#submission-list/{{project.project_id}}/project_uuid/{{project.project_uuid}}">
           {{ project.name }} 
         </a>
