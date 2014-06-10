@@ -1,0 +1,12 @@
+[
+    {
+        "name": "project-1", 
+        "project_uuid": "prj-uuid-1", 
+        "version": "prj-1-ver-1"
+    }, 
+    {
+        "name": "project-2", 
+        "project_uuid": "prj-uuid-2", 
+        "version": "prj-1-ver-1"
+    }
+]

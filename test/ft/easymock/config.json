@@ -1,0 +1,8 @@
+{
+    "cors": true, 
+    "jsonp": false, 
+    "routes": [
+        "/client/questionnaires/"
+    ], 
+    "simulated-lag": 1000
+}

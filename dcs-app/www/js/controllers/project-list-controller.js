@@ -8,15 +8,26 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     //TODO move the message related methods to a better place
     $rootScope.disableMessage = function(){
         $rootScope.showMessage = false;
+        $rootScope.apply();
     };
 
     var enableMessage = function(MessageType,message){
         $rootScope.css = MessageType;
         $rootScope.message_to_display = message;
         $rootScope.showMessage = true;
-        if(!$scope.$$phase)
-            $scope.$apply();
+        $rootScope.apply();
     };
+
+    $rootScope.hideLoading = function() {
+        $rootScope.loading = false;
+        $rootScope.apply();
+    }
+
+    $rootScope.apply = function() {
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+    }
 
     $rootScope.displaySuccess = function(message){
         enableMessage("alert-success", message);
@@ -68,10 +79,9 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        
-        project.isStored = false;
-        
+        $rootScope.loading = true;
         localStore.deleteProject(project.project_id).then(function() {
+            project.isStored = false;
             $rootScope.displaySuccess('Project deleted!');
         }, function(e) {
             project.isStored = true;
@@ -80,16 +90,16 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.downloadProject = function(project){
-        
-        project.isStored = true;
-        
-        localStore.createProject(project).then(function(project_id) {
-            project.project_id = project_id;
-
-            $rootScope.displaySuccess('Project downloaded.');
-
-        }, $rootScope.displayError);
-        
+        var project_uuid = project.project_uuid;
+        $rootScope.loading = true;
+        dcsService.getQuestion(project_uuid).then(function(serverProject){
+            localStore.createProject(serverProject).then(function(project_id) {
+                project.project_id = project_id;
+                project.isStored = true;
+                $rootScope.loading = false;
+                $rootScope.displaySuccess('Project downloaded.');
+            }, $rootScope.displayError);
+        }, function(error){$rootScope.displayError(error);});
     };
 
 

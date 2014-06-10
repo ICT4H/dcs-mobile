@@ -24,16 +24,14 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         console.log('submissions refreshContents clicked');
         $rootScope.displayInfo(fetchMsg);
         $rootScope.loading = true;
-        dcsService.getSubmissions(project_uuid).then(function(serverSubmissions){
-            $scope.$apply(function(){
-                updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
-                $rootScope.disableMessage();
-                $rootScope.loading = false;
-            });
+        dcsService.getAllSubmissions(project_uuid).then(function(serverSubmissions) {
+            updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
+            $rootScope.loading = false;
+            $rootScope.disableMessage();
         },function(error){$rootScope.displayError(error);});
     }
 
-    var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions){
+    var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions) {
         var inScope;
 
         serverSubmissions.forEach(function(serverSubmission) {
@@ -46,22 +44,24 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
             if(!inScope) {
                 serverSubmission['in'] = 'server';
+                serverSubmission.project_id = project_id
                 $scope.submissions.push(serverSubmission);
             }
         });
     };
 
-    $scope.createSurveyResponse = function(project_id){
+    $scope.createSurveyResponse = function(project_id) {
         $location.path('/project/' + project_id + '/submission/' + null);
     };
 
-    $scope.editSurveyResponse = function(submission){
+    $scope.editSurveyResponse = function(submission) {
         $location.path('/project/' + submission.project_id + '/submission/' + submission.submission_id);
     };
 
-    $scope.deleteSubmission = function(submission){
-
+    $scope.deleteSubmission = function(submission) {
+        $rootScope.loading = true;
         localStore.deleteSubmission(submission.submission_id).then(function() {
+            $rootScope.loading = false;
             $rootScope.displaySuccess("Submission deleted.");
         }, function(error){
             $rootScope.displayError("Submission deletion failed.")
@@ -74,25 +74,39 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         }
     };
 
-    $scope.downloadSubmission = function(submission){
-        submission.project_id = project_id;
+    $scope.downloadSubmission = function(submission) {
+        $rootScope.loading = true;
 
-        localStore.createSubmission(submission).then(function(storedId) {
-            $rootScope.displaySuccess("Submission downloaded.");
-        }, function(e) {
-            $rootScope.displayError('Unable to download submission.');
-        });
-        submission['in'] = 'both';
+        dcsService.getSubmission(submission)
+            .then(localStore.createSubmission)
+            .then(function(resp) {
+                submission['in'] = 'both';
+                submission.submission_id = resp.submission_id;
+                submission.html = resp.html;
+                submission.xml = resp.xml;
+                $rootScope.displaySuccess("Submission downloaded.");
+            }, function(error) {
+                $rootScope.displayError('Unable to download submission.');
+            }).done(function() {
+                $rootScope.hideLoading();
+            });
     };
 
-    $scope.postSubmission = function(submission){
+    $scope.postSubmission = function(submission) {
         $rootScope.loading = true;
-        dcsService.postSubmission(submission).then(function(updatedSubmission){
+        dcsService.postSubmission(submission).then(function(updatedSubmission) {
             $rootScope.loading = false;
-            $rootScope.displaySuccess('Submitted successfully!');
-            localStore.updateSubmission(submission.submission_id, updatedSubmission.submission_uuid, updatedSubmission.created);
+            localStore.updateSubmissionMeta(submission.submission_id, updatedSubmission)
+                .then(function() {
+                        $rootScope.displaySuccess('Submitted successfully');
+                    },function(error) {
+                        $rootScope.displayError('Submitted to server, local status not updated.');
+                    });;
 
         }, function(error){
+            if (error.status == '404') {
+                // this submission is not avail in the server. Delete your local copy.
+            }
             $rootScope.displayError('Unable to submit submission.');
         });
 

@@ -15,8 +15,8 @@ var localStore = function() {
 	//tx.executeSql('DROP TABLE IF EXISTS projects');
 
 	db.transaction (function(tx) {
-		tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, name text, xform text)');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, project_id, created text, html text, xml text)');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version, name text, xform text)');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version, project_id, created text, html text, xml text)');
 
 	});
 	
@@ -25,7 +25,7 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO projects (project_uuid, name, xform) VALUES (?,?,?)', [project.project_uuid, project.name, project.xform],
+					'INSERT INTO projects (project_uuid, version, name, xform) VALUES (?,?,?,?)', [project.project_uuid, project.version, project.name, project.xform],
 					function(tx, resp){
 						resolve(resp.insertId);
 					}, reject
@@ -75,25 +75,43 @@ var localStore = function() {
 		});
 	}
 
-
+	// used by download & enketo
 	store.createSubmission = function(submission) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO submissions (submission_uuid, project_id, created, html, xml) VALUES (?,?,?,?,?)', 
-						[submission.submission_uuid, submission.project_id, submission.created, submission.html, submission.xml],
+					'INSERT INTO submissions (submission_uuid, version, project_id, created, html, xml) VALUES (?,?,?,?,?,?)', 
+						[submission.submission_uuid, submission.version, submission.project_id, submission.created, submission.html, submission.xml],
 					function(tx, resp){
-						resolve()
+						submission.submission_id = resp.insertId;
+						resolve(submission);
 					}, reject
 				);
 			});
 		});
 	}
 
-	store.updateSubmission = function(submission_id, submission_uuid, created) {
-		db.transaction (function(tx) {
-			tx.executeSql('UPDATE submissions set (submission_uuid, created) VALUES (?,?) where submission_id = ?', 
-					[submission_uuid, created, submission_id]);
+	// used by enketo update
+	store.updateSubmissionData = function(submission_id, submission) {
+		return new Promise(function(resolve, reject) {
+			db.transaction (function(tx) {
+				tx.executeSql('UPDATE submissions SET html=?, xml=?, created=? where submission_id = ?', 
+						[submission.html, submission.xml, submission.created, submission_id], function(tx, resp) {
+							resolve();
+						}, reject);
+			})
+		});
+	}
+
+	// used by post submission
+	store.updateSubmissionMeta = function(submission_id, submission) {
+		return new Promise(function(resolve, reject) {
+			db.transaction (function(tx) {
+				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, created=? where submission_id = ?', 
+						[submission.submission_uuid, submission.version, submission.created, submission_id], function(tx, resp) {
+							resolve();
+						}, reject);
+			})
 		});
 	}
 
