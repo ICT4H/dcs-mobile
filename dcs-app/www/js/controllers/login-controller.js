@@ -20,6 +20,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', 'userService', fun
         userService.createUser(new_user.name,new_user.serverUrl).then(function(saveId){
             console.log(saveId);
             $rootScope.displaySuccess('Saved!');
+            $rootScope.isAuthenticated = true;
         },function(error){
             $rootScope.displayError(error);
         });
