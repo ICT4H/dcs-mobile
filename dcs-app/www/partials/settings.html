@@ -1,30 +1,19 @@
 <div class="scrollable-content section">
-   <div class="panel" bs-panel="">
-       
-       <h2 class="panel-title"align ="center" >Server url</h2>
-       <label>Url</label>
-       <div class="form-group">
-           <input class=" form-control" type ="text" ng-model="serverDetails.serverUrl" autofocus>
-       </div>
 
-       <h2 class="panel-title" align ="center">User credentials</h2>
-       <div class="container-fluid">
-           <div class ="form-group">
-               <label>Username</label>
-               <input class="form-control" type ="text" ng-model="serverDetails.username">
-           </div>
-           <div class ="form-group">
-               <label>Password</label>
-               <input class="form-control" type ="password" ng-model="serverDetails.password">
-           </div>
-           <div class ="form-group">
-               <label>Confirm password</label>
-               <input class="form-control" type ="password" ng-model="serverDetails.confirmPassword">
-           </div>
-           <div class="form-group">
-               <button class="btn btn-primary" ng-click="saveDetails()" ng-disabled='isFormValid()'>Save</button>
-           </div>
-       </div>
-   </div>
+    <div bs-panel>
+        <div class ="form-group">
+            <label>Username</label>
+            <input class="form-control" type ="text" ng-model="user.name">
+        </div>
+        <div class ="form-group">
+            <label>Password</label>
+            <input class="form-control" type ="password" ng-model="user.password">
+        </div>
+        <div class="form-group">
+            <label>Url</label>
+            <input class=" form-control" type ="text" ng-model="user.serverUrl">
+        </div>
+        <a href="#/project-list"><button class="btn btn-primary" >continue</button></a>
+    </div>
 </div>
  

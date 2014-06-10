@@ -1,23 +1,23 @@
-dcsApp.controller('settingsController', ['$rootScope', '$scope', 'userService', function($rootScope, $scope, userService){
+dcsApp.controller('loginController', ['$rootScope', '$scope', 'userService', function($rootScope, $scope, userService){
 
     $scope.serverDetails = {
         username: '',
         password: '',
         serverUrl: ''
     };
-    $scope.user = {};
     $rootScope.loading = false;
-
+    $scope.new_user ={};    
     userService.getDetails().then(function(details){
-        $scope.user.name=details.name;
-        $scope.user.password='';
-        $scope.user.serverUrl=details.url;
+        $scope.new_user.name = details[0].user_name;
+        $scope.new_user.password = '';
+        $scope.new_user.serverUrl = details[0].url;
         $scope.$apply();
-    });
+        },function(error){
+            $rootScope.displayError(error);
+        });
 
-    $scope.saveDetails = function(){ 
-        $scope.serverDetails.id = 'credentials';
-        userService.createUser($scope.new_user.name,$scope.new_user.serverUrl).then(function(saveId){
+    $scope.saveDetails = function(new_user){ 
+        userService.createUser(new_user.name,new_user.serverUrl).then(function(saveId){
             console.log(saveId);
             $rootScope.displaySuccess('Saved!');
         },function(error){

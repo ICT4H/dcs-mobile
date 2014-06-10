@@ -1,4 +1,4 @@
-dcsApp.service('dcsService', ['$rootScope', 'dbService', function($rootScope, dbService) {
+dcsApp.service('dcsService', ['$rootScope', function($rootScope) {
 
     this.getQuestionnaires = function() {
         return new Promise(function(resolve, reject) {

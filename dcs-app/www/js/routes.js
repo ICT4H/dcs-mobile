@@ -1,6 +1,10 @@
 dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routeProvider, $httpProvider, $provide) {
     $routeProvider
         .when('/',{
+          templateUrl: "partials/login.html",
+          controller: 'loginController'
+         })
+        .when('/project-list',{
           templateUrl: "partials/project-list.html",
           controller: 'projectListController'
          })
@@ -12,7 +16,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/about.html",
           controller: 'projectListController',
         })
-        .when('/settings-list',{
+        .when('/settings',{
           templateUrl: "partials/settings.html",
           controller: 'settingsController'
         })
