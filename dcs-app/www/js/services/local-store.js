@@ -6,11 +6,10 @@ var localStore = function() {
 	var db;
 
 	// drop TABLE projects ; DROP TABLE submissions ;
-	if (window.sqlitePlugin)
-
-		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1})
-	else
+	if (isEmulator)
 		db = window.openDatabase(dbName, version, dbName, -1);
+	else
+		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1})
 
 	//tx.executeSql('DROP TABLE IF EXISTS projects');
 
