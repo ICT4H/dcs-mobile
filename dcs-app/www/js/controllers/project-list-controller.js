@@ -79,14 +79,27 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        $rootScope.loading = true;
-        localStore.deleteProject(project.project_id).then(function() {
-            project.isStored = false;
-            $rootScope.displaySuccess('Project deleted!');
-        }, function(e) {
-            project.isStored = true;
-            $rootScope.displayError('Project cannot be deleted.');
-        });
+        var BUTTON_NO = 3;
+        function onConfirm(buttonIndex) {
+            if(buttonIndex==BUTTON_NO) return;
+
+            $rootScope.loading = true;
+            localStore.deleteProject(project.project_id).then(function() {
+                project.isStored = false;
+                $rootScope.loading = false;
+                $rootScope.displaySuccess('Project deleted!');
+            }, function(e) {
+                project.isStored = true;
+                $rootScope.displayError('Project cannot be deleted.');
+            });
+
+        };
+        navigator.notification.confirm(
+            'Do you want to delete '+project.name+' ?',
+            onConfirm,
+            'Delete project',
+            ['Yes','No']
+        );
     };
 
     $scope.downloadProject = function(project){

@@ -15,8 +15,8 @@ var localStore = function() {
 	//tx.executeSql('DROP TABLE IF EXISTS projects');
 
 	db.transaction (function(tx) {
-		tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version, name text, xform text)');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version, project_id, created text, html text, xml text)');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, name text, xform text)');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, project_id text, created text, html text, xml text)');
 
 	});
 	

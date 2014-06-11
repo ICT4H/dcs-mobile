@@ -1,1 +1,3 @@
 node_modules/
+plugins
+test/access_logs.db
