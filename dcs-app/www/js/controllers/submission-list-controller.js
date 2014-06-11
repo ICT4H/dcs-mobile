@@ -1,7 +1,7 @@
 dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 
     function($rootScope, $scope, $routeParams, $location, dcsService, localStore){
     
-    $scope.pageTitle = 'Submissions';
+    $scope.pageTitle = $routeParams.project_name + " >>";
 	var project_id = $routeParams.project_id;
     var project_uuid = $routeParams.project_uuid;
     $scope.project_id = project_id;

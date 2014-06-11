@@ -8,7 +8,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/project-list.html",
           controller: 'projectListController'
          })
-        .when('/submission-list/:project_id/project_uuid/:project_uuid',{
+        .when('/submission-list/:project_id/project_uuid/:project_uuid/project_name/:project_name',{
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
         })
