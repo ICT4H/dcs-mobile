@@ -1,3 +1,12 @@
+dcsApp.service('auth', [function() {
+    return function(userName, password, server) { 
+        return new Promise(function(resolve, reject) {
+                resolve(true);
+            });
+    };
+
+}]);
+
 dcsApp.service('userService', [function() {
 	var store = {};
 	var dbName = 'USER-STORE'; // TODO appropriate name?

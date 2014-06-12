@@ -3,17 +3,17 @@
     <div bs-panel>
         <div class ="form-group">
             <label>Username</label>
-            <input class="form-control" type ="text" ng-model="new_user.name"></input>
+            <input class="form-control" type ="text" ng-model="user.name"></input>
         </div>    
         <div class ="form-group">
             <label>Password</label>
-            <input class="form-control" type ="password" ng-model="new_user.password" autofocus> 
+            <input class="form-control" type ="password" ng-model="user.password" autofocus> 
         </div>
         <div class="form-group">
             <label>Url</label>    
-            <input class=" form-control" type ="text" ng-model="new_user.serverUrl">
+            <input class=" form-control" type ="text" ng-model="user.serverUrl">
         </div>
-        <a href="#/project-list"><button class="btn btn-primary" ng-click="saveDetails(new_user)">continue</button></a>
+        <button class="btn btn-primary" ng-click="saveDetails(user)">continue</button>
     </div>
 </div>
  

@@ -1,36 +1,74 @@
-dcsApp.controller('loginController', ['$rootScope', '$scope', 'userService', function($rootScope, $scope, userService){
+dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', function($rootScope, $scope, $location, userService, auth){
 
-    $scope.serverDetails = {
-        username: '',
-        password: '',
-        serverUrl: ''
-    };
-    $rootScope.loading = false;
-    $scope.new_user ={};    
-    userService.getDetails().then(function(details){
-        $scope.new_user.name = details[0].user_name;
-        $scope.new_user.password = '';
-        $scope.new_user.serverUrl = details[0].url;
+    $rootScope.loading = true;
+    $scope.user = {};
+
+    userService.getDetails().then(function(details) {
+
+        // later user will be selcting existing/new check box to selct/enter user name
+        // For now assuming there will be only one user per app.
+
+        if (details.length != 0) {
+            $scope.user.name = details[0].user_name;
+            //$scope.user.password = '';
+            $scope.user.serverUrl = details[0].url;
+        }
+
+        $rootScope.loading = false;
         $scope.$apply();
-        },function(error){
-            $rootScope.displayError(error);
-        });
+    },function(error) {
+        $rootScope.displayError(error);
+    });
 
-    $scope.saveDetails = function(new_user){ 
-        userService.createUser(new_user.name,new_user.serverUrl).then(function(saveId){
-            console.log(saveId);
-            $rootScope.displaySuccess('Saved!');
-            $rootScope.isAuthenticated = true;
-        },function(error){
-            $rootScope.displayError(error);
+    $scope.saveDetails = function(user) {
+        auth(user.name, user.password, user.serverUrl).then(function(isValidUser) {
+            if (isValidUser) {
+                $rootScope.isAuthenticated = true;
+                $location.path('/project-list');
+                $rootScope.apply();
+            } else {
+                $rootScope.displayError('Invalid login details. Try again.');
+            }
+        }, function(e) {
+            $rootScope.displayError('Invalid login details. Try again later.');
         });
     };
 
-    $scope.isFormValid = function(){
-        return (!$scope.serverDetails.serverUrl) || 
-                (!$scope.serverDetails.username) ||
-                (!$scope.serverDetails.password) ||
-                (!angular.equals($scope.serverDetails.password, $scope.serverDetails.confirmPassword));
+    //TODO move the message related methods to a better place | may be a class
+    $rootScope.disableMessage = function(){
+        $rootScope.showMessage = false;
+        $rootScope.apply();
     };
-    
+
+    var enableMessage = function(MessageType,message){
+        $rootScope.css = MessageType;
+        $rootScope.message_to_display = message;
+        $rootScope.showMessage = true;
+        $rootScope.apply();
+    };
+
+    $rootScope.hideLoading = function() {
+        $rootScope.loading = false;
+        $rootScope.apply();
+    }
+
+    $rootScope.apply = function() {
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+    }
+
+    $rootScope.displaySuccess = function(message){
+        enableMessage("alert-success", message);
+    };
+
+    $rootScope.displayInfo = function(message){
+        enableMessage("alert-info",message);
+    };
+
+    $rootScope.displayError = function(message){
+        enableMessage("alert-danger",message);
+    };
+
 }]);
+
