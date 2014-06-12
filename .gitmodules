@@ -1,3 +1,6 @@
 [submodule "enketo-core"]
 	path = enketo-core
 	url = https://github.com/ICT4H/enketo-core-dcs.git
+[submodule "Cordova-SQLitePlugin"]
+	path = Cordova-SQLitePlugin
+	url = https://github.com/ICT4H/Cordova-SQLitePlugin.git

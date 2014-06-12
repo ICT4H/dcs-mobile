@@ -9,7 +9,7 @@ var localStore = function() {
 	if (isEmulator)
 		db = window.openDatabase(dbName, version, dbName, -1);
 	else
-		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1})
+		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: 'secret1'});
 
 	//tx.executeSql('DROP TABLE IF EXISTS projects');
 
