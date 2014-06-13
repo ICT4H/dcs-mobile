@@ -7,7 +7,6 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
 
         // later user will be selcting existing/new check box to selct/enter user name
         // For now assuming there will be only one user per app.
-
         if (details.length >= 1) {
             $scope.user.name = details[0].user_name;
             $scope.user.serverUrl = details[0].url;
@@ -15,7 +14,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
         $rootScope.loading = false;
         $scope.$apply();
     },function(error) {
-        $rootScope.displayError(error);
+        $rootScope.displayError('Unable to connect to local storage');
     });
 
     $scope.saveDetails = function(user) {

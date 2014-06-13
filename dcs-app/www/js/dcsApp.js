@@ -4,3 +4,5 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "mobile-angular-ui.scrollable",
     "ngSanitize"
 ]);
+
+var isEmulator = true;
