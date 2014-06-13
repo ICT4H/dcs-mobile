@@ -15,11 +15,10 @@ var localStore = function() {
 	}
 
 	store.openDB = function(dbName, dbKey) {
-		//TODO replace this hardcoding
 		return new Promise(function(resolve, reject) {
-			db = _getDB(dbName, dbKey);
+			db = _getDB(dbName, dbKey, reject);
 			db.transaction(function(tx) {
-				//TODO change this to get server password
+				//TODO change this to get user server password
 				tx.executeSql('SELECT * FROM projects where project_id = ?', [1], function(tx, resp) {
 					resolve(true);
 				}, function() {
@@ -29,14 +28,24 @@ var localStore = function() {
 		});
 	}
 
-	function _getDB(dbName, dbKey) {
+	function _getDB(dbName, dbKey, reject) {
+		//TODO make this method to always return promise
 		dbName = convertToSlug(dbName);
-		console.log('opening db ' + dbName);
 		var db;
 		if (isEmulator) {
 			db = window.openDatabase(dbName, version, dbName, -1);
 		} else {
-			db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey});
+			if (reject) {
+				db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey}, function() {
+					console.log('_getDB success');
+				}, function(e) {
+					console.log('_getDB failed');
+					reject();
+				});
+
+			} else {
+				db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey});
+			}
 		}
 		return db;
 	}

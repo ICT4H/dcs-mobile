@@ -3,8 +3,6 @@ dcsApp.service('auth', ['userService', 'localStore', function(userService, local
         return new Promise(function(resolve, reject) {
 				userService.getUserByName(userName).then(function() {
 
-					// verify db is acceeible
-					//getProjectById
 					localStore.openDB(userName, password).then(function() {
 						console.log('You are authenticated to use local data store');
 						resolve(true);
@@ -12,7 +10,6 @@ dcsApp.service('auth', ['userService', 'localStore', function(userService, local
 						console.log('Failed to use local data store');
 						reject();
 					});
-
 						
 					// reject is not
 				}, function(userNotFound) {
@@ -31,23 +28,9 @@ dcsApp.service('auth', ['userService', 'localStore', function(userService, local
 			        		console.log('Failed to create user details');
 			        	});
 					}
-
 				});
-                // getByUserName(userName)
-                
-
-                // True
-
-
-                //false
-
-        		// new user -> createdb
-
-
-                
             });
     };
-
 }]);
 
 dcsApp.service('userService', [function() {
@@ -56,18 +39,16 @@ dcsApp.service('userService', [function() {
 	var version = '1.0';
 	var db;
 
-	// drop TABLE projects ; DROP TABLE submissions ;
 	if (isEmulator)
 		db = window.openDatabase(dbName, version, dbName, -1);
 	else
 		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: 'secret1'});
 
-	//tx.executeSql('DROP TABLE IF EXISTS projects');
-
 	db.transaction (function(tx) {
 		tx.executeSql('CREATE TABLE IF NOT EXISTS users (user_id integer primary key, user_name text, url text)');
 
 	});
+	
 	this.createUser = function(name, url) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
@@ -113,7 +94,7 @@ dcsApp.service('userService', [function() {
 						resolve(resp.rows.item(0));
 					else
 						reject(true); // user not found
-				}, function() {
+				}, function(e) {
 					reject(false);
 				});
 			});
