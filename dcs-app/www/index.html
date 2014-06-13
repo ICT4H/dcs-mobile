@@ -114,6 +114,12 @@
     <!-- build:js scripts/scripts.js -->
     <script type="text/javascript">
         var isEmulator = true;
+        function convertToSlug(Text) {
+            return Text
+                .toLowerCase()
+                .replace(/[^\w-]+/g,'')
+                ;
+        }
     </script>
     <script type="text/javascript" src="js/services/local-store.js"></script>
     

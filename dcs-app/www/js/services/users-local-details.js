@@ -1,7 +1,50 @@
-dcsApp.service('auth', [function() {
+dcsApp.service('auth', ['userService', 'localStore', function(userService, localStore) {
     return function(userName, password, server) { 
         return new Promise(function(resolve, reject) {
-                resolve(true);
+				userService.getUserByName(userName).then(function() {
+
+					// verify db is acceeible
+					//getProjectById
+					localStore.openDB(userName, password).then(function() {
+						console.log('You are authenticated to use local data store');
+						resolve(true);
+					}, function(e) {
+						console.log('Failed to use local data store');
+						reject();
+					});
+
+						
+					// reject is not
+				}, function(userNotFound) {
+					console.log('Either userName not found or local user store is not accessible (userNotFount): ');
+					if (userNotFound) {
+				        userService.createUser(userName, server).then(function() {
+							localStore.init(userName, password).then(function() {
+								console.log('You are authenticated to use local data store for first time');
+								resolve(true);
+							}, function(e){
+								console.log('Failed to create local data store');
+								reject();
+							});
+			        	
+			        	},function(e) {
+			        		console.log('Failed to create user details');
+			        	});
+					}
+
+				});
+                // getByUserName(userName)
+                
+
+                // True
+
+
+                //false
+
+        		// new user -> createdb
+
+
+                
             });
     };
 
@@ -51,7 +94,8 @@ dcsApp.service('userService', [function() {
 					[new_url, user_name]);
 		});
 	};
-	this.getDetails = function() {
+
+	this.getUsers = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM users', [], function(tx, resp) {
@@ -60,6 +104,23 @@ dcsApp.service('userService', [function() {
 			});
 		});
 	};
+
+	this.getUserByName = function(userName) {
+		return new Promise(function(resolve, reject) {
+			db.transaction(function(tx) {
+				tx.executeSql('SELECT * FROM users WHERE user_name = ?', [userName], function(tx, resp) {
+					if(resp.rows.length >= 1)
+						resolve(resp.rows.item(0));
+					else
+						reject(true); // user not found
+				}, function() {
+					reject(false);
+				});
+			});
+		});
+
+	}
+
 	var transformRows = function(resultSet) {
 		var rows = [];
 		for (var i=0; i < resultSet.length; i++) {

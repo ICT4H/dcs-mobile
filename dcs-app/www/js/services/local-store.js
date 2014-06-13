@@ -1,24 +1,45 @@
 var localStore = function() {
-
 	var store = {};
-	var dbName = 'DCS-STORE'; // TODO appropriate name?
-	var version = '1.0';
 	var db;
+	var version = '1.0';
 
-	// drop TABLE projects ; DROP TABLE submissions ;
-	if (isEmulator)
-		db = window.openDatabase(dbName, version, dbName, -1);
-	else
-		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: 'secret1'});
+	store.init = function(dbName, dbKey) {
+		return new Promise(function(resolve, reject) {
+			db = _getDB(dbName, dbKey);
+			db.transaction (function(tx) {
+				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, name text, xform text)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, project_id text, created text, html text, xml text)');
+				resolve(true);
+			});
+		});
+	}
 
-	//tx.executeSql('DROP TABLE IF EXISTS projects');
+	store.openDB = function(dbName, dbKey) {
+		//TODO replace this hardcoding
+		return new Promise(function(resolve, reject) {
+			db = _getDB(dbName, dbKey);
+			db.transaction(function(tx) {
+				//TODO change this to get server password
+				tx.executeSql('SELECT * FROM projects where project_id = ?', [1], function(tx, resp) {
+					resolve(true);
+				}, function() {
+					resolve(true);
+				});
+			});	
+		});
+	}
 
-	db.transaction (function(tx) {
-		tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, name text, xform text)');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, project_id text, created text, html text, xml text)');
-
-	});
-	
+	function _getDB(dbName, dbKey) {
+		dbName = convertToSlug(dbName);
+		console.log('opening db ' + dbName);
+		var db;
+		if (isEmulator) {
+			db = window.openDatabase(dbName, version, dbName, -1);
+		} else {
+			db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey});
+		}
+		return db;
+	}
 
 	store.createProject = function(project) {
 		return new Promise(function(resolve, reject) {

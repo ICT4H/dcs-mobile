@@ -8,13 +8,6 @@ dcsApp.controller('settingsController', ['$rootScope', '$scope', 'userService', 
     $scope.user = {};
     $rootScope.loading = false;
 
-    userService.getDetails().then(function(details){
-        $scope.user.name=details.name;
-        $scope.user.password='';
-        $scope.user.serverUrl=details.url;
-        $scope.$apply();
-    });
-
     $scope.saveDetails = function(){ 
         $scope.serverDetails.id = 'credentials';
         userService.createUser($scope.new_user.name,$scope.new_user.serverUrl).then(function(saveId){
