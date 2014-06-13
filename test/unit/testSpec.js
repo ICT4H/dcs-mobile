@@ -1,3 +1,4 @@
+var isEmulator = true;
 describe('controllers', function(){
 
  	var scope;
