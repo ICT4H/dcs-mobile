@@ -1,30 +1,29 @@
 
-dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', function($rootScope, $scope, dcsService, localStore) {
+dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-    $rootScope.loading = true;
+    msg.showLoading();
     var serverProjects = [];
     var fetchMsg = 'Fetching project list...';
-    $rootScope.displayInfo(fetchMsg);
+    msg.displayInfo(fetchMsg);
 
     localStore.getAllLocalProjects().then(function(localProjects){
         $rootScope.loading = false;
-        $scope.$apply(function(){
-            $rootScope.disableMessage();
-            $scope.projects = localProjects || [];
-        },function(error){$rootScope.displayError(error);});
+
+        $scope.projects = localProjects || [];
+        msg.disableMessage();
+        // $scope.$apply(function(){
+        // },function(error){$rootScope.displayError(error);});
     });
 
     $scope.$refreshContents = function() {
         console.log('projectListController refresh called');
-        $rootScope.displayInfo(fetchMsg);
-        $rootScope.loading = true;
+        msg.displayInfo(fetchMsg);
+        msg.showLoading();
         dcsService.getQuestionnaires().then(function(serverProjects){
-            $scope.$apply(function(){
-                updateProjectsToDisplay($scope.projects, serverProjects);
-                $rootScope.disableMessage();
-                $rootScope.loading = false;
-            });
+            updateProjectsToDisplay($scope.projects, serverProjects);
+            msg.disableMessage();
+            msg.hideLoading();
         }, function(error){$rootScope.displayError(error);});
     }
 

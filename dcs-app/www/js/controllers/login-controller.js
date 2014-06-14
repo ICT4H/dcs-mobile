@@ -1,6 +1,6 @@
-dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', 'localStore', function($rootScope, $scope, $location, userService, auth, localStore){
+dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', 'localStore', 'messageService', function($rootScope, $scope, $location, userService, auth, localStore, msg) {
 
-    $rootScope.loading = true;
+    msg.showLoading();
     $scope.user = {};
 
     userService.getUsers().then(function(details) {
@@ -11,10 +11,9 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
             $scope.user.name = details[0].user_name;
             $scope.user.serverUrl = details[0].url;
         }
-        $rootScope.loading = false;
-        $scope.$apply();
+        msg.hideLoading();
     },function(error) {
-        $rootScope.displayError('Unable to connect to local storage');
+        msg.displayError('Unable to connect to local storage');
     });
 
     $scope.saveDetails = function(user) {
@@ -22,7 +21,8 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
             if (isValidUser) {
                 $rootScope.isAuthenticated = true;
                 $location.path('/project-list');
-                $rootScope.apply();
+                //$rootScope.apply();
+                $scope.$apply();
             } else {
                 $rootScope.displayError('Invalid login details. Try again.');
             }
@@ -31,41 +31,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
         });
     };
 
-    //TODO move the message related methods to a better place | may be a class
-    $rootScope.disableMessage = function(){
-        $rootScope.showMessage = false;
-        $rootScope.apply();
-    };
 
-    var enableMessage = function(MessageType,message){
-        $rootScope.css = MessageType;
-        $rootScope.message_to_display = message;
-        $rootScope.showMessage = true;
-        $rootScope.apply();
-    };
-
-    $rootScope.hideLoading = function() {
-        $rootScope.loading = false;
-        $rootScope.apply();
-    }
-
-    $rootScope.apply = function() {
-        if(!$scope.$$phase) {
-            $scope.$apply();
-        }
-    }
-
-    $rootScope.displaySuccess = function(message){
-        enableMessage("alert-success", message);
-    };
-
-    $rootScope.displayInfo = function(message){
-        enableMessage("alert-info",message);
-    };
-
-    $rootScope.displayError = function(message){
-        enableMessage("alert-danger",message);
-    };
 
 }]);
 
