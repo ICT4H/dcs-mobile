@@ -15,7 +15,8 @@ dcsApp.service('auth', ['userService', 'localStore', function(userService, local
 			validLocalUserDetails(options)
 				.then(resolve,
 				function(userNotFound) {
-					authAndCreateLocalUser(options).then(resolve,
+					authAndCreateLocalUser(options)
+					.then(resolve,
 					function(serverAuthFailed) {
 						rejct('Not valid local or server user');
 					});
