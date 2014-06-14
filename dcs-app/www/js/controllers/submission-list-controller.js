@@ -1,34 +1,33 @@
-dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 
-    function($rootScope, $scope, $routeParams, $location, dcsService, localStore){
+dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
+    function($rootScope, $scope, $routeParams, $location, dcsService, localStore, msg){
     
-    $scope.pageTitle = ">> " + $routeParams.project_name;
-	var project_id = $routeParams.project_id;
+    $scope.pageTitle = "Submissions";
+    msg.showLoadingWithInfo('Loading submissions');
+
+    var project_id = $routeParams.project_id;
     var project_uuid = $routeParams.project_uuid;
     $scope.project_id = project_id;
-
-    $rootScope.loading = true;
     var serverSubmissions = [];
 
-    var fetchMsg = 'Fetching submission list...';
-    $rootScope.displayInfo(fetchMsg);
-
-    localStore.getAllProjectSubmissions(project_id).then(function(localSubmissions) {
-        $scope.$apply(function() {
+    localStore.getAllProjectSubmissions(project_id)
+        .then(function(localSubmissions) {
             $scope.submissions = localSubmissions || [];
-            $rootScope.disableMessage();
-            $rootScope.loading = false;
-        });
-    }, $rootScope.displayError);
+            msg.hideAll();
+        }, function(e) {
+            msg.hideLoadingWithErr('Unable to show local submissions');
+        }
+    );
 
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
-        $rootScope.displayInfo(fetchMsg);
-        $rootScope.loading = true;
-        dcsService.getAllSubmissions(project_uuid).then(function(serverSubmissions) {
-            updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
-            $rootScope.loading = false;
-            $rootScope.disableMessage();
-        },function(error){$rootScope.displayError(error);});
+        msg.showLoadingWithInfo('Fetching server submissions');
+        dcsService.getAllSubmissions(project_uuid)
+            .then(function(serverSubmissions) {
+                updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
+                msg.hideAll();
+            }, function(error){
+                msg.hideLoadingWithErr('Unable to fetch submissions')
+            });
     }
 
     var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions) {
@@ -58,25 +57,27 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         $location.path('/project/' + submission.project_id + '/submission/' + submission.submission_id);
     };
 
-    $scope.deleteSubmission = function(submission) {
-        $rootScope.loading = true;
-        localStore.deleteSubmission(submission.submission_id).then(function() {
-            $rootScope.loading = false;
-            $rootScope.displaySuccess("Submission deleted.");
-        }, function(error){
-            $rootScope.displayError("Submission deletion failed.")
-        });
-
+    var updateScopeSubmission = function(submission) {
         if (submission['in'] == 'both') {
             submission['in'] = 'server';
         } else {
             $scope.submissions.splice($scope.submissions.indexOf(submission), 1);
         }
+    }
+
+    $scope.deleteSubmission = function(submission) {
+        msg.showLoading();
+        localStore.deleteSubmission(submission.submission_id)
+            .then(function() {
+                updateScopeSubmission(submission);
+                msg.hideLoadingWithInfo("Submission deleted");
+            }, function(error){
+                msg.hideLoadingWithErr("Submission deletion failed")
+            });
     };
 
     $scope.downloadSubmission = function(submission) {
-        $rootScope.loading = true;
-
+        msg.showLoading();
         dcsService.getSubmission(submission)
             .then(localStore.createSubmission)
             .then(function(resp) {
@@ -84,32 +85,29 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                 submission.submission_id = resp.submission_id;
                 submission.html = resp.html;
                 submission.xml = resp.xml;
-                $rootScope.displaySuccess("Submission downloaded.");
+                msg.hideLoadingWithInfo("Submission downloaded.");
             }, function(error) {
-                $rootScope.displayError('Unable to download submission.');
-            }).done(function() {
-                $rootScope.hideLoading();
+                msg.hideLoadingWithErr('Unable to download submission.');
             });
     };
 
     $scope.postSubmission = function(submission) {
-        $rootScope.loading = true;
+        msg.showLoading();
         dcsService.postSubmission(submission).then(function(updatedSubmission) {
-            $rootScope.loading = false;
             localStore.updateSubmissionMeta(submission.submission_id, updatedSubmission)
                 .then(function() {
-                        $rootScope.displaySuccess('Submitted successfully');
-                    },function(error) {
-                        $rootScope.displayError('Submitted to server, local status not updated.');
-                    });;
+                    submission['in'] = 'both';
+                    msg.hideLoadingWithInfo('Submitted successfully');
+                },function(error) {
+                    msg.hideLoadingWithErr('Submitted to server, local status not updated.');
+                });;
 
         }, function(error){
             if (error.status == '404') {
                 // this submission is not avail in the server. Delete your local copy.
             }
-            $rootScope.displayError('Unable to submit submission.');
+            msg.hideLoadingWithErr('Unable to submit submission.');
         });
-
-        submission['in'] = 'both';
     };
+
 }]);

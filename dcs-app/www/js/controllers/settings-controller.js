@@ -1,4 +1,4 @@
-dcsApp.controller('settingsController', ['$rootScope', '$scope', 'userService', function($rootScope, $scope, userService){
+dcsApp.controller('settingsController', ['$rootScope', '$scope', 'userService', 'messageService', function($rootScope, $scope, userService, msg){
 
     $scope.serverDetails = {
         username: '',
@@ -6,15 +6,15 @@ dcsApp.controller('settingsController', ['$rootScope', '$scope', 'userService', 
         serverUrl: ''
     };
     $scope.user = {};
-    $rootScope.loading = false;
+    msg.showLoading();
 
     $scope.saveDetails = function(){ 
         $scope.serverDetails.id = 'credentials';
         userService.createUser($scope.new_user.name,$scope.new_user.serverUrl).then(function(saveId){
-            console.log(saveId);
-            $rootScope.displaySuccess('Saved!');
+            console.log('user created id:' + saveId);
+            msg.hideLoadingWithInfo('Saved!');
         },function(error){
-            $rootScope.displayError(error);
+            msg.hideLoadingWithErr('Unable to create user');
         });
     };
 

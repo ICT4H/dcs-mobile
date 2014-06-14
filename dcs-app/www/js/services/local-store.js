@@ -3,13 +3,13 @@ var localStore = function() {
 	var db;
 	var version = '1.0';
 
-	store.init = function(dbName, dbKey) {
+	store.init = function(options) {
 		return new Promise(function(resolve, reject) {
-			db = _getDB(dbName, dbKey);
+			db = _getDB(options.userName, options.password);
 			db.transaction (function(tx) {
 				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, name text, xform text)');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, project_id text, created text, html text, xml text)');
-				resolve(true);
+				resolve();
 			});
 		});
 	}
@@ -18,12 +18,10 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db = _getDB(dbName, dbKey, reject);
 			db.transaction(function(tx) {
+				// Is this required, as only valid key will unlock sqlite store
 				//TODO change this to get user server password
-				tx.executeSql('SELECT * FROM projects where project_id = ?', [1], function(tx, resp) {
-					resolve(true);
-				}, function() {
-					resolve(true);
-				});
+				tx.executeSql('SELECT * FROM projects where project_id = ?',
+					[1], resolve, reject);
 			});	
 		});
 	}

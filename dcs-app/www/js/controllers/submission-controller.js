@@ -1,13 +1,13 @@
-dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'localStore', function($rootScope, $routeParams, localStore){
+dcsApp.controller('submissionController', ['$rootScope', '$routeParams', 'localStore', 'messageService', function($rootScope, $routeParams, localStore, msg){
     
     var submission_id = $routeParams.submission_id;
     var project_id = $routeParams.project_id;
     var buttonLabel = 'Save';
     var onSuccess = function(message){
-    	$rootScope.displaySuccess(message);
+    	msg.displaySuccess(message);
     };
     var onError = function(message){
-    	$rootScope.displayError(message);
+    	msg.displayError(message);
     };	
 
     if(submission_id != "null")

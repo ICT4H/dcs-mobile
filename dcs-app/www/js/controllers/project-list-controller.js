@@ -2,29 +2,29 @@
 dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-    msg.showLoading();
+    msg.showLoading('Loading projects');
     var serverProjects = [];
-    var fetchMsg = 'Fetching project list...';
-    msg.displayInfo(fetchMsg);
 
-    localStore.getAllLocalProjects().then(function(localProjects){
-        $rootScope.loading = false;
-
-        $scope.projects = localProjects || [];
-        msg.disableMessage();
-        // $scope.$apply(function(){
-        // },function(error){$rootScope.displayError(error);});
-    });
+    localStore.getAllLocalProjects()
+        .then(function(localProjects){
+            $scope.projects = localProjects || [];
+            msg.hideAll();
+        }, function(e) {
+            msg.hideLoadingWithErr('Unable to show local projects');
+        }
+    );
 
     $scope.$refreshContents = function() {
         console.log('projectListController refresh called');
-        msg.displayInfo(fetchMsg);
-        msg.showLoading();
-        dcsService.getQuestionnaires().then(function(serverProjects){
-            updateProjectsToDisplay($scope.projects, serverProjects);
-            msg.disableMessage();
-            msg.hideLoading();
-        }, function(error){$rootScope.displayError(error);});
+        msg.showLoadingWithInfo('Fetching server projects');
+        
+        dcsService.getQuestionnaires()
+            .then(function(serverProjects){
+                updateProjectsToDisplay($scope.projects, serverProjects);
+                msg.hideAll();
+            }, function(error) {
+                msg.hideLoadingWithErr('Unable fetch server projects');
+            });
     }
 
     var updateProjectsToDisplay = function(projectsInScope, serverProjects){
@@ -41,18 +41,17 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        var BUTTON_NO = 3;
+        var BUTTON_NO = 2;
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
-
-            $rootScope.loading = true;
+            
+            msg.showLoading();
             localStore.deleteProject(project.project_id).then(function() {
                 project.isStored = false;
-                $rootScope.loading = false;
-                $rootScope.displaySuccess('Project deleted!');
+                msg.hideLoadingWithInfo('Project deleted!');
             }, function(e) {
                 project.isStored = true;
-                $rootScope.displayError('Project cannot be deleted.');
+                msg.hideLoadingWithErr('Project cannot be deleted');
             });
 
         };
@@ -66,15 +65,16 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
 
     $scope.downloadProject = function(project){
         var project_uuid = project.project_uuid;
-        $rootScope.loading = true;
-        dcsService.getQuestion(project_uuid).then(function(serverProject){
-            localStore.createProject(serverProject).then(function(project_id) {
+        msg.showLoadingWithInfo('Downloading project');
+        dcsService.getQuestion(project_uuid)
+            .then(localStore.createProject)
+            .then(function(project_id) {
                 project.project_id = project_id;
                 project.isStored = true;
-                $rootScope.loading = false;
-                $rootScope.displaySuccess('Project downloaded.');
-            }, $rootScope.displayError);
-        }, function(error){$rootScope.displayError(error);});
+                msg.hideLoadingWithInfo('Project downloaded.');
+            }, function(e) {
+                msg.hideLoadingWithErr('Unable to download project');
+            });
     };
 
 

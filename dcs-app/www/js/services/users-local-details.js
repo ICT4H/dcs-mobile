@@ -1,35 +1,27 @@
 dcsApp.service('auth', ['userService', 'localStore', function(userService, localStore) {
-    return function(userName, password, server) { 
-        return new Promise(function(resolve, reject) {
-				userService.getUserByName(userName).then(function() {
+    return function(options) {
 
-					localStore.openDB(userName, password).then(function() {
-						console.log('You are authenticated to use local data store');
-						resolve(true);
-					}, function(e) {
-						console.log('Failed to use local data store');
-						reject();
+	    var validLocalUserDetails = function(options) {
+			return localStore.openDB(options.userName, options.password);
+	    };
+
+	    var authAndCreateLocalUser = function(options) {
+			//TODO chk valid server user also initially
+			return userService.createUser(options)
+				.then(localStore.init);
+	    };
+
+        return new Promise(function(resolve, reject) {
+			validLocalUserDetails(options)
+				.then(resolve,
+				function(userNotFound) {
+					authAndCreateLocalUser(options).then(resolve,
+					function(serverAuthFailed) {
+						rejct('Not valid local or server user');
 					});
-						
-					// reject is not
-				}, function(userNotFound) {
-					console.log('Either userName not found or local user store is not accessible (userNotFount): ');
-					if (userNotFound) {
-				        userService.createUser(userName, server).then(function() {
-							localStore.init(userName, password).then(function() {
-								console.log('You are authenticated to use local data store for first time');
-								resolve(true);
-							}, function(e){
-								console.log('Failed to create local data store');
-								reject();
-							});
-			        	
-			        	},function(e) {
-			        		console.log('Failed to create user details');
-			        	});
-					}
-				});
-            });
+				}
+			);
+	    });
     };
 }]);
 
@@ -49,13 +41,13 @@ dcsApp.service('userService', [function() {
 
 	});
 	
-	this.createUser = function(name, url) {
+	this.createUser = function(options) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO users (user_name, url) VALUES (?,?)', [name, url],
+					'INSERT INTO users (user_name, url) VALUES (?,?)', [options.userName, options.url],
 					function(tx, resp){
-						resolve(resp.insertId);
+						resolve(options);
 					}, reject
 				);
 			});

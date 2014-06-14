@@ -5,29 +5,26 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
 
     userService.getUsers().then(function(details) {
 
-        // later user will be selcting existing/new check box to selct/enter user name
+        // TODO User will be selcting existing/new check box to selct/enter user name
         // For now assuming there will be only one user per app.
         if (details.length >= 1) {
             $scope.user.name = details[0].user_name;
             $scope.user.serverUrl = details[0].url;
         }
-        msg.hideLoading();
+        msg.hideAll();
     },function(error) {
-        msg.displayError('Unable to connect to local storage');
+        msg.hideLoadingWithErr('Unable to connect to local storage');
     });
 
     $scope.saveDetails = function(user) {
-        auth(user.name, user.password, user.serverUrl).then(function(isValidUser) {
-            if (isValidUser) {
-                $rootScope.isAuthenticated = true;
-                $location.path('/project-list');
-                //$rootScope.apply();
-                $scope.$apply();
-            } else {
-                $rootScope.displayError('Invalid login details. Try again.');
-            }
+        msg.showLoading();
+        auth({userName: user.name, password: user.password, url: user.serverUrl}).then(function() {
+            $rootScope.isAuthenticated = true;
+            $location.path('/project-list');
+            $scope.$apply();
+            msg.hideLoadingWithErr('Invalid login details.');
         }, function(e) {
-            $rootScope.displayError('Invalid login details. Try again later.');
+            msg.hideLoadingWithErr(e);
         });
     };
 
