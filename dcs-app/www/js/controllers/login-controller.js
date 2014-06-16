@@ -1,4 +1,4 @@
-dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', 'localStore', 'messageService', function($rootScope, $scope, $location, userService, auth, localStore, msg) {
+dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', 'messageService', function($rootScope, $scope, $location, userService, auth, msg) {
 
     msg.showLoading();
     $scope.user = {};
@@ -18,13 +18,12 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
 
     $scope.saveDetails = function(user) {
         msg.showLoading();
-        auth({userName: user.name, password: user.password, url: user.serverUrl}).then(function() {
+        auth.validateUser({userName: user.name, password: user.password, url: user.serverUrl}).then(function() {
             $rootScope.isAuthenticated = true;
             $location.path('/project-list');
             $scope.$apply();
-            msg.hideLoadingWithErr('Invalid login details.');
         }, function(e) {
-            msg.hideLoadingWithErr(e);
+            msg.hideLoadingWithErr('Invalid login details.');
         });
     };
 

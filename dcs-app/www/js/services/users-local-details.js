@@ -1,16 +1,14 @@
 dcsApp.service('auth', ['userService', 'localStore', function(userService, localStore) {
-    return function(options) {
+    var validLocalUserDetails = function(options) {
+		return localStore.openDB(options.userName, options.password);
+    };
 
-	    var validLocalUserDetails = function(options) {
-			return localStore.openDB(options.userName, options.password);
-	    };
-
-	    var authAndCreateLocalUser = function(options) {
-			//TODO chk valid server user also initially
-			return userService.createUser(options)
-				.then(localStore.init);
-	    };
-
+    var authAndCreateLocalUser = function(options) {
+		//TODO chk valid server user also initially
+		return userService.createUser(options)
+			.then(localStore.init);
+    };
+    var validateUser = function(options) {
         return new Promise(function(resolve, reject) {
 			validLocalUserDetails(options)
 				.then(resolve,
