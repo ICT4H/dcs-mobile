@@ -19,7 +19,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         msg.showLoadingWithInfo('Fetching server projects');
         
         dcsService.getQuestionnaires()
-            .then(function(serverProjects){
+            .then(function(serverProjects) {
                 updateProjectsToDisplay($scope.projects, serverProjects);
                 msg.hideAll();
             }, function(error) {
@@ -29,28 +29,41 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
 
     var updateProjectsToDisplay = function(projectsInScope, serverProjects){
         serverProjects.forEach(function(serverProject){
-            serverProject.isStored = false;
+            serverProject.status = SERVER;
+
             projectsInScope.forEach(function(localProject){
                 if(serverProject.project_uuid == localProject.project_uuid){
-                    serverProject.isStored = true; 
+                    serverProject.status = BOTH;
                 }
             });
-            if(!serverProject.isStored)
+            if(serverProject.status == SERVER)
                 projectsInScope.push(serverProject);
         });
+        var onServer;
+        projectsInScope.forEach(function(localProject){
+            onServer = false;
+            serverProjects.forEach(function(serverProject){
+                if(localProject.project_uuid == serverProject.project_uuid){
+                    onServer = true;
+                }
+            });
+            if(!onServer){
+                localProject.status = SERVER_DELETED;
+            }
+        });
+
     };
 
     $scope.deleteProject = function(project){
-        var BUTTON_NO = 2;
+        var BUTTON_NO = 3;
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
             
             msg.showLoading();
             localStore.deleteProject(project.project_id).then(function() {
-                project.isStored = false;
+                project.status = SERVER;
                 msg.hideLoadingWithInfo('Project deleted!');
             }, function(e) {
-                project.isStored = true;
                 msg.hideLoadingWithErr('Project cannot be deleted');
             });
 
@@ -66,13 +79,14 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     $scope.downloadProject = function(project){
         var project_uuid = project.project_uuid;
         msg.showLoadingWithInfo('Downloading project');
+        project.status = BOTH;
         dcsService.getQuestion(project_uuid)
             .then(localStore.createProject)
             .then(function(project_id) {
                 project.project_id = project_id;
-                project.isStored = true;
                 msg.hideLoadingWithInfo('Project downloaded.');
             }, function(e) {
+                project.status = SERVER;
                 msg.hideLoadingWithErr('Unable to download project');
             });
     };

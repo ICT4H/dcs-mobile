@@ -1,4 +1,3 @@
-var isEmulator = true;
 describe('login controller', function(){
     var controller;
     beforeEach(angular.mock.module('dcsApp'));
@@ -6,10 +5,13 @@ describe('login controller', function(){
         var scope;
         var mockedLocation;
         var locals;
+        var mocks;
+
     beforeEach(angular.mock.inject(function($rootScope, $controller, $location) {
         rootScope = $rootScope.$new();
         scope = rootScope.$new();
         mockedLocation = jasmine.createSpyObj('$location',['path']);
+        mocks = new DCSMocks();
         locals = {$scope: scope, $rootScope: rootScope, $location: mockedLocation, userService: mocks.userService, messageService: mocks.messageService, auth: mocks.authService};
         controller = $controller;
         $controller('loginController', locals);

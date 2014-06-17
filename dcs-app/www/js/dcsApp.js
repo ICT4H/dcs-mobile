@@ -6,3 +6,11 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
 ]);
 
 var isEmulator = true;
+
+
+var SERVER = 'server';
+var LOCAL = 'local';
+var BOTH = 'both';
+var SERVER_DELETED = 'server-deleted';
+var OUTDATED = 'outdated';
+

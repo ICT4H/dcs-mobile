@@ -1,34 +1,58 @@
-var isEmulator = true;
-describe('project list controller', function(){
+describe('project list controller', function() {
     var controller;
     var rootScope;
     var scope;
+    var locals;
+    var mocks;
+
     beforeEach(angular.mock.module('dcsApp'));
     beforeEach(angular.mock.inject(function($rootScope, $controller) {
-    	rootScope = $rootScope.$new();
+        rootScope = $rootScope.$new();
         scope = rootScope.$new();
+        mocks = new DCSMocks();
         locals = {$scope: scope, $rootScope: rootScope, dcsService: mocks.dcsService, localStore: mocks.localStore, messageService: mocks.messageService};
         controller = $controller;
-        $controller('projectListController', locals);
+        controller('projectListController', locals);
     }));
     
     it('should list all local projects', function() {
-    	expect(mocks.messageService.showLoading).toHaveBeenCalledWith('Loading projects');
-    	expect(mocks.localStore.getAllLocalProjects).toHaveBeenCalled();
-    	expect(mocks.messageService.hideAll).toHaveBeenCalled();
+     expect(mocks.messageService.showLoading).toHaveBeenCalledWith('Loading projects');
+     expect(mocks.localStore.getAllLocalProjects).toHaveBeenCalled();
+     expect(mocks.messageService.hideAll).toHaveBeenCalled();
     });
 
-    it('should give error if local project are not present', function() {
-		mocks.localStore.getAllLocalProjects.andReturn({then: function(resolve,reject) {reject();}});
-        controller('projectListController', locals);
-    	
-    	expect(mocks.messageService.hideLoadingWithErr).toHaveBeenCalledWith('Unable to show local projects');
+    it('should add \'both\' status on project download', function() {
+        var project = {"name": "project-2",
+                        "project_uuid": "prj-uuid-2",
+                        "version": "prj-1-ver-1"
+                    };
+        
+        scope.downloadProject(project);
+
+        expect(project.status).toBe('both');
+        expect(mocks.localStore.createProject).toHaveBeenCalled();
+
     });
 
-    // it('should fetch server projects and update project list', function() {
-    //     controller('projectListController', locals);
-    	
-    // 	scope.$refreshContents();
-    // 	expect(mocks.messageService.showLoadingWithInfo).toHaveBeenCalled();//With('Fetching server projects');
-    // });
+    it('should add server status for projects that are not stored locally', function() {
+        expect(scope.projects.length).toBe(1);
+
+        scope.$refreshContents();
+
+        expect(scope.projects.length).toBe(2);
+        expect(scope.projects[1].status).toBe('server');
+    });
+
+    it('should change project status to SERVER on project delete ', function() {
+
+        navigator.notification = {confirm : function(dummy, onConfirm) {
+            var BUTTON_YES = 2;
+            onConfirm(BUTTON_YES);
+        }};
+
+        
+        scope.deleteProject(scope.projects[0]);
+
+        expect(scope.projects[0].status).toBe('server');
+    });
 });

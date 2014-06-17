@@ -125,3 +125,16 @@ h1 {
 .list-group .active {
   background-color: #222 !important;
 }
+
+.both {
+  background-color: #fff !important;
+}
+
+.server {
+  background-color: #F6F7ED !important;
+}
+
+.server-deleted {
+  text-decoration: line-through !important;
+  background-color: #FFAD33 !important;
+}

@@ -7,8 +7,8 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db = _getDB(options.userName, options.password);
 			db.transaction (function(tx) {
-				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, name text, xform text)');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, project_id text, created text, html text, xml text)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id text, created text, html text, xml text)');
 				resolve();
 			});
 		});
@@ -52,7 +52,7 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO projects (project_uuid, version, name, xform) VALUES (?,?,?,?)', [project.project_uuid, project.version, project.name, project.xform],
+					'INSERT INTO projects (project_uuid, version, status, name, xform) VALUES (?,?,?,?,?)', [project.project_uuid, project.version, 'both', project.name, project.xform],
 					function(tx, resp){
 						resolve(resp.insertId);
 					}, reject
@@ -107,8 +107,8 @@ var localStore = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO submissions (submission_uuid, version, project_id, created, html, xml) VALUES (?,?,?,?,?,?)', 
-						[submission.submission_uuid, submission.version, submission.project_id, submission.created, submission.html, submission.xml],
+					'INSERT INTO submissions (submission_uuid, version, status, project_id, created, html, xml) VALUES (?,?,?,?,?,?,?)', 
+						[submission.submission_uuid, submission.version, submission.status, submission.project_id, submission.created, submission.html, submission.xml],
 					function(tx, resp){
 						submission.submission_id = resp.insertId;
 						resolve(submission);
@@ -134,8 +134,8 @@ var localStore = function() {
 	store.updateSubmissionMeta = function(submission_id, submission) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
-				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, created=? where submission_id = ?', 
-						[submission.submission_uuid, submission.version, submission.created, submission_id], function(tx, resp) {
+				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, created=? where submission_id = ?', 
+						[submission.submission_uuid, submission.version, submission.status, submission.created, submission_id], function(tx, resp) {
 							resolve();
 						}, reject);
 			})
@@ -165,7 +165,8 @@ var localStore = function() {
 		for (var i=0; i < resultSet.length; i++) {
 			 rows.push(resultSet.item(i));
 		}
-		return rows;
+
+		return JSON.parse(JSON.stringify(rows));
 	};
 
 	return store;
