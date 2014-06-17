@@ -166,7 +166,7 @@ var localStore = function() {
 			 rows.push(resultSet.item(i));
 		}
 
-		return JSON.parse(JSON.stringify(rows));
+		return angular.copy(rows);
 	};
 
 	return store;

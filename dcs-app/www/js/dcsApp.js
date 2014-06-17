@@ -14,3 +14,9 @@ var BOTH = 'both';
 var SERVER_DELETED = 'server-deleted';
 var OUTDATED = 'outdated';
 
+function convertToSlug(Text) {
+    return Text
+        .toLowerCase()
+        .replace(/[^\w-]+/g,'')
+        ;
+}
