@@ -39,7 +39,7 @@
             <div ng-If="item.status !='server'">
               <div class="panel-heading" >
                 <div class="pull-left" toggle target="{{item.submission_id ||item.submission_uuid}} ">
-                    <h4 class="panel-title" style="display:inline-block;">
+                    <h4 class="panel-title" ng-class="item.status" style="display:inline-block;">
                        {{ item.created }}
                     </h4>
                 </div>
