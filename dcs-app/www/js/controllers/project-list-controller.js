@@ -2,7 +2,7 @@
 dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-    msg.showLoading('Loading projects');
+    msg.showLoadingWithInfo('Loading projects');
     var serverProjects = [];
 
     localStore.getAllLocalProjects()
@@ -39,16 +39,21 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             if(serverProject.status == SERVER)
                 projectsInScope.push(serverProject);
         });
-        var onServer;
+        var onServer, outdated;
         projectsInScope.forEach(function(localProject){
-            onServer = false;
+            onServer = outdated = false;
             serverProjects.forEach(function(serverProject){
                 if(localProject.project_uuid == serverProject.project_uuid){
                     onServer = true;
+                    if(localProject.version != serverProject.version) {
+                        outdated = true;
+                    }
                 }
             });
             if(!onServer){
                 localProject.status = SERVER_DELETED;
+            } else if(outdated) {
+                localProject.status = OUTDATED;
             }
         });
 

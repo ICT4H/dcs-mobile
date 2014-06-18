@@ -15,9 +15,10 @@
       </div>
 
       <div class="panel-group" id="accordion">
-          <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="{'server-content' : item.in == 'server'}">
+          <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="item.status">
+
             <!-- server only -->
-            <div ng-If="item.in == 'server'">
+            <div ng-If="item.status == 'server'">
               <div class="panel-heading" >
                     <div class="pull-left" toggle target="{{ item.submission_uuid }} ">
                         <h4 class="panel-title" style="display:inline-block;">
@@ -33,8 +34,9 @@
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
+
             <!-- local -->
-            <div ng-If="item.in !='server'">
+            <div ng-If="item.status !='server'">
               <div class="panel-heading" >
                 <div class="pull-left" toggle target="{{item.submission_id ||item.submission_uuid}} ">
                     <h4 class="panel-title" style="display:inline-block;">
@@ -51,6 +53,7 @@
                 <div class="panel-body" ng-bind-html="item.html"></div>
               </div>
             </div>
+
           </div>  
       </div>
     </div>

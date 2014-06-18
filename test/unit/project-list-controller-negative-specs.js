@@ -22,24 +22,36 @@ describe('project list controller -ive', function() {
         expect(mocks.messageService.hideLoadingWithErr).toHaveBeenCalledWith('Unable to show local projects');
     });
     
-    it('should change status to server_deleted when project is deleted over server', function() {
-        mocks.dcsService.getQuestionnaires.andReturn({then: function(resolve,reject) {
-            resolve(
-                [
-                    {
-                        "name": "project-2",
-                        "project_uuid": "prj-uuid-2",
-                        "version": "prj-1-ver-1"
-                    }
-                ]
-            );
-        }});
+    it('should add server projects to scope that were not already in the scope', function() {
         controller('projectListController', locals);
 
         scope.$refreshContents();
 
         expect(scope.projects.length).toBe(2);
+    })
+
+    it('should change status to server_deleted when project is deleted over server', function() {
+        mocks.dcsService.getQuestionnaires.andReturn({then: function(resolve,reject) {
+            resolve([mocks.createProject(2)]);
+        }});
+        controller('projectListController', locals);
+
+        scope.$refreshContents();
+
         expect(scope.projects[0].status).toBe('server-deleted');
     });
+
+    it('should change status to outdated when server project is updated', function() {
+        var changedProject = mocks.createProject(1);
+        changedProject.version = 'prj-1-ver-2';
+        mocks.dcsService.getQuestionnaires.andReturn({then: function(resolve,reject) {
+            resolve([changedProject]);
+        }});
+        controller('projectListController', locals);
+
+        scope.$refreshContents();
+
+        expect(scope.projects[0].status).toBe('outdated');
+    })
 
 });

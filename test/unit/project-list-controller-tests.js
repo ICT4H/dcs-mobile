@@ -16,20 +16,17 @@ describe('project list controller', function() {
     }));
     
     it('should list all local projects', function() {
-     expect(mocks.messageService.showLoading).toHaveBeenCalledWith('Loading projects');
+     expect(mocks.messageService.showLoadingWithInfo).toHaveBeenCalledWith('Loading projects');
      expect(mocks.localStore.getAllLocalProjects).toHaveBeenCalled();
      expect(mocks.messageService.hideAll).toHaveBeenCalled();
     });
 
     it('should add \'both\' status on project download', function() {
-        var project = {"name": "project-2",
-                        "project_uuid": "prj-uuid-2",
-                        "version": "prj-1-ver-1"
-                    };
+        var project2 = mocks.createProject(2);
         
-        scope.downloadProject(project);
+        scope.downloadProject(project2);
 
-        expect(project.status).toBe('both');
+        expect(project2.status).toBe('both');
         expect(mocks.localStore.createProject).toHaveBeenCalled();
 
     });

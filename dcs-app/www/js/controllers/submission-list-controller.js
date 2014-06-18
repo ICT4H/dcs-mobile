@@ -31,22 +31,41 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     }
 
     var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions) {
-        var inScope;
 
         serverSubmissions.forEach(function(serverSubmission) {
-            inScope = false;
-            submissionsInScope.forEach(function(localSubmission){
+            serverSubmission.status = SERVER;
+            submissionsInScope.forEach(function(localSubmission) {
                 if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
-                    inScope = true;
+                    serverSubmission.status = BOTH;
                 }
             });
 
-            if(!inScope) {
-                serverSubmission['in'] = 'server';
+            if(serverSubmission.status == SERVER) {
                 serverSubmission.project_id = project_id
                 $scope.submissions.push(serverSubmission);
             }
         });
+
+        var onServer, outdated;
+        submissionsInScope.forEach(function(localSubmission) {
+            if(BOTH == localSubmission.status) {
+                onServer = outdated = false;
+                serverSubmissions.forEach(function(serverSubmission) {
+                    if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
+                        onServer = true;
+                        if (serverSubmission.version != localSubmission.version) {
+                            outdated = true;
+                        }
+                    }
+                });
+                if(!onServer) {
+                    localSubmission.status = SERVER_DELETED;
+                } else if (outdated) {
+                    localSubmission.status = OUTDATED;
+                }
+            }
+        });
+
     };
 
     $scope.createSurveyResponse = function(project_id) {
@@ -58,8 +77,8 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     };
 
     var updateScopeSubmission = function(submission) {
-        if (submission['in'] == 'both') {
-            submission['in'] = 'server';
+        if (submission.status == BOTH) {
+            submission.status = SERVER;
         } else {
             $scope.submissions.splice($scope.submissions.indexOf(submission), 1);
         }
@@ -78,10 +97,10 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     $scope.downloadSubmission = function(submission) {
         msg.showLoading();
+        submission.status = BOTH;
         dcsService.getSubmission(submission)
             .then(localStore.createSubmission)
             .then(function(resp) {
-                submission['in'] = 'both';
                 submission.submission_id = resp.submission_id;
                 submission.html = resp.html;
                 submission.xml = resp.xml;
@@ -96,7 +115,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         dcsService.postSubmission(submission).then(function(updatedSubmission) {
             localStore.updateSubmissionMeta(submission.submission_id, updatedSubmission)
                 .then(function() {
-                    submission['in'] = 'both';
+                    submission.status = BOTH;
                     msg.hideLoadingWithInfo('Submitted successfully');
                 },function(error) {
                     msg.hideLoadingWithErr('Submitted to server, local status not updated.');
