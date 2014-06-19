@@ -1,4 +1,4 @@
-dcsApp.service('auth', ['userService', 'localStore', function(userService, localStore) {
+dcsApp.service('auth', ['$q', 'userService', 'localStore', function($q, userService, localStore) {
     var validLocalUserDetails = function(options) {
 		return localStore.openDB(options.userName, options.password);
     };
@@ -9,17 +9,17 @@ dcsApp.service('auth', ['userService', 'localStore', function(userService, local
 			.then(localStore.init);
     };
     this.validateUser = function(options) {
-        return new Promise(function(resolve, reject) {
+    	var deferred = $q.defer();
 			validLocalUserDetails(options)
-				.then(resolve,
+				.then(deferred.resolve,
 				function(userNotFound) {
 					authAndCreateLocalUser(options)
-					.then(resolve,
+					.then(deferred.resolve,
 					function(serverAuthFailed) {
-						rejct('Not valid local or server user');
+						deferred.reject('Not valid local or server user');
 					});
 				}
 			);
-	    });
+	    return deferred.promise;
     };
 }]);

@@ -1,4 +1,4 @@
-dcsApp.service('userService', [function() {
+dcsApp.service('userService', ['$q', function($q) {
 	var store = {};
 	var dbName = 'USER-STORE'; // TODO appropriate name?
 	var version = '1.0';
@@ -15,17 +15,17 @@ dcsApp.service('userService', [function() {
 	});
 	
 	this.createUser = function(options) {
-		return new Promise(function(resolve, reject) {
+    	var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql(
 					'INSERT INTO users (user_name, url) VALUES (?,?)', [options.userName, options.url],
 					function(tx, resp){
-						resolve(options);
-					}, reject
+						deferred.resolve(options);
+					}, deferred.reject
 				);
 			});
-		});
-	};
+		return deferred.promise;
+    };
 
 	this.updateUserName = function(old_user_name, new_user_name) {
 		db.transaction (function(tx) {
@@ -42,30 +42,28 @@ dcsApp.service('userService', [function() {
 	};
 
 	this.getUsers = function() {
-		return new Promise(function(resolve, reject) {
+    	var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM users', [], function(tx, resp) {
-					resolve(transformRows(resp.rows));
-				},reject);
+					deferred.resolve(transformRows(resp.rows));
+				},deferred.reject);
 			});
-		});
-	};
-
+		return deferred.promise;
+    };
 	this.getUserByName = function(userName) {
-		return new Promise(function(resolve, reject) {
+    	var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM users WHERE user_name = ?', [userName], function(tx, resp) {
 					if(resp.rows.length >= 1)
-						resolve(resp.rows.item(0));
+						deferred.resolve(resp.rows.item(0));
 					else
-						reject(true); // user not found
+						deferred.reject(true); // user not found
 				}, function(e) {
-					reject(false);
+					deferred.reject(false);
 				});
 			});
-		});
-
-	}
+		return deferred.promise;
+    };
 
 	var transformRows = function(resultSet) {
 		var rows = [];

@@ -21,7 +21,6 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
         auth.validateUser({userName: user.name, password: user.password, url: user.serverUrl}).then(function() {
             $rootScope.isAuthenticated = true;
             $location.path('/project-list');
-            $scope.$apply();
         }, function(e) {
             msg.hideLoadingWithErr('Invalid login details.');
         });
