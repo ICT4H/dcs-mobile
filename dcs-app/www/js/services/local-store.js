@@ -1,9 +1,8 @@
-var localStore = function() {
-	var store = {};
+dcsApp.service('localStore', [function () {
 	var db;
 	var version = '1.0';
 
-	store.init = function(options) {
+	this.init = function(options) {
 		return new Promise(function(resolve, reject) {
 			db = _getDB(options.userName, options.password);
 			db.transaction (function(tx) {
@@ -12,19 +11,19 @@ var localStore = function() {
 				resolve();
 			});
 		});
-	}
+	};
 
-	store.openDB = function(dbName, dbKey) {
+	this.openDB = function(dbName, dbKey) {
 		return new Promise(function(resolve, reject) {
 			db = _getDB(dbName, dbKey, reject);
 			db.transaction(function(tx) {
-				// Is this required, as only valid key will unlock sqlite store
+				// Is this required, as only valid key will unlock sqlite this
 				//TODO change this to get user server password
 				tx.executeSql('SELECT * FROM projects where project_id = ?',
 					[1], resolve, reject);
 			});	
 		});
-	}
+	};
 
 	function _getDB(dbName, dbKey, reject) {
 		//TODO make this method to always return promise
@@ -46,9 +45,9 @@ var localStore = function() {
 			}
 		}
 		return db;
-	}
+	};
 
-	store.createProject = function(project) {
+	this.createProject = function(project) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
@@ -59,9 +58,9 @@ var localStore = function() {
 				);
 			});
 		});
-	}
+	};
 
-	store.getProjectById = function(project_id) {
+	this.getProjectById = function(project_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM projects where project_id = ?', [project_id], function(tx, resp) {
@@ -69,9 +68,9 @@ var localStore = function() {
 				},reject);
 			});
 		});
-	}
+	};
 
-	store.getAllLocalProjects = function() {
+	this.getAllLocalProjects = function() {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM projects', [], function(tx, resp) {
@@ -81,7 +80,7 @@ var localStore = function() {
 		});
 	};
 
-	store.deleteProject = function(project_id) {
+	this.deleteProject = function(project_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
@@ -92,7 +91,7 @@ var localStore = function() {
 		});
 	};
 
-	store.getAllProjectSubmissions = function(project_id) {
+	this.getAllProjectSubmissions = function(project_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM submissions WHERE project_id = ?', [project_id], function(tx, resp) {
@@ -100,10 +99,10 @@ var localStore = function() {
 				}, reject);
 			});
 		});
-	}
+	};
 
 	// used by download & enketo
-	store.createSubmission = function(submission) {
+	this.createSubmission = function(submission) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql(
@@ -116,10 +115,10 @@ var localStore = function() {
 				);
 			});
 		});
-	}
+	};
 
 	// used by enketo update
-	store.updateSubmissionData = function(submission_id, submission) {
+	this.updateSubmissionData = function(submission_id, submission) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET html=?, xml=?, created=? where submission_id = ?', 
@@ -128,10 +127,10 @@ var localStore = function() {
 						}, reject);
 			})
 		});
-	}
+	};
 
 	// used by post submission
-	store.updateSubmissionMeta = function(submission_id, submission) {
+	this.updateSubmissionMeta = function(submission_id, submission) {
 		return new Promise(function(resolve, reject) {
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, created=? where submission_id = ?', 
@@ -140,9 +139,9 @@ var localStore = function() {
 						}, reject);
 			})
 		});
-	}
+	};
 
-	store.getSubmissionById = function(submission_id) {
+	this.getSubmissionById = function(submission_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM submissions where submission_id = ?', [submission_id], function(tx, resp) {
@@ -150,15 +149,15 @@ var localStore = function() {
 				},reject);
 			});
 		});
-	}
+	};
 
-	store.deleteSubmission = function(submission_id) {
+	this.deleteSubmission = function(submission_id) {
 		return new Promise(function(resolve, reject) {
 			db.transaction(function(tx) {
 				tx.executeSql('DELETE FROM submissions WHERE submission_id = ? ', [submission_id], function(tx, resp) {resolve()}, reject);
 			});
 		});
-	}
+	};
 
 	var transformRows = function(resultSet) {
 		var rows = [];
@@ -168,6 +167,4 @@ var localStore = function() {
 
 		return angular.copy(rows);
 	};
-
-	return store;
-}
+}]);

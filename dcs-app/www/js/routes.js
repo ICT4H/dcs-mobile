@@ -26,16 +26,8 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
         }); 
 
     $httpProvider.defaults.timeout = 1000;
-
-    $provide.provider('localStore', function() {
-        this.$get = localStore;
-    });
     
 }]);
-
-dcsApp.factory('dbService', function(){
-    return dbService;
-});
 
 dcsApp.run(['$http', '$rootScope', function($http, $rootScope) {
 
