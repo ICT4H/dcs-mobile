@@ -1,0 +1,5 @@
+/*File to be copied to the device/simulator 
+adb push /opt/code/android/dcs-app/project-dcs.json sdcard/
+*/{
+	"projects": [{"project_uuid": "1"}, {"project_uuid": "2"}, {"project_uuid": "3"}]
+}

@@ -23,6 +23,10 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
         .when('/project/:project_id/submission/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
+        })
+        .when('/import', {
+          templateUrl: "partials/import.html",
+          controller: 'importController'
         }); 
 
     $httpProvider.defaults.timeout = 1000;

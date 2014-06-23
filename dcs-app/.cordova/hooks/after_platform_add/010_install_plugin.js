@@ -7,7 +7,8 @@
 // or the URL
 var pluginlist = [
     "https://git-wip-us.apache.org/repos/asf/cordova-plugin-dialogs.git",
-    "https://github.com/ICT4H/Cordova-SQLitePlugin.git"
+    "https://github.com/ICT4H/Cordova-SQLitePlugin.git",
+    "https://git-wip-us.apache.org/repos/asf/cordova-plugin-file.git"
 ];
  
 // no need to configure below
