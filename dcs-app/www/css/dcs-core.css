@@ -134,7 +134,16 @@ h1 {
   background-color: #F6F7ED !important;
 }
 
-.server-deleted, .outdated {
+.server-deleted {
   text-decoration: line-through !important;
   background-color: #FFAD33 !important;
+}
+
+.outdated {
+  background-color: #FFAD33 !important;
+}
+
+.status-title {
+  border-top: solid white 1px;
+  padding: 5px 15px 5px 15px;
 }

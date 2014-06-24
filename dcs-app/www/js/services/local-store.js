@@ -3,7 +3,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	var version = '1.0';
 
 	this.init = function(options) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db = _getDB(options.userName, options.password);
 			db.transaction (function(tx) {
 				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
@@ -11,10 +11,10 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				deferred.resolve();
 			});
 		return deferred.promise;
-    };
+	};
 
 	this.openDB = function(dbName, dbKey) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db = _getDB(dbName, dbKey, deferred.reject);
 			db.transaction(function(tx) {
 				// Is this required, as only valid key will unlock sqlite this
@@ -23,7 +23,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 					[1], deferred.resolve, deferred.reject);
 			});	
 		return deferred.promise;
-    };
+	};
 
 	function _getDB(dbName, dbKey, reject) {
 		//TODO make this method to always return promise
@@ -48,7 +48,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	};
 
 	this.createProject = function(project) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql(
 					'INSERT INTO projects (project_uuid, version, status, name, xform) VALUES (?,?,?,?,?)', [project.project_uuid, project.version, 'both', project.name, project.xform],
@@ -58,9 +58,9 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				);
 			});
 		return deferred.promise;
-    };
+	};
 
-    this.updateProjectStatus = function(project_id, newStatus) {
+	this.updateProjectStatus = function(project_id, newStatus) {
 			db.transaction (function(tx) {
 				tx.executeSql(
 					'UPDATE projects SET status=? where project_id=?', [newStatus, project_id],
@@ -73,30 +73,30 @@ dcsApp.service('localStore', ['$q', function ($q) {
 					}
 				);
 			});
-    }
+	}
 
 	this.getProjectById = function(project_id) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM projects where project_id = ?', [project_id], function(tx, resp) {
 					deferred.resolve(transformRows(resp.rows)[0]);
 				},deferred.reject);
 			});
 		return deferred.promise;
-    };
+	};
 
 	this.getAllLocalProjects = function() {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM projects', [], function(tx, resp) {
 					deferred.resolve(transformRows(resp.rows));
 				},deferred.reject);
 			});
 		return deferred.promise;
-    };
+	};
 
 	this.deleteProject = function(project_id) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
 						deferred.resolve()
@@ -104,21 +104,21 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				);
 			});
 		return deferred.promise;
-    };
+	};
 
 	this.getAllProjectSubmissions = function(project_id) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM submissions WHERE project_id = ?', [project_id], function(tx, resp) {
 					deferred.resolve(transformRows(resp.rows));
 				}, deferred.reject);
 			});
 		return deferred.promise;
-    };
+	};
 
 	// used by download & enketo
 	this.createSubmission = function(submission) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql(
 					'INSERT INTO submissions (submission_uuid, version, status, project_id, created, html, xml) VALUES (?,?,?,?,?,?,?)', 
@@ -130,11 +130,22 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				);
 			});
 		return deferred.promise;
-    };
+	};
+
+	this.updateSubmissionStatus = function(submission_id, new_status) {
+		db.transaction (function(tx) {
+			tx.executeSql('UPDATE submissions SET status=? where submission_id = ?', 
+					[new_status, submission_id], function(tx, resp) {
+						console.log('submission '+ submission_id + ' status updated to ' + new_status);
+					}, function(e) {
+						console.log('Cannot update the status of submission ' + submission_id);
+					});
+		})
+	};
 
 	// used by enketo update
 	this.updateSubmissionData = function(submission_id, submission) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET html=?, xml=?, created=? where submission_id = ?', 
 						[submission.html, submission.xml, submission.created, submission_id], function(tx, resp) {
@@ -142,11 +153,11 @@ dcsApp.service('localStore', ['$q', function ($q) {
 						}, deferred.reject);
 			})
 		return deferred.promise;
-    };
+	};
 
 	// used by post submission
 	this.updateSubmissionMeta = function(submission_id, submission) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, created=? where submission_id = ?', 
 						[submission.submission_uuid, submission.version, submission.status, submission.created, submission_id], function(tx, resp) {
@@ -154,25 +165,47 @@ dcsApp.service('localStore', ['$q', function ($q) {
 						}, deferred.reject);
 			})
 		return deferred.promise;
-    };
+	};
+
+	this.updateSubmissionVersionAndStatus = function(submission_id, version, status) {
+		var deferred = $q.defer();
+			db.transaction (function(tx) {
+				tx.executeSql('UPDATE submissions SET version=?, status=? where submission_id = ?', 
+						[version, status, submission_id], function(tx, resp) {
+							deferred.resolve();
+						}, deferred.reject);
+			})
+		return deferred.promise;
+	};
+
+	this.updateSubmission = function(submission_id, submission) {
+		var deferred = $q.defer();
+			db.transaction (function(tx) {
+				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, html=?, xml=?, created=? where submission_id = ?', 
+						[submission.submission_uuid, submission.version, submission.status, submission.html, submission.xml, submission.created, submission_id], function(tx, resp) {
+							deferred.resolve();
+						}, deferred.reject);
+			})
+		return deferred.promise;
+	};
 
 	this.getSubmissionById = function(submission_id) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM submissions where submission_id = ?', [submission_id], function(tx, resp) {
 					deferred.resolve(transformRows(resp.rows)[0]);
 				},deferred.reject);
 			});
 		return deferred.promise;
-    };
+	};
 
 	this.deleteSubmission = function(submission_id) {
-    	var deferred = $q.defer();
+		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('DELETE FROM submissions WHERE submission_id = ? ', [submission_id], function(tx, resp) {deferred.resolve()}, deferred.reject);
 			});
 		return deferred.promise;
-    };
+	};
 
 	var transformRows = function(resultSet) {
 		var rows = [];
