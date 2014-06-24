@@ -60,6 +60,21 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
     };
 
+    this.updateProjectStatus = function(project_id, newStatus) {
+			db.transaction (function(tx) {
+				tx.executeSql(
+					'UPDATE projects SET status=? where project_id=?', [newStatus, project_id],
+					function(tx, resp){
+						// TODO how success and failure will be tracked
+						//doning nothing here
+						console.log('Project ' + project_id + ' status changed to ' + newStatus);
+					}, function(e) {
+						console.log('Project ' + project_id + ' status NOT changed to ' + newStatus);
+					}
+				);
+			});
+    }
+
 	this.getProjectById = function(project_id) {
     	var deferred = $q.defer();
 			db.transaction(function(tx) {

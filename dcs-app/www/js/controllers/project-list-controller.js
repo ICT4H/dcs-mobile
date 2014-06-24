@@ -52,8 +52,10 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             });
             if(!onServer){
                 localProject.status = SERVER_DELETED;
+                localStore.updateProjectStatus(localProject.project_id, SERVER_DELETED);
             } else if(outdated) {
                 localProject.status = OUTDATED;
+                localStore.updateProjectStatus(localProject.project_id, OUTDATED);
             }
         });
 
@@ -81,14 +83,21 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         );
     };
 
-    $scope.downloadProject = function(project){
+    $scope.downloadProject = function(project) {
         var project_uuid = project.project_uuid;
         msg.showLoadingWithInfo('Downloading project');
-        project.status = BOTH;
+
         dcsService.getQuestion(project_uuid)
             .then(localStore.createProject)
             .then(function(project_id) {
                 project.project_id = project_id;
+                if (project.status == OUTDATED) {
+                    var tmpPrj = angular.copy(project);
+                    tmpPrj.status = BOTH;
+                    $scope.projects.unshift(tmpPrj);
+                } else {
+                    project.status = BOTH;
+                }         
                 msg.hideLoadingWithInfo('Project downloaded.');
             }, function(e) {
                 project.status = SERVER;

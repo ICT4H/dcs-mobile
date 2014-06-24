@@ -16,11 +16,11 @@
     <div ng-repeat="project in projects  | filter:searchText" href="#submission-list" class="list-group-item" ng-class="project.status" >
         <i ng-show="project.status != 'server'" class="fa fa-times fa-lg pull-right" ng-click="deleteProject(project)"></i>
 
-        <i ng-show="project.status == 'server'" class="fa fa-download fa-lg pull-right" ng-click="downloadProject(project)"></i>
+        <i ng-show="project.status != 'both'" class="fa fa-download fa-lg pull-right" ng-click="downloadProject(project)"></i>
 
-        <span ng-show="project.status != 'both'">{{ project.name }}</span>
+        <span ng-show="project.status == 'server'">{{ project.name }}</span>
 
-        <a ng-show="project.status == 'both'" href="#submission-list/{{project.project_id}}/project_uuid/{{project.project_uuid}}/project_name/{{project.name}}">
+        <a ng-show="project.status != 'server'" href="#submission-list/{{project.project_id}}/project_uuid/{{project.project_uuid}}/project_name/{{project.name}}">
             {{ project.name }}
         </a>
 

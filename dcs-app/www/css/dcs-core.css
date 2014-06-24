@@ -134,11 +134,7 @@ h1 {
   background-color: #F6F7ED !important;
 }
 
-.outdated {
-  background-color: #FFAD33 !important;
-}
-
-.server-deleted {
+.server-deleted, .outdated {
   text-decoration: line-through !important;
   background-color: #FFAD33 !important;
 }
