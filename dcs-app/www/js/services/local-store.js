@@ -7,7 +7,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 			db = _getDB(options.userName, options.password);
 			db.transaction (function(tx) {
 				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id text, created text, html text, xml text)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id integer, created text, html text, xml text)');
 				deferred.resolve();
 			});
 		return deferred.promise;
@@ -97,12 +97,22 @@ dcsApp.service('localStore', ['$q', function ($q) {
 
 	this.deleteProject = function(project_id) {
 		var deferred = $q.defer();
-			db.transaction(function(tx) {
-				tx.executeSql('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
-						deferred.resolve()
-					}, deferred.reject
-				);
-			});
+
+		console.log('1 isEmulator: ' + isEmulator + ' deleting submission for project_id: ' + project_id);
+		
+		//TODO This needs to be improved.
+		db.transaction(function(tx) {
+			tx.executeSql('DELETE FROM submissions where project_id=?', [project_id], function(tx, resp) {
+				console.log('Submissions of the project deleted: ' + project_id);
+			}, deferred.reject);
+		});
+
+		db.transaction(function(tx) {
+			tx.executeSql('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
+				console.log('Project deleted succssfully: ' + project_id);
+				deferred.resolve();
+			}, deferred.reject);
+		});
 		return deferred.promise;
 	};
 

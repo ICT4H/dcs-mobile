@@ -62,7 +62,6 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     };
 
     $scope.deleteProject = function(project){
-        var BUTTON_NO = 3;
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
             

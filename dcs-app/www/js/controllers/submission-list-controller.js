@@ -51,7 +51,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     }
 
     $scope.takeLocalSubmission = function(s) {
-        var BUTTON_NO = 3;
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
@@ -69,7 +68,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     };
 
     $scope.takeServerSubmission = function(s) {
-         var BUTTON_NO = 3;
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
