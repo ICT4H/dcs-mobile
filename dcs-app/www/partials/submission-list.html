@@ -1,9 +1,9 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="new">
-    <i class="fa fa-lg fa-file" ng-click="createSurveyResponse(project_id)"></i>
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_id)"></i>
 </div>
 <div content-for="refreshContents">
-    <i class="fa fa-lg fa-arrow-circle-down" ng-click="$refreshContents()"></i>
+    <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
 </div>
 
 <div class="scrollable">  
@@ -13,7 +13,9 @@
         <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
         <span class="input-group-addon" ng-click="searchText = ''"><a><i class="fa fa-search-minus"></i></a></span>
       </div>
-
+      <div class="list-group-item alert-danger" ng-show="projectWarning">
+        <p>{{projectWarning}}</p>
+      </div>
       <div class="panel-group" id="accordion">
           <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="item.status">
 

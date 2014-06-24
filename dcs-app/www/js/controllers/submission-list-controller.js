@@ -8,15 +8,36 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     var project_uuid = $routeParams.project_uuid;
     $scope.project_id = project_id;
     var serverSubmissions = [];
+    $scope.outdateProject = false;
+    $scope.deletedProject = false;
 
-    localStore.getAllProjectSubmissions(project_id)
-        .then(function(localSubmissions) {
-            $scope.submissions = localSubmissions || [];
-            msg.hideAll();
-        }, function(e) {
-            msg.hideLoadingWithErr('Unable to show local submissions');
+    localStore.getProjectById(project_id)
+        .then(function(project) {
+            
+            setObseleteProjectWarning(project);
+
+            localStore.getAllProjectSubmissions(project_id)
+                .then(function(localSubmissions) {
+                    $scope.submissions = localSubmissions || [];
+                    msg.hideAll();
+                }, function(e) {
+                    msg.hideLoadingWithErr('Unable to show local submissions');
+                });
+        });
+
+    var setObseleteProjectWarning = function(project) {
+        delete $scope.projectWarning;
+        
+        if(project.status == OUTDATED) {
+            $scope.outdateProject = true;
+            $scope.projectWarning = 'The porject is outdated. You can only submit existing submissions.';
         }
-    );
+
+        if(project.status == SERVER_DELETED) {
+            $scope.deletedProject = true;
+            $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
+        }
+    }
 
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
