@@ -96,7 +96,9 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     };
 
     $scope.deleteSubmission = function(submission) {
-        msg.showLoading();
+         function onConfirm(buttonIndex) {
+            if(buttonIndex==BUTTON_NO) return;
+
         localStore.deleteSubmission(submission.submission_id)
             .then(function() {
                 updateScopeSubmission(submission);
@@ -104,6 +106,13 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             }, function(error){
                 msg.hideLoadingWithErr("Submission deletion failed")
             });
+        };
+        navigator.notification.confirm(
+            'Do you want to delete ?',
+            onConfirm,
+            'Delete submission',
+            ['Yes','No']
+        );
     };
 
     $scope.downloadSubmission = function(submission) {
