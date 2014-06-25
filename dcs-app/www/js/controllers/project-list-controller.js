@@ -7,7 +7,8 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
 
     localStore.getAllLocalProjects()
         .then(function(localProjects){
-            $scope.projects = localProjects || [];
+            if(!$rootScope.projects)
+            $rootScope.projects = localProjects || [];
             msg.hideAll();
         }, function(e) {
             msg.hideLoadingWithErr('Unable to show local projects');
@@ -20,7 +21,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         
         dcsService.getQuestionnaires()
             .then(function(serverProjects) {
-                updateProjectsToDisplay($scope.projects, serverProjects);
+                updateProjectsToDisplay($rootScope.projects, serverProjects);
                 msg.hideAll();
             }, function(error) {
                 msg.hideLoadingWithErr('Unable fetch server projects');
@@ -93,7 +94,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
                 if (project.status == OUTDATED) {
                     var tmpPrj = angular.copy(project);
                     tmpPrj.status = BOTH;
-                    $scope.projects.unshift(tmpPrj);
+                    $rootScope.projects.unshift(tmpPrj);
                 } else {
                     project.status = BOTH;
                 }         

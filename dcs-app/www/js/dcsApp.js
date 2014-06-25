@@ -6,7 +6,7 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
 ]);
 
 var isEmulator = true;
-var BUTTON_NO = isEmulator ? 2 : 3;
+var BUTTON_NO = isEmulator ? 3 : 2;
 
 var SERVER = 'server';
 var LOCAL = 'local';
