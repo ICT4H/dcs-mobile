@@ -13,7 +13,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     localStore.getProjectById(project_id)
         .then(function(project) {
-
+            $scope.project_name = project.name;
             setObseleteProjectWarning(project);
 
             localStore.getAllProjectSubmissions(project_id)

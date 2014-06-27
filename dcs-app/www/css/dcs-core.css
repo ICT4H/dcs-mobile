@@ -118,10 +118,6 @@ h1 {
   background-color: #F6F7ED !important;
 }
 
-.btn-margin-reduced {
-  margin-right: -9px !important;
-}
-
 .list-group .active {
   background-color: #222 !important;
 }
@@ -146,4 +142,9 @@ h1 {
 .status-title {
   border-top: solid white 1px;
   padding: 5px 15px 5px 15px;
+}
+
+.context-info {
+  color: white;
+  text-align: center;
 }
