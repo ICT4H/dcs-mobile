@@ -36,7 +36,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
             $rootScope.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).success(function(serverSubmission) {
                 serverSubmission.project_id = submission.project_id;
                 serverSubmission.status = submission.status;
-                console.log('all submissions: ' + JSON.stringify(serverSubmission));
+                serverSubmission.created = submission.created;
                 deferred.resolve(serverSubmission);
             }).error(deferred.reject);
         return deferred.promise;

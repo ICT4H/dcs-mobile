@@ -162,11 +162,18 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
         }
     }
-
+    var prettifyDate = function(serverDate) {
+        var now = new Date(serverDate);
+        var date = now.toLocaleDateString();
+        var time = now.toLocaleTimeString();
+        time = time.replace(time.slice(time.length-6,time.length-3),'');
+        return date.concat(' '+time);
+    };
     var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions) {
 
         serverSubmissions.forEach(function(serverSubmission) {
             serverSubmission.status = SERVER;
+            serverSubmission.created = prettifyDate(serverSubmission.created);
             submissionsInScope.forEach(function(localSubmission) {
                 if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
                     serverSubmission.status = BOTH;
