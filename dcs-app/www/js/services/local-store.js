@@ -2,50 +2,34 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	var db;
 	var version = '1.0';
 
-	this.init = function(options) {
+	this.init =  function(user) {
+		var dbName = convertToSlug(user.name);
 		var deferred = $q.defer();
-			db = _getDB(options.userName, options.password);
-			db.transaction (function(tx) {
-				tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id integer, created text, html text, xml text)');
-				deferred.resolve();
-			});
-		return deferred.promise;
-	};
 
-	this.openDB = function(dbName, dbKey) {
-		var deferred = $q.defer();
-			db = _getDB(dbName, dbKey, deferred.reject);
-			db.transaction(function(tx) {
-				// Is this required, as only valid key will unlock sqlite this
-				//TODO change this to get user server password
-				tx.executeSql('SELECT * FROM projects where project_id = ?',
-					[1], deferred.resolve, deferred.reject);
-			});	
-		return deferred.promise;
-	};
-
-	function _getDB(dbName, dbKey, reject) {
-		//TODO make this method to always return promise
-		dbName = convertToSlug(dbName);
-		var db;
 		if (isEmulator) {
 			db = window.openDatabase(dbName, version, dbName, -1);
+			deferred.resolve();
+			return deferred.promise;
 		} else {
-			if (reject) {
-				db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey}, function() {
-					console.log('_getDB success');
-				}, function(e) {
-					console.log('_getDB failed');
-					reject();
-				});
-
-			} else {
-				db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: dbKey});
-			}
+			db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: user.password}, function() {
+				console.log('_getDB success, trying to create non existing tables');
+				initTables(db);
+				deferred.resolve();
+			}, function(e) {
+				console.log('_getDB failed');
+				deferred.reject();
+			});
 		}
-		return db;
+
+		return deferred.promise;
 	};
+
+	var initTables = function(db) {
+		db.transaction (function(tx) {
+			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
+			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id integer, created text, html text, xml text)');
+		});		
+	}
 
 	this.createProject = function(project) {
 		var deferred = $q.defer();

@@ -2,6 +2,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
 
     msg.showLoading();
     $scope.user = {};
+    $scope.user.loginType = 'existing';
 
     userService.getUsers().then(function(details) {
 
@@ -16,14 +17,30 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
         msg.hideLoadingWithErr('Unable to connect to local storage');
     });
 
-    $scope.saveDetails = function(user) {
+    $scope.login = function(user) {
         msg.showLoading();
-        auth.validateUser({userName: user.name, password: user.password, url: user.serverUrl}).then(function() {
-            $rootScope.isAuthenticated = true;
-            $location.path('/project-list');
-        }, function(e) {
-            msg.hideLoadingWithErr('Invalid login details.');
-        });
+        if ('change' == user.loginType) {
+            //TODO
+        } else if ('new' == user.loginType) {
+            auth.createValidLocalStore(user)
+                .then(function() {
+                    $rootScope.isAuthenticated = true;
+                    $location.path('/project-list');
+                }, function() {
+                    msg.hideLoadingWithErr('Server authentication failed');
+                });
+        } else {// existing user
+            auth.validateLocalUser(user)
+                .then(function() {
+                    msg.hideAll();
+                    $rootScope.isAuthenticated = true;
+                    $location.path('/project-list');
+                }, function() {
+                    msg.hideLoadingWithErr('Invalid login details');
+                    $location.path('/');
+                });
+
+        }
     };
 
 

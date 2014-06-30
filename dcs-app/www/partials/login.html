@@ -13,7 +13,15 @@
             <label>Url</label>    
             <input class=" form-control" type ="text" ng-model="user.serverUrl">
         </div>
-        <button class="btn btn-primary" ng-click="saveDetails(user)">continue</button>
+        <div class="form-group">
+            <label>User</label>
+            <select class="form-control" id="login_type" ng-model="user.loginType">
+                <option value="existing">Existing</option>
+                <option value="new">New</option>
+                <option value="change">Change password</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" ng-click="login(user)">continue</button>
     </div>
 </div>
  

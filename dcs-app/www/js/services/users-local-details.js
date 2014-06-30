@@ -11,16 +11,15 @@ dcsApp.service('userService', ['$q', function($q) {
 
 	db.transaction (function(tx) {
 		tx.executeSql('CREATE TABLE IF NOT EXISTS users (user_id integer primary key, user_name text, url text)');
-
 	});
 	
-	this.createUser = function(options) {
+	this.createUser = function(user) {
     	var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO users (user_name, url) VALUES (?,?)', [options.userName, options.url],
+					'INSERT INTO users (user_name, url) VALUES (?,?)', [user.name, user.serverUrl],
 					function(tx, resp){
-						deferred.resolve(options);
+						deferred.resolve(user);
 					}, deferred.reject
 				);
 			});
