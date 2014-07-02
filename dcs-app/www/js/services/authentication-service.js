@@ -1,4 +1,4 @@
-dcsApp.service('auth', ['$q', 'userService', 'localStore', function($q, userService, localStore) {
+dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', function($rootScope, $q, userService, localStore) {
 
     var currentUser = {};
 
@@ -59,13 +59,12 @@ dcsApp.service('auth', ['$q', 'userService', 'localStore', function($q, userServ
     var serverAuth = function(user) {
         var deferred = $q.defer();
 
-        if (user.name.indexOf('thoughtworks.com') != -1) {
-            console.log('server auth pass');
-            deferred.resolve(user);
-        } else {
-            console.log('server auth failed');
-            deferred.reject();
-        }
+        console.log('trying to auth from server')
+        $rootScope.httpRequest('/client/auth/')
+            .then(function() {
+                console.log('server auth pass');
+                deferred.resolve(user);
+            }, deferred.reject);
 
         return deferred.promise;
     }
