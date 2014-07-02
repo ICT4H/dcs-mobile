@@ -4,10 +4,11 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
     msg.showLoadingWithInfo('Loading projects');
     var serverProjects = [];
 
+    console.log('trying to get allProjects');
     localStore.getAllLocalProjects()
         .then(function(localProjects){
             if(!$rootScope.projects)
-            $rootScope.projects = localProjects || [];
+                $rootScope.projects = localProjects || [];
             msg.hideAll();
         }, function(e) {
             msg.hideLoadingWithErr('Unable to show local projects');

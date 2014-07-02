@@ -8,27 +8,29 @@ dcsApp.service('localStore', ['$q', function ($q) {
 
 		if (isEmulator) {
 			db = window.openDatabase(dbName, version, dbName, -1);
-			deferred.resolve();
-			return deferred.promise;
+			deferred.resolve(user);
 		} else {
 			db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: user.password}, function() {
-				console.log('_getDB success, trying to create non existing tables');
-				initTables(db);
-				deferred.resolve();
+				console.log('_getDB success');
+				deferred.resolve(user);
 			}, function(e) {
 				console.log('_getDB failed');
 				deferred.reject();
 			});
 		}
-
 		return deferred.promise;
 	};
 
-	var initTables = function(db) {
+	this.createStore = function() {
+		var deferred = $q.defer();
+		console.log('db inside initTable: ' + db);
 		db.transaction (function(tx) {
 			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
 			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id integer, created text, html text, xml text)');
-		});		
+			console.log('Project and submission tables created');
+			deferred.resolve();
+		});
+		return deferred.promise;
 	}
 
 	this.createProject = function(project) {

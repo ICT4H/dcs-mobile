@@ -5,14 +5,18 @@ dcsApp.service('auth', ['$q', 'userService', 'localStore', function($q, userServ
 
     this.validateLocalUser = function(user) {
         currentUser = user;
-        return checkDBFileExists(user).then(localStore.init);
+        return checkDBFileExists(user)
+            .then(userService.updateUrl)
+            .then(localStore.init);
     }
 
     this.createValidLocalStore = function(user) {
         currentUser = user;
         return serverAuth(user)
             .then(userService.createUser)
-            .then(localStore.init);
+            .then(userService.updateUrl)
+            .then(localStore.init)
+            .then(localStore.createStore);
     }
 
     this.changePassword = function() {
@@ -55,7 +59,7 @@ dcsApp.service('auth', ['$q', 'userService', 'localStore', function($q, userServ
     var serverAuth = function(user) {
         var deferred = $q.defer();
 
-        if (user.name == 'tester150411@gmail.com') {
+        if (user.name.indexOf('thoughtworks.com') != -1) {
             console.log('server auth pass');
             deferred.resolve(user);
         } else {

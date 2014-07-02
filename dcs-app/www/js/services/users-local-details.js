@@ -10,7 +10,7 @@ dcsApp.service('userService', ['$q', function($q) {
 		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: 'secret1'});
 
 	db.transaction (function(tx) {
-		tx.executeSql('CREATE TABLE IF NOT EXISTS users (user_id integer primary key, user_name text, url text)');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS users (user_id integer primary key, user_name text NOT NULL UNIQUE, url text)');
 	});
 	
 	this.createUser = function(user) {
@@ -26,18 +26,18 @@ dcsApp.service('userService', ['$q', function($q) {
 		return deferred.promise;
     };
 
-	this.updateUserName = function(old_user_name, new_user_name) {
+	this.updateUrl = function(user) {
+		var deferred = $q.defer();
+		console.log('Trying to update serverurl ' + user.name + 'url: ' + user.serverUrl);
 		db.transaction (function(tx) {
-			tx.executeSql('UPDATE users set (user_name) VALUES (?) where user_name = ?', 
-					[new_user_name, old_user_name]);
+			tx.executeSql('UPDATE users set url=? where user_name = ?', 
+					[user.serverUrl, user.name],
+					function() {
+						console.log('serverurl update done; resolving promise');
+						deferred.resolve(user);
+					}, deferred.reject);
 		});
-	};
-
-	this.updateUrl = function(user_name, new_url) {
-		db.transaction (function(tx) {
-			tx.executeSql('UPDATE users set (url) VALUES (?) where user_name = ?', 
-					[new_url, user_name]);
-		});
+		return deferred.promise;
 	};
 
 	this.getUsers = function() {

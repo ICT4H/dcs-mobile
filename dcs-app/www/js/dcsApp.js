@@ -14,11 +14,10 @@ var BOTH = 'both';
 var SERVER_DELETED = 'server-deleted';
 var OUTDATED = 'outdated';
 
-function convertToSlug(Text) {
-    return Text
+function convertToSlug(text) {
+    return text
         .toLowerCase()
-        .replace(/[^\w-]+/g,'')
-        ;
+        .replace(/[^\w-]+/g,'');
 }
 
 dcsApp.run(['$http', '$rootScope', 'auth', function($http, $rootScope, auth) {
@@ -30,26 +29,28 @@ dcsApp.run(['$http', '$rootScope', 'auth', function($http, $rootScope, auth) {
         window.history.back();
     };
 
-    var credentials = {};
-    credentials.username = auth.getCurrentUser().name;
-    credentials.password = auth.getCurrentUser().password;
-    credentials.serverUrl= credentials.serverUrl;
+    var getUser = function() {
+        var user = auth.getCurrentUser();
+        // user.name = 'tester150411@gmail.com';
+        // user.password = 'tester150411';
+        //user.serverUrl= 'http://10.37.129.2:8001';
+        return user;
+    }
 
-    // TODO remove this hardcoding with auth.getCurrentUser().name
-    credentials.username = 'tester150411@gmail.com';
-    credentials.password = 'tester150411';
-    credentials.serverUrl= 'http://10.4.31.52:8001';
-    //credentials.serverUrl= 'https://dcsweb.twhosted.com';
-    //credentials.serverUrl= 'http://localhost:3000';
 
     $rootScope.httpRequest = function(uri) {
-        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
-        return $http.get(credentials.serverUrl + uri);
+        var user = getUser();
+        console.log('calls user name: ' + user.name);
+        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
+        return $http.get(user.serverUrl + uri);
     };
+
     $rootScope.httpPostRequest = function(uri, data) {
+        var user = getUser();
+        console.log('calls user name: ' + user.name);
         $http.defaults.headers.post["Content-Type"] = "text/plain";
-        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(credentials.username + ':' + credentials.password);
-        return $http.post(credentials.serverUrl + uri, data);
+        $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
+        return $http.post(user.serverUrl + uri, data);
     };
 
 

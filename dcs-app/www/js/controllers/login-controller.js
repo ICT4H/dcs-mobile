@@ -4,8 +4,9 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
     $scope.user = {};
     $scope.user.loginType = 'existing';
 
-    userService.getUsers().then(function(details) {
+    $rootScope.projects = []; // clear cache when user comes to login page
 
+    userService.getUsers().then(function(details) {
         // TODO User will be selcting existing/new check box to selct/enter user name
         // For now assuming there will be only one user per app.
         if (details.length >= 1) {
@@ -24,6 +25,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
         } else if ('new' == user.loginType) {
             auth.createValidLocalStore(user)
                 .then(function() {
+                    console.log('createValidLocalStore resolved');
                     $rootScope.isAuthenticated = true;
                     $location.path('/project-list');
                 }, function() {
