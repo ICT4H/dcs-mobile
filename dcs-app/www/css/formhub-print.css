@@ -32,6 +32,7 @@ body .paper {
 .form-footer,
 .or-appearance-no-print,
 button,
+.ad,
 .paper #submit-form {
   display: none !important;
 }
@@ -219,6 +220,25 @@ label, legend, .trigger, .note {
 .question.or-appearance-compact input:checked ~ img,
 .question.or-appearance-quickcompact input:checked ~ img {
   border-color: black;
+}
+
+.or-appearance-distress .slider.slider-vertical {
+  border: 1px solid black;
+  border-bottom: none;
+}
+.or-appearance-distress .bulb {
+  border: 1px solid black;
+}
+.or-appearance-distress .bulb .inner {
+  border: 1px solid black;
+}
+.or-appearance-distress .slider.slider-vertical .slider-track {
+  border: 1px solid black;
+  border-bottom: none;
+}
+
+.pages.or [role="page"] {
+  display: block;
 }
 
 *:not(.or-appearance-field-list) .question, .note, .trigger, .or-appearance-field-list {
