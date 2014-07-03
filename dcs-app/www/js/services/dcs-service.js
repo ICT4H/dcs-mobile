@@ -50,7 +50,10 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
                     submission.submission_uuid == "undefined") { // websql in emulator returns this
                 $rootScope.httpPostRequest("/client/project/dummy/submission/", 'form_data=' + submission.xml)
                     .success(function(updatedSubmission) {
-                        deferred.resolve(updatedSubmission);
+                        submission.status = BOTH;
+                        submission.submission_uuid = updatedSubmission.submission_uuid;
+                        submission.version = updatedSubmission.version;
+                        deferred.resolve(submission);
                     }).error(deferred.reject);
             } else {
                 $rootScope.httpPostRequest("/client/project/dummy/submission/" + submission.submission_uuid, 'form_data=' + submission.xml)

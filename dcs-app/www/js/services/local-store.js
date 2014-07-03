@@ -152,11 +152,11 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	};
 
 	// used by post submission
-	this.updateSubmissionMeta = function(submission_id, submission) {
+	this.updateSubmissionMeta = function(submission) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, created=? where submission_id = ?', 
-						[submission.submission_uuid, submission.version, submission.status, submission.created, submission_id], function(tx, resp) {
+						[submission.submission_uuid, submission.version, submission.status, submission.created, submission.submission_id], function(tx, resp) {
 							deferred.resolve();
 						}, deferred.reject);
 			})

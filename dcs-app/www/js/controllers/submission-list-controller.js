@@ -28,14 +28,19 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
         msg.showLoadingWithInfo('Fetching server submissions');
-        dcsService.getAllSubmissions(project_uuid)
-            .then(function(serverSubmissions) {
-                updateSubmissionsToDisplay($scope.submissions, serverSubmissions);
-                msg.hideAll();
-            }, function(error){
-                msg.hideLoadingWithErr('Unable to fetch submissions')
+        $scope.submissions = [];
+
+        localStore.getAllProjectSubmissions(project_id)
+            .then(function(localSubmissions) {
+                dcsService.getAllSubmissions(project_uuid)
+                    .then(function(serverSubmissions) {
+                        updateSubmissionsToDisplay(localSubmissions, serverSubmissions);
+                        msg.hideAll();
+                    }, function(error){
+                        msg.hideLoadingWithErr('Unable to fetch submissions')
+                    });
             });
-    }
+    };
 
     $scope.compare = function(localSubmission) {
         msg.showLoadingWithInfo('Fetching latest server submission');
@@ -56,7 +61,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
             localStore.updateSubmissionVersionAndStatus(s.submission_id, s.serverSubmission.version, s.serverSubmission.status);
             // s.status = BOTH;
-            s.status = 'changed';
+            s.status = CHANGED;
             msg.displaySuccess('Local changes taken');
 
         };
@@ -133,24 +138,16 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     $scope.postSubmission = function(submission) {
         msg.showLoading();
-        dcsService.postSubmission(submission).then(function(updatedSubmission) {
-            updatedSubmission.status = BOTH;
-            submission.status = BOTH;
-            localStore.updateSubmissionMeta(submission.submission_id, updatedSubmission)
-                .then(function() {
-                    submission.submission_uuid = updatedSubmission.submission_uuid;
-                    submission.version = updatedSubmission.version;
-                    msg.hideLoadingWithInfo('Submitted successfully');
-                },function(error) {
-                    msg.hideLoadingWithErr('Submitted to server, local status not updated.');
-                });;
+        submission.status = BOTH;
 
-        }, function(error){
-            if (error.status == '404') {
-                // this submission is not avail in the server. Delete your local copy.
-            }
-            msg.hideLoadingWithErr('Unable to submit submission.');
-        });
+        dcsService.postSubmission(submission)
+            .then(localStore.updateSubmissionMeta)
+            .then(function() {
+                msg.hideLoadingWithInfo('Submitted successfully');
+            },function(error) {
+                submission.status = CHANGED;
+                msg.hideLoadingWithErr('Submitted to server, local status not updated.');
+            });
     };
 
     var setObseleteProjectWarning = function(project) {
@@ -166,6 +163,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
         }
     }
+
     var prettifyDate = function(serverDate) {
         var now = new Date(serverDate);
         var date = now.toLocaleDateString();
@@ -173,12 +171,13 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         time = time.replace(time.slice(time.length-6,time.length-3),'');
         return date.concat(' '+time);
     };
-    var updateSubmissionsToDisplay = function(submissionsInScope, serverSubmissions) {
+
+    var updateSubmissionsToDisplay = function(localSubmissions, serverSubmissions) {
 
         serverSubmissions.forEach(function(serverSubmission) {
             serverSubmission.status = SERVER;
             serverSubmission.created = prettifyDate(serverSubmission.created);
-            submissionsInScope.forEach(function(localSubmission) {
+            localSubmissions.forEach(function(localSubmission) {
                 if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
                     serverSubmission.status = BOTH;
                 }
@@ -191,12 +190,13 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         });
 
         var onServer, outdated;
-        submissionsInScope.forEach(function(localSubmission) {
+        localSubmissions.forEach(function(localSubmission) {
             if(BOTH == localSubmission.status) {
                 onServer = outdated = false;
                 serverSubmissions.forEach(function(serverSubmission) {
                     if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
                         onServer = true;
+                        console.log('aaya    '+serverSubmission.version +'\t' +localSubmission.version)
                         if (serverSubmission.version != localSubmission.version) {
                             outdated = true;
                         }
