@@ -7,7 +7,8 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
         currentUser = user;
         return checkDBFileExists(user)
             .then(userService.updateUrl)
-            .then(localStore.init);
+            .then(localStore.init)
+            .then(localStore.createStore);
     }
 
     this.createValidLocalStore = function(user) {

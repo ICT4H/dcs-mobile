@@ -46,7 +46,8 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
         console.log('submit submission: ' + JSON.stringify(submission));
         var deferred = $q.defer();
 
-            if (angular.isUndefined(submission.submission_uuid)) {
+            if (angular.isUndefined(submission.submission_uuid) ||
+                    submission.submission_uuid == "undefined") { // websql in emulator returns this
                 $rootScope.httpPostRequest("/client/project/dummy/submission/", 'form_data=' + submission.xml)
                     .success(function(updatedSubmission) {
                         deferred.resolve(updatedSubmission);

@@ -6,7 +6,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
     $scope.user.name = 'tester150411@gmail.com';
     $scope.user.serverUrl = 'https://172.18.29.3';
 
-    $rootScope.projects = []; // clear cache when user comes to login page
+    delete $rootScope.projects; // clear cache when user comes to login page
 
     userService.getUsers().then(function(details) {
         // TODO User will be selcting existing/new check box to selct/enter user name
