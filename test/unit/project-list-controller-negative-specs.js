@@ -27,7 +27,7 @@ describe('project list controller -ive', function() {
 
         scope.$refreshContents();
 
-        expect(scope.projects.length).toBe(2);
+        expect(scope.projects.length).toBe(3);
     })
 
     it('should change status to server_deleted when project is deleted over server', function() {

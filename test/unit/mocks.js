@@ -6,14 +6,14 @@ function DCSMocks() {
 	var mocks = {
 	    messageService: jasmine.createSpyObj('messageService', ['showLoading', 'hideLoadingWithErr', 'hideAll', 'showLoadingWithInfo', 'hideLoadingWithInfo']),
 	    userService: jasmine.createSpyObj('userService', ['getUsers']),
-	    authService: jasmine.createSpyObj('auth',['validateUser']),
+	    authService: jasmine.createSpyObj('auth',['validateLocalUser']),
 	    dcsService: jasmine.createSpyObj('dcsService', ['getQuestionnaires', 'getQuestion', 'getAllSubmissions']),
-	    localStore: jasmine.createSpyObj('localStore',['getAllLocalProjects', 'createProject', 'deleteProject', 'getAllProjectSubmissions'])
+	    localStore: jasmine.createSpyObj('localStore',['getAllLocalProjects', 'createProject', 'getProjectById', 'updateProjectStatus', 'deleteProject', 'updateSubmissionStatus', 'getAllProjectSubmissions'])
 	};
 
     mocks.userService.getUsers.andReturn( { then:function(deThen) { deThen([{user_name:'user_name', url:'url'}]); } } );
 
-    mocks.authService.validateUser.andReturn(promise);
+    mocks.authService.validateLocalUser.andReturn(promise);
 
     mocks.localStore.deleteProject.andReturn(promise);
 
@@ -51,14 +51,20 @@ function DCSMocks() {
     }
 
     mocks.dcsService.getQuestionnaires.andReturn({then: function(resolve,reject) {
-        resolve( [mocks.createProject(1), mocks.createProject(2)] );
+        resolve( [mocks.createProject(1),
+            mocks.createProject(2),
+            mocks.createProject(3)] );
     }});
 
     mocks.dcsService.getQuestion.andReturn({then: function(resolve,reject) {
         return mocks.localStore.createProject();
     }});
 
-    mocks.localStore.getAllLocalProjects.andReturn({then: function(resolve,reject) {
+    mocks.localStore.getProjectById.andReturn({then: function(resolve,reject) {
+        resolve( [mocks.createLocalProject(1, "both")] );
+    }});
+
+    mocks.localStore.getProjectById.andReturn({then: function(resolve,reject) {
         resolve( [mocks.createLocalProject(1, "both")] );
     }});
 
@@ -67,12 +73,20 @@ function DCSMocks() {
         resolve(ANY_NUM);
     }});
 
+    mocks.localStore.getAllLocalProjects.andReturn({then: function(resolve,reject) {
+        resolve( [mocks.createLocalProject(1, "both"),
+            mocks.createLocalProject(2, "both")] );
+    }});
+
     mocks.localStore.getAllProjectSubmissions.andReturn({then: function(resolve, reject) {
-        resolve( [mocks.createLocalSubmission(1,1,'both'), mocks.createLocalSubmission(1,2,'both')] );
+        resolve( [mocks.createLocalSubmission(1,1,'both'),
+            mocks.createLocalSubmission(1,2,'both')] );
     }});
 
     mocks.dcsService.getAllSubmissions.andReturn({then: function(resolve, reject) {
-        resolve( [mocks.createSubmission(1,1), mocks.createSubmission(1,1)] );
+        resolve( [mocks.createSubmission(1,1),
+            mocks.createSubmission(1,2),
+            mocks.createSubmission(1,3)] );
     }});
 
     return mocks;

@@ -11,6 +11,20 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
+    var setObseleteProjectWarning = function(project) {
+        delete $scope.projectWarning;
+
+        if(project.status == OUTDATED) {
+            $scope.outdateProject = true;
+            $scope.projectWarning = 'The porject is outdated. You can only submit existing submissions.';
+        }
+
+        if(project.status == SERVER_DELETED) {
+            $scope.deletedProject = true;
+            $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
+        }
+    }
+
     localStore.getProjectById(project_id)
         .then(function(project) {
             $scope.project_name = project.name;
@@ -40,6 +54,65 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                         msg.hideLoadingWithErr('Unable to fetch submissions')
                     });
             });
+    };
+
+
+    var groupOnStatus = function(localSubmissions) {
+        var statusLocal = [];
+        var statusNonLocal = [];
+        localSubmissions.forEach(function(submission) {
+            if (submission.status == LOCAL) {
+                statusLocal.push(submission);
+            } else {
+                statusNonLocal.push(submission);
+            }
+        });
+        return {'local':statusLocal, 'non-local':statusNonLocal};
+    }
+
+    var updateSubmissionsToDisplay = function(localSubmissions, serverSubmissions) {
+
+        var submissionByStatus = groupOnStatus(localSubmissions);
+        $scope.submissions = submissionByStatus['local'];
+        var nonLocalSubmissions = submissionByStatus['non-local'];
+
+        // What if there are 10,000 submissions on server?
+        var onServer, outdated;
+        nonLocalSubmissions.forEach(function(nonLocalSubmission) {
+            onServer = outdated = false;
+            serverSubmissions.forEach(function(serverSubmission) {
+                if (serverSubmission.submission_uuid == nonLocalSubmission.submission_uuid) {
+                    onServer = true;
+                    if (serverSubmission.version != nonLocalSubmission.version) {
+                        outdated = true;
+                    }
+                }
+            });
+            if(!onServer) {
+                nonLocalSubmission.status = SERVER_DELETED;
+                localStore.updateSubmissionStatus(nonLocalSubmission.submission_id, SERVER_DELETED);
+            } else if (outdated) {
+                nonLocalSubmission.status = OUTDATED;
+                localStore.updateSubmissionStatus(nonLocalSubmission.submission_id, OUTDATED);
+            }
+            $scope.submissions.push(nonLocalSubmission);
+        });
+
+        serverSubmissions.forEach(function(serverSubmission) {
+            serverSubmission.status = SERVER;
+            serverSubmission.created = prettifyDate(serverSubmission.created);
+            nonLocalSubmissions.forEach(function(nonLocalSubmission) {
+                if (serverSubmission.submission_uuid == nonLocalSubmission.submission_uuid) {
+                    serverSubmission.status = BOTH;
+                }
+            });
+
+            if(serverSubmission.status == SERVER) {
+                serverSubmission.project_id = project_id
+                $scope.submissions.push(serverSubmission);
+            }
+        });
+
     };
 
     $scope.compare = function(localSubmission) {
@@ -150,68 +223,12 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             });
     };
 
-    var setObseleteProjectWarning = function(project) {
-        delete $scope.projectWarning;
-
-        if(project.status == OUTDATED) {
-            $scope.outdateProject = true;
-            $scope.projectWarning = 'The porject is outdated. You can only submit existing submissions.';
-        }
-
-        if(project.status == SERVER_DELETED) {
-            $scope.deletedProject = true;
-            $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
-        }
-    }
-
     var prettifyDate = function(serverDate) {
         var now = new Date(serverDate);
         var date = now.toLocaleDateString();
         var time = now.toLocaleTimeString();
         time = time.replace(time.slice(time.length-6,time.length-3),'');
         return date.concat(' '+time);
-    };
-
-    var updateSubmissionsToDisplay = function(localSubmissions, serverSubmissions) {
-
-        serverSubmissions.forEach(function(serverSubmission) {
-            serverSubmission.status = SERVER;
-            serverSubmission.created = prettifyDate(serverSubmission.created);
-            localSubmissions.forEach(function(localSubmission) {
-                if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
-                    serverSubmission.status = BOTH;
-                }
-            });
-
-            if(serverSubmission.status == SERVER) {
-                serverSubmission.project_id = project_id
-                $scope.submissions.push(serverSubmission);
-            }
-        });
-
-        var onServer, outdated;
-        localSubmissions.forEach(function(localSubmission) {
-            if(BOTH == localSubmission.status) {
-                onServer = outdated = false;
-                serverSubmissions.forEach(function(serverSubmission) {
-                    if (serverSubmission.submission_uuid == localSubmission.submission_uuid) {
-                        onServer = true;
-                        console.log('aaya    '+serverSubmission.version +'\t' +localSubmission.version)
-                        if (serverSubmission.version != localSubmission.version) {
-                            outdated = true;
-                        }
-                    }
-                });
-                if(!onServer) {
-                    localSubmission.status = SERVER_DELETED;
-                    localStore.updateSubmissionStatus(localSubmission.submission_id, SERVER_DELETED);
-                } else if (outdated) {
-                    localSubmission.status = OUTDATED;
-                    localStore.updateSubmissionStatus(localSubmission.submission_id, OUTDATED);
-                }
-            }
-        });
-
     };
 
     var updateScopeSubmission = function(submission) {

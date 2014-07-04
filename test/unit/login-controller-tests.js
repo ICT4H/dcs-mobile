@@ -31,22 +31,13 @@ describe('login controller', function(){
     });
 
     it('should open project list for valid user.', function() {
-        var user = {name:'tester150411@gmail.com', password:'password', serverUrl:'localhost:8080'};
-        scope.saveDetails(user);
+        var user = {loginType: 'existing', name:'tester150411@gmail.com', password:'password', serverUrl:'localhost:8080'};
+        scope.login(user);
 
         expect(mocks.messageService.showLoading).toHaveBeenCalled();
-        expect(mocks.authService.validateUser).toHaveBeenCalledWith({userName: user.name, password: user.password, url: user.serverUrl});
+        expect(mocks.authService.validateLocalUser).toHaveBeenCalled();
         expect(rootScope.isAuthenticated).toBe(true);
         expect(mockedLocation.path).toHaveBeenCalledWith('/project-list');
-    });
-
-    it('should give error for invalid user.', function() {
-        mocks.authService.validateUser.andReturn({then: function(resolve,reject) {reject();}});
-        controller('loginController',locals);
-        var user = {name:'tester150411@gmail.com', password:'password', serverUrl:'localhost:8080'};
-        scope.saveDetails(user);
-
-        expect(mocks.messageService.hideLoadingWithErr).toHaveBeenCalledWith('Invalid login details.');
     });
 
 });

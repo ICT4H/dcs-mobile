@@ -32,12 +32,12 @@ describe('project list controller', function() {
     });
 
     it('should add server status for projects that are not stored locally', function() {
-        expect(scope.projects.length).toBe(1);
+        expect(scope.projects.length).toBe(2);
 
         scope.$refreshContents();
 
-        expect(scope.projects.length).toBe(2);
-        expect(scope.projects[1].status).toBe('server');
+        expect(scope.projects.length).toBe(3);
+        expect(scope.projects[2].status).toBe('server');
     });
 
     it('should change project status to SERVER on project delete ', function() {

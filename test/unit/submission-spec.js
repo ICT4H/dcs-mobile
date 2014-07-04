@@ -19,12 +19,36 @@ describe('submission list controller', function() {
         controller('submissionListController', locals);
 
         expect(mocks.messageService.showLoadingWithInfo).toHaveBeenCalledWith('Loading submissions');
-         expect(mocks.localStore.getAllProjectSubmissions).toHaveBeenCalled();
-         expect(mocks.messageService.hideAll).toHaveBeenCalled();
+        expect(mocks.localStore.getAllProjectSubmissions).toHaveBeenCalled();
+        expect(mocks.messageService.hideAll).toHaveBeenCalled();
         expect(scope.submissions.length).toBe(2);
     });
 
+    it('should show union of local and server submissions on refresh', function() {
+        controller('submissionListController', locals);
+        scope.$refreshContents();
+
+        expect(scope.submissions.length).toBe(3);
+    });
+
+    it('should change status to outdated when server has updated submission', function() {
+        var changedSubmission = mocks.createSubmission(1,2);
+        changedSubmission.version = 'v2';
+        mocks.dcsService.getAllSubmissions.andReturn({then: function(resolve, reject) {
+            resolve( [mocks.createSubmission(1,1),
+                changedSubmission] );
+        }});
+        controller('submissionListController', locals);
+
+        scope.$refreshContents();
+
+        expect(scope.submissions[1].status).toBe(OUTDATED);
+    });
+
     it('should change status to server_deleted when submission is deleted over server', function() {
+        mocks.dcsService.getAllSubmissions.andReturn({then: function(resolve, reject) {
+            resolve( [mocks.createSubmission(1,1)] );
+        }});
         controller('submissionListController', locals);
         
         scope.$refreshContents();
@@ -32,18 +56,5 @@ describe('submission list controller', function() {
 
         expect(scope.submissions[0].status).toBe(BOTH);
         expect(scope.submissions[1].status).toBe(SERVER_DELETED);
-    });
-
-    it('should change status to outdated when server has updated submission', function() {
-        var changedSubmission = mocks.createSubmission(1,2);
-        changedSubmission.version = 'v2';
-        mocks.dcsService.getAllSubmissions.andReturn({then: function(resolve, reject) {
-            resolve( [mocks.createSubmission(1,1), changedSubmission] );
-        }});
-        controller('submissionListController', locals);
-
-        scope.$refreshContents();
-
-        expect(scope.submissions[1].status).toBe(OUTDATED);
     });
 });
