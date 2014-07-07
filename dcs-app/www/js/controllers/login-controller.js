@@ -4,6 +4,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
     $scope.user = {};
     $scope.user.loginType = 'existing';
     $scope.user.name = 'tester150411@gmail.com';
+    $scope.user.password = 'tester150411';
     $scope.user.serverUrl = 'https://172.18.29.3';
 
     delete $rootScope.projects; // clear cache when user comes to login page
@@ -19,12 +20,11 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
     },function(error) {
         msg.hideLoadingWithErr('Unable to connect to local storage');
     });
-
-    $scope.login = function(user) {
-        msg.showLoading();
-        if ('change' == user.loginType) {
+    var loginUser = {
+        'change' : function(user) {
             //TODO
-        } else if ('new' == user.loginType) {
+        },
+        'new' : function(user) {
             auth.createValidLocalStore(user)
                 .then(function() {
                     console.log('createValidLocalStore resolved');
@@ -33,7 +33,8 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
                 }, function() {
                     msg.hideLoadingWithErr('Server authentication failed');
                 });
-        } else {// existing user
+        },
+        'existing' : function(user) {
             auth.validateLocalUser(user)
                 .then(function() {
                     msg.hideAll();
@@ -45,6 +46,10 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
                 });
 
         }
+    };
+    $scope.login = function(user) {
+        msg.showLoading();
+        loginUser[user.loginType](user);
     };
 
 
