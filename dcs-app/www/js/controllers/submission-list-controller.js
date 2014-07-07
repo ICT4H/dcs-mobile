@@ -211,7 +211,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     $scope.postSubmission = function(submission) {
         msg.showLoading();
         submission.status = BOTH;
-
+        submission.is_modified = 0;
         dcsService.postSubmission(submission)
             .then(localStore.updateSubmissionMeta)
             .then(function() {
