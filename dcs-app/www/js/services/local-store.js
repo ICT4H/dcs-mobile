@@ -9,15 +9,14 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		if (isEmulator) {
 			db = window.openDatabase(dbName, version, dbName, -1);
 			deferred.resolve(user);
-		} else {
-			db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: user.password}, function() {
-				console.log('_getDB success');
-				deferred.resolve(user);
-			}, function(e) {
-				console.log('_getDB failed');
-				deferred.reject();
-			});
+			return deferred.promise;
 		}
+
+		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: user.password}, function() {
+			console.log('_getDB success');
+			deferred.resolve(user);
+		},deferred.reject);
+
 		return deferred.promise;
 	};
 
@@ -119,7 +118,6 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_id, created, html, xml) VALUES (?,?,?,?,?,?,?,?)';
 				var values =[submission.submission_uuid, submission.version, submission.status, 1, submission.project_id, submission.created, submission.html, submission.xml];
 				var onSuccess= function(tx, resp){
-					console.log('ram ')
 					submission.submission_id = resp.insertId;
 					deferred.resolve(submission);
 				};
