@@ -13,7 +13,6 @@ var LOCAL = 'local';
 var BOTH = 'both';
 var SERVER_DELETED = 'server-deleted';
 var OUTDATED = 'outdated';
-var CHANGED = 'changed';
 
 function convertToSlug(text) {
     return text

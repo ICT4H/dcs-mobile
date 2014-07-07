@@ -105,6 +105,4 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             });
     };
 
-
-
 }]);

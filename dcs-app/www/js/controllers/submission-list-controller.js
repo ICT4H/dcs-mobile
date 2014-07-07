@@ -133,8 +133,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             if(buttonIndex==BUTTON_NO) return;
 
             localStore.updateSubmissionVersionAndStatus(s.submission_id, s.serverSubmission.version, s.serverSubmission.status);
-            // s.status = BOTH;
-            s.status = CHANGED;
+            s.is_modified = 1;
             msg.displaySuccess('Local changes taken');
 
         };
@@ -218,7 +217,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             .then(function() {
                 msg.hideLoadingWithInfo('Submitted successfully');
             },function(error) {
-                submission.status = CHANGED;
+                submission.is_modified = 1;
                 msg.hideLoadingWithErr('Submitted to server, local status not updated.');
             });
     };

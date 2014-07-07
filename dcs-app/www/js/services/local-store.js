@@ -26,7 +26,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		console.log('db inside initTable: ' + db);
 		db.transaction (function(tx) {
 			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
-			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, project_id integer, created text, html text, xml text)');
+			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, is_modified integer, project_id integer, created text, html text, xml text)');
 			console.log('Project and submission tables created');
 			deferred.resolve();
 		});
@@ -116,14 +116,14 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	this.createSubmission = function(submission) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
-				tx.executeSql(
-					'INSERT INTO submissions (submission_uuid, version, status, project_id, created, html, xml) VALUES (?,?,?,?,?,?,?)', 
-						[submission.submission_uuid, submission.version, submission.status, submission.project_id, submission.created, submission.html, submission.xml],
-					function(tx, resp){
-						submission.submission_id = resp.insertId;
-						deferred.resolve(submission);
-					}, deferred.reject
-				);
+				var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_id, created, html, xml) VALUES (?,?,?,?,?,?,?,?)';
+				var values =[submission.submission_uuid, submission.version, submission.status, 1, submission.project_id, submission.created, submission.html, submission.xml];
+				var onSuccess= function(tx, resp){
+					console.log('ram ')
+					submission.submission_id = resp.insertId;
+					deferred.resolve(submission);
+				};
+				tx.executeSql(query, values, onSuccess, deferred.reject);
 			});
 		return deferred.promise;
 	};
@@ -166,8 +166,19 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	this.updateSubmissionVersionAndStatus = function(submission_id, version, status) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
-				tx.executeSql('UPDATE submissions SET version=?, status=? where submission_id = ?', 
-						[version, status, submission_id], function(tx, resp) {
+				tx.executeSql('UPDATE submissions SET version=?, status=?, is_modified=? where submission_id = ?', 
+						[version, status, submission_id, 1], function(tx, resp) {
+							deferred.resolve();
+						}, deferred.reject);
+			})
+		return deferred.promise;
+	};
+
+	this.updateSubmissionModified = function(submission_id,status) {
+		var deferred = $q.defer();
+			db.transaction (function(tx) {
+				tx.executeSql('UPDATE submissions SET is_modified=? where submission_id = ?', 
+						[status, submission_id], function(tx, resp) {
 							deferred.resolve();
 						}, deferred.reject);
 			})
@@ -177,8 +188,8 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	this.updateSubmission = function(submission_id, submission) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
-				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, html=?, xml=?, created=? where submission_id = ?', 
-						[submission.submission_uuid, submission.version, submission.status, submission.html, submission.xml, submission.created, submission_id], function(tx, resp) {
+				tx.executeSql('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, html=?, xml=?, created=? where submission_id = ?', 
+						[submission.submission_uuid, submission.version, submission.status, 1, submission.html, submission.xml, submission.created, submission_id], function(tx, resp) {
 							deferred.resolve();
 						}, deferred.reject);
 			})
