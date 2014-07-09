@@ -23,7 +23,15 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     //     $rootScope.loading = false;
     //     apply();
     // }
+    this.handleError = function(status,message) {
+        if(status == 404){
+        this.hideLoadingWithErr('unable to reach server');
+        return;
+        }
 
+        this.hideLoadingWithErr(message);
+
+    };
     this.hideLoadingWithInfo = function(message) {
         $rootScope.loading = false;
         this.displayInfo(message);

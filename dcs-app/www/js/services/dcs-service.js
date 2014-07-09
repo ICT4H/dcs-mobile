@@ -2,45 +2,42 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
 
     this.getQuestionnaires = function() {
         var deferred = $q.defer();
-            $rootScope.httpRequest("/client/project/").success(function(projects) {
+            $rootScope.httpRequest("/client/project/")
+            .then(function(projects) {
                 console.log('all projects: ' + JSON.stringify(projects));
                 deferred.resolve(projects);
-              }).error(function(error){
-                  deferred.resolve([]);
-              });  
+                },deferred.reject);
         return deferred.promise;
     };
 
     this.getQuestion = function(project_uuid) {
         var deferred = $q.defer();
-            $rootScope.httpRequest("/client/project/" + project_uuid).success(function(project) {
+            $rootScope.httpRequest("/client/project/" + project_uuid).then(function(project) {
                 console.log('project: ' + JSON.stringify(project));
                 deferred.resolve(project);
-              }).error(deferred.reject);
+              },deferred.reject);
         return deferred.promise;
     };
 
     this.getAllSubmissions = function(project_uuid) {
         var deferred = $q.defer();
-            $rootScope.httpRequest("/client/project/" + project_uuid + "/submission/").success(function(serverProjects) {
+            $rootScope.httpRequest("/client/project/" + project_uuid + "/submission/").then(function(serverProjects) {
                 console.log('all submissions: ' + JSON.stringify(serverProjects));
                 deferred.resolve(serverProjects);
-            }).error(function(error){
-                  deferred.resolve([]);
-            });
+            },deferred.reject);
         return deferred.promise;
     };
 
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
-            $rootScope.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).success(function(serverSubmission) {
+            $rootScope.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).then(function(serverSubmission) {
                 serverSubmission.project_id = submission.project_id;
                 serverSubmission.status = submission.status;
                 serverSubmission.created = submission.created;
 
                 deferred.resolve(serverSubmission);
 
-            }).error(deferred.reject);
+            },deferred.reject);
         return deferred.promise;
     };
 
@@ -57,14 +54,14 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
         }
 
         $rootScope.httpPostRequest(createOrUpdateUrl, 'form_data=' + submission.xml)
-            .success(function(updatedSubmission) {
+            .then(function(updatedSubmission) {
                 submission.status = BOTH;
                 submission.submission_uuid = updatedSubmission.submission_uuid;
                 submission.version = updatedSubmission.version;
 
                 deferred.resolve(submission);
 
-            }).error(deferred.reject);
+            },deferred.reject);
 
         return deferred.promise;
     };

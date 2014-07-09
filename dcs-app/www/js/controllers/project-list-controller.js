@@ -10,8 +10,8 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             if(!$rootScope.projects)
                 $rootScope.projects = localProjects || [];
             msg.hideAll();
-        }, function(e) {
-            msg.hideLoadingWithErr('Unable to show local projects');
+        }, function(error) {
+            msg.handleError(error,'Unable to show local projects');
         }
     );
 
@@ -24,7 +24,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
                 updateProjectsToDisplay($rootScope.projects, serverProjects);
                 msg.hideAll();
             }, function(error) {
-                msg.hideLoadingWithErr('Unable fetch server projects');
+                msg.handleError(error,' Unable fetch server projects')
             });
     };
 
@@ -68,8 +68,8 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             localStore.deleteProject(project.project_id).then(function() {
                 project.status = SERVER;
                 msg.hideLoadingWithInfo('Project deleted!');
-            }, function(e) {
-                msg.hideLoadingWithErr('Project cannot be deleted');
+            }, function(error) {
+                msg.handleError(error,'Project cannot be deleted');
             });
 
         };
@@ -97,9 +97,9 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
                     project.status = BOTH;
                 }         
                 msg.hideLoadingWithInfo('Project downloaded.');
-            }, function(e) {
+            }, function(error) {
                 project.status = SERVER;
-                msg.hideLoadingWithErr('Unable to download project');
+                msg.handleError(error,'Unable to download project');
             });
     };
 
