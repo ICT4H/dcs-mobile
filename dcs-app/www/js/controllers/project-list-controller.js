@@ -26,41 +26,39 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             }, function(error) {
                 msg.hideLoadingWithErr('Unable fetch server projects');
             });
-    }
+    };
 
     var updateProjectsToDisplay = function(projectsInScope, serverProjects){
         serverProjects.forEach(function(serverProject){
-            serverProject.status = SERVER;
-
-            projectsInScope.forEach(function(localProject){
-                if(serverProject.project_uuid == localProject.project_uuid){
-                    serverProject.status = BOTH;
-                }
-            });
-            if(serverProject.status == SERVER)
-                projectsInScope.push(serverProject);
+            addServerOnlyProject(projectsInScope,serverProject);
         });
-        var onServer, outdated;
         projectsInScope.forEach(function(localProject){
-            onServer = outdated = false;
-            serverProjects.forEach(function(serverProject){
-                if(localProject.project_uuid == serverProject.project_uuid){
-                    onServer = true;
-                    if(localProject.version != serverProject.version) {
-                        outdated = true;
-                    }
-                }
-            });
-            if(!onServer){
-                localProject.status = SERVER_DELETED;
-                localStore.updateProjectStatus(localProject.project_id, SERVER_DELETED);
-            } else if(outdated) {
-                localProject.status = OUTDATED;
-                localStore.updateProjectStatus(localProject.project_id, OUTDATED);
-            }
+            updateLocalProjectStatus(serverProjects, localProject);
         });
 
     };
+    var updateLocalProjectStatus = function(projects,localProject) {
+        for (var i = 0; i < projects.length; i++) {
+            if(localProject.project_uuid == projects[i].project_uuid) {
+                if(projects[i].version != localProject.version) {
+                    localProject.status = OUTDATED;
+                    localStore.updateProjectStatus(localProject.project_id, OUTDATED);
+                }
+                return;
+            }
+        }
+        localProject.status = SERVER_DELETED;
+        localStore.updateProjectStatus(localProject.project_id, SERVER_DELETED);
+    };
+
+    var addServerOnlyProject = function(projects,serverProject) {
+        for (var i = 0; i < projects.length; i++) {
+            if(serverProject.project_uuid == projects[i].project_uuid) return;
+        }
+        serverProject.status = SERVER;
+        projects.push(serverProject);
+    };
+
 
     $scope.deleteProject = function(project){
         function onConfirm(buttonIndex) {
