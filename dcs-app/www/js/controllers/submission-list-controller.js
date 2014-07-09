@@ -209,6 +209,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     };
 
     $scope.postSubmission = function(submission) {
+        var submitAfterConfirm = function() {
         msg.showLoading();
         submission.status = BOTH;
         submission.is_modified = 0;
@@ -220,6 +221,21 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                 submission.is_modified = 1;
                 msg.hideLoadingWithErr('Submitted to server, local status not updated.');
             });
+        };
+        if(submission.status == SERVER_DELETED){
+            function onConfirm(buttonIndex) {
+                if(buttonIndex==BUTTON_NO) return;
+                submitAfterConfirm();
+            };
+            navigator.notification.confirm(
+                'New submission will be created over server',
+                onConfirm,
+                'Post submission',
+                ['Yes','No']
+            );
+            return;
+        }
+        submitAfterConfirm();
     };
 
     var prettifyDate = function(serverDate) {

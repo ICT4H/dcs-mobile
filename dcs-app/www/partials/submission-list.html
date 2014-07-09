@@ -50,7 +50,7 @@
                 </div>
                 <div class="pull-right" ng-hide="deletedProject">
                   <i class=" panel-title fa fa-eye fa-lg" ng-show="item.status == 'outdated'" ng-click="compare(item)" toggle target="{{item.submission_id || item.submission_uuid}} "></i>
-                  <i class="panel-title fa fa-pencil fa-lg" ng-hide="item.status == 'outdated'" ng-click="editSurveyResponse(item)"></i>
+                  <i class="panel-title fa fa-pencil fa-lg" ng-hide="item.status == 'outdated'|| item.status == 'server-deleted'" ng-click="editSurveyResponse(item)"></i>
                   <i class="panel-title fa fa-upload fa-lg" ng-show="item.is_modified" ng-click="postSubmission(item)"></i>
                   <i class="panel-title fa fa-times fa-lg" ng-click="deleteSubmission(item)"></i>
                 </div>
