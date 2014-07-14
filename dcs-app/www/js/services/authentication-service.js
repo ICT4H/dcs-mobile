@@ -26,7 +26,13 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
         // delete user_detail_db and create new db with new user password as key
 
     }
+    this.logout = function() {
+        delete currentUser;
+    };
 
+    this.isLoggedIn = function() {
+        return angular.isDefined(currentUser);
+    };
     this.getCurrentUser = function() {
         return currentUser;
     }

@@ -20,10 +20,36 @@ function convertToSlug(text) {
         .replace(/[^\w-]+/g,'');
 }
 
-dcsApp.run(['$http', '$rootScope', '$q', 'auth', function($http, $rootScope, $q, auth) {
+dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', function($http, $rootScope, $location, $q, auth, msg) {
 
     $rootScope.title = 'D Collector';
 
+
+    $rootScope.$on("$routeChangeStart", function (event, next, current) {
+        //$rootScope.isAuthenticated = true;
+
+        console.log('going to ' + $location.path());
+        if ($location.path() != '/' && !auth.isLoggedIn()) {
+            $location.path('/');
+        }
+        // else {
+
+        // }
+
+        // if ($rootScope.isAuthenticated  next.path == '/')) {
+        //     if(Auth.isLoggedIn()) $location.path('/');
+        //     else                  $location.path('/login');
+        // }
+    });
+    $rootScope.logout = function() {
+        console.log('logout');
+        auth.logout();
+        msg.showLoadingWithInfo('Logging out, please wait');
+        setTimeout(function(){
+            $location.path('/');
+            msg.hideAll();
+        },2000);
+    };
     $rootScope.$back = function() {
         console.log('back clicked');
         window.history.back();
