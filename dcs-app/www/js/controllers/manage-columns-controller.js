@@ -23,7 +23,7 @@ dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routePar
     $scope.getSubmissions = function() {
 
         $rootScope.httpRequest('/client/submission-headers/?uuid='+$scope.project_uuid)
-            .success(function(responce) {
+            .then(function(responce) {
                 $scope.headers = responce.data;
                 // $scope.headers = JSON.parse(header_str).data;
                 // console.log($scope.headers);
@@ -31,7 +31,7 @@ dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routePar
                 // console.log(responce);
 
                 msg.hideAll();
-            }).error(function() {
+            },function() {
                 msg.hideLoadingWithErr('Failed to load columns');
                 console.log('errored');
             });

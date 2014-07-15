@@ -20,7 +20,7 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         $scope.from = start + 1;
 
         $rootScope.httpRequest('/client/submissions/?uuid='+$scope.project_uuid+'&start='+start+'&length='+pageSize)
-            .success(function(responce) {
+            .then(function(responce) {
                 //var responce = resp;
                 $scope.cols = responce.headers;
 
@@ -38,7 +38,7 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
                 // pages 
 
                 msg.hideAll();
-            }).error(function() {
+            },function() {
                 msg.hideLoadingWithErr('Failed to load submissions');
                 console.log('errored');
             });
