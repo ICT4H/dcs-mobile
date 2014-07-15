@@ -21,7 +21,7 @@
 
         <span ng-show="project.status == 'server'">{{ project.name }}</span>
 
-        <a ng-show="project.status != 'server'" href="#submission-list/{{project.project_id}}/project_uuid/{{project.project_uuid}}/project_name/{{project.name}}">
+        <a ng-show="project.status != 'server'" href="#submission-list/{{project.project_id}}">
             {{ project.name }}
         </a>
 

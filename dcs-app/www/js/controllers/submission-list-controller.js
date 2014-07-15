@@ -5,7 +5,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     msg.showLoadingWithInfo('Loading submissions');
 
     var project_id = $routeParams.project_id;
-    var project_uuid = $routeParams.project_uuid;
     $scope.project_id = project_id;
     var serverSubmissions = [];
     $scope.outdateProject = false;
@@ -28,6 +27,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     localStore.getProjectById(project_id)
         .then(function(project) {
             $scope.project_name = project.name;
+            $scope.project_uuid = project.project_uuid;
             setObseleteProjectWarning(project);
 
             localStore.getAllProjectSubmissions(project_id)
@@ -46,7 +46,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
         localStore.getAllProjectSubmissions(project_id)
             .then(function(localSubmissions) {
-                dcsService.getAllSubmissions(project_uuid)
+                dcsService.getAllSubmissions($scope.project_uuid)
                     .then(function(serverSubmissions) {
                         updateSubmissionsToDisplay(localSubmissions, serverSubmissions);
                         msg.hideAll();
@@ -117,7 +117,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
 
     $scope.compare = function(localSubmission) {
         msg.showLoadingWithInfo('Fetching latest server submission');
-        localSubmission.project_uuid = project_uuid;
+        localSubmission.project_uuid = $scope.project_uuid;
         dcsService.getSubmission(localSubmission)
             .then(function(serverSubmission) {
                 serverSubmission.status = BOTH;

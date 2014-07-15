@@ -148,3 +148,59 @@ h1 {
   color: white;
   text-align: center;
 }
+
+.bg-white {
+  background-color: #fff;
+}
+
+.submission-tab .active {
+  background-color: #adadad !important;
+  border-radius: 6px;
+}
+
+/*.submission-tab > li:last-child > a{
+  border-color: #adadad !important;
+}*/
+
+.line-bottom {
+  border-bottom: 1px solid #adadad;
+}
+
+.black-font li a {
+  color: #555 !important;
+}
+
+table.hide-first-col tr td:first-child {
+  display: none;
+}
+
+.select-in-bar {
+  border-radius: 0;
+  margin: -1px;
+  color: #555;
+}
+
+.table-bar {
+  padding: 10px 0px 10px 0px;
+  text-align: right;
+}
+
+.table-bar > span {
+  padding: 6px 10px;
+  margin: 0px -1px;
+  border-right: 1px solid #adadad;
+}
+
+/*.table-bar > span:first-child {
+  border-left: 1px solid #adadad;
+}*/
+
+.table-bar button {
+  border-color: #fff !important;
+}
+
+@media (max-width: 240px) {
+  .hide-for-small {
+    display: none;
+  }
+}

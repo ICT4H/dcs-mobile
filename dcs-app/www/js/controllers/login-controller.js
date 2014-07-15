@@ -5,7 +5,9 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
     $scope.user.loginType = 'existing';
     $scope.user.name = 'tester150411@gmail.com';
     $scope.user.password = 'tester150411';
-    $scope.user.serverUrl = 'https://172.18.29.3';
+    // user ip with emulator & domain name with simulator/device
+    //$scope.user.serverUrl = 'https://172.18.29.3';
+    $scope.user.serverUrl = 'https://dcsci.twhosted.com';
 
     delete $rootScope.projects; // clear cache when user comes to login page
 
