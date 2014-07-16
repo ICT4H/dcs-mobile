@@ -200,7 +200,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             .then(localStore.createSubmission)
             .then(function(resp) {
                 submission.submission_id = resp.submission_id;
-                submission.html = resp.html;
+                submission.data = resp.data;
                 submission.xml = resp.xml;
                 msg.hideLoadingWithInfo("Submission downloaded.");
             }, function(error) {

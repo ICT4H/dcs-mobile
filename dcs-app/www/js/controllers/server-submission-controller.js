@@ -43,10 +43,40 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
                 console.log('errored');
             });
     };
-    
+
+    $scope.download = function() {
+        console.log('download clicked');
+        var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
+
+        for (var i=0; i<selected_rows.length; i++) {
+
+            downloadSubmission({submission_uuid: selected_rows[i].cells[0].innerText,
+                                project_id:$scope.project_id,
+                                project_uuid:$scope.project_uuid
+                            });
+        }
+    }
+
+    function downloadSubmission(submission) {
+        msg.showLoading();
+        submission.status = BOTH;
+
+        dcsService.getSubmission(submission)
+            .then(localStore.createSubmission)
+            .then(function(resp) {
+                submission.submission_id = resp.submission_id;
+                submission.data = resp.data;
+                submission.xml = resp.xml;
+                msg.hideLoadingWithInfo("Submission downloaded.");
+            }, function(error) {
+                msg.hideLoadingWithErr('Unable to download submission.');
+            });
+    }
+
     function isBigEnough(element) {
       return element >= 10;
     }
+
     var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
 
 

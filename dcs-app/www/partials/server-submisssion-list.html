@@ -28,6 +28,8 @@
             <div class="tab-content">
               <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
                 <div class="bg-white black-font table-bar line-bottom">
+                  <span><a ng-click="download()"><li class="fa fa-lg fa-chevron-down"></li></a></span>
+
                   <span>{{from}} to {{to}} of {{total}}</span>
                   <span>
                       <select class="select-in-bar" ng-model="pageSize" ng-change="onPageSizeChange()">
@@ -44,14 +46,14 @@
                   <span><a ng-click="do_next()"><li class="fa fa-lg fa-chevron-right"></li></a></span>
                 </div>
 
-                <table class="bg-white hide-first-col table table-striped table-condensed">
+                <table id="server-submissions" class="bg-white hide-first-col table table-striped table-condensed">
                   <thead>
                     <tr>
                         <th ng-repeat="c in cols">{{c}}</th>
                     </tr>
                   </thead> 
                   <tbody>
-                    <tr ng-repeat="items in submissions">
+                    <tr ng-repeat="items in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
                       <td ng-repeat="item in items">{{ item }}</td>
                     </tr>
                   </tbody>

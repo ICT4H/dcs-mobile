@@ -27,56 +27,20 @@
             <p>{{projectWarning}}</p>
           </div>
           <div class="panel-group" id="accordion">
-              <div class="panel panel-default" ng-repeat="item in submissions | filter:searchText" ng-class="item.status">
 
-                <!-- server only -->
-                <div ng-If="item.status == 'server'">
-                  <div class="panel-heading" >
-                        <div class="pull-left" toggle target="{{ item.submission_uuid }} ">
-                            <h4 class="panel-title" style="display:inline-block;">
-                                {{ item.created }} 
-                            </h4>
-                        </div>
-                        <div class="panel-title pull-right">
-                            <i class="fa fa-download fa-lg" ng-click="downloadSubmission(item)"></i>
-                        </div>
-                  </div>
+                <table class="bg-white table table-striped table-condensed">
+<!--                   <thead>
+                    <tr>
+                        <th ng-repeat="c in cols">{{c}}</th>
+                    </tr>
+                  </thead>  -->
+                  <tbody>
+                    <tr ng-repeat="item in submissions">
+                      <td ng-repeat="(k,v) in item.data">{{v}}</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-                  <div id="{{ item.submission_uuid }}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
-                    <div class="panel-body" ng-bind-html="item.html"></div>
-                  </div>
-                </div>
-
-                <!-- local -->
-                <div ng-If="item.status !='server'">
-                  <div class="panel-heading" >
-                    <div class="pull-left" toggle target="{{item.submission_id || item.submission_uuid}} ">
-                        <h4 class="panel-title" ng-class="item.status" style="display:inline-block;">
-                           {{ item.created }}
-                        </h4>
-                    </div>
-                    <div class="pull-right" ng-hide="deletedProject">
-                      <i class=" panel-title fa fa-eye fa-lg" ng-show="item.status == 'outdated'" ng-click="compare(item)" toggle target="{{item.submission_id || item.submission_uuid}} "></i>
-                  <i class="panel-title fa fa-pencil fa-lg" ng-hide="item.status == 'outdated'|| item.status == 'server-deleted'" ng-click="editSurveyResponse(item)"></i>
-                      <i class="panel-title fa fa-upload fa-lg" ng-show="item.is_modified" ng-click="postSubmission(item)"></i>
-                      <i class="panel-title fa fa-times fa-lg" ng-click="deleteSubmission(item)"></i>
-                    </div>
-                  </div>
-                  <div id="{{item.submission_id || item.submission_uuid}}" toggleable active-class="in" exclusion-group="accordion1" class="panel-collapse collapse" style="clear: both;">
-                    <div class="status-title" ng-show="item.status == 'outdated'">
-                      Local
-                      <i class="pull-right fa fa-lg fa-thumbs-o-up" toggle target="{{item.submission_id || item.submission_uuid}} " ng-click="takeLocalSubmission(item)"></i>
-                    </div>
-                    <div class="panel-body" ng-bind-html="item.html"></div>
-                    <div class="status-title" ng-show="item.status == 'outdated'">
-                      Lastest on server
-                      <i class="pull-right fa fa-lg fa-thumbs-o-up" toggle target="{{item.submission_id || item.submission_uuid}} " ng-click="takeServerSubmission(item)"></i>
-                    </div>
-                    <div class="panel-body" ng-show="item.status == 'outdated'" style="text-decoration:none" ng-bind-html="item.serverSubmission.html"></div>
-                  </div>
-                </div>
-
-              </div>  
           </div>
         </div>
       </div>
