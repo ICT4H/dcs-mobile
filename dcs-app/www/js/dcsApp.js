@@ -26,20 +26,11 @@ dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 
 
 
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-        //$rootScope.isAuthenticated = true;
 
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !auth.isLoggedIn()) {
             $location.path('/');
         }
-        // else {
-
-        // }
-
-        // if ($rootScope.isAuthenticated  next.path == '/')) {
-        //     if(Auth.isLoggedIn()) $location.path('/');
-        //     else                  $location.path('/login');
-        // }
     });
     $rootScope.logout = function() {
         console.log('logout');
@@ -50,23 +41,15 @@ dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 
             msg.hideAll();
         },2000);
     };
+
     $rootScope.$back = function() {
         console.log('back clicked');
         window.history.back();
     };
 
-    var getUser = function() {
-        var user = auth.getCurrentUser();
-        // user.name = 'tester150411@gmail.com';
-        // user.password = 'tester150411';
-        //user.serverUrl= 'http://10.37.129.2:8001';
-        return user;
-    }
-
-
     $rootScope.httpRequest = function(uri) {
         var deferred = $q.defer();
-        var user = getUser();
+        var user = auth.getCurrentUser();
         console.log('calls user name: ' + user.name);
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
         $http.get(user.serverUrl + uri).success(deferred.resolve).error(function(data, status, headers, config) {
@@ -79,7 +62,7 @@ dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 
     $rootScope.httpPostRequest = function(uri, data) {
         var deferred = $q.defer();
 
-        var user = getUser();
+        var user = auth.getCurrentUser();
         console.log('calls user name: ' + user.name);
         $http.defaults.headers.post["Content-Type"] = "text/plain";
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
