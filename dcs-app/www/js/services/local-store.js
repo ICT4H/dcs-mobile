@@ -100,17 +100,28 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		});
 		return deferred.promise;
 	};
-
-	this.getAllProjectSubmissions = function(project_id) {
+	this.getCountOfSubmissions = function(project_id) {
+		var deferred = $q.defer();
+		db.transaction(function(tx) {
+			tx.executeSql('select count(*) as total FROM submissions where project_id = ?',[project_id],function(tx, resp) {
+				deferred.resolve(resp.rows.item(0).total);
+			},deferred.reject);
+		});
+		return deferred.promise;
+	};
+	this.getAllProjectSubmissions = function(project_id, offset, limit) {
 		var deferred = $q.defer();
 			db.transaction(function(tx) {
-				tx.executeSql('SELECT * FROM submissions WHERE project_id = ?', [project_id], function(tx, resp) {
+				tx.executeSql('SELECT * FROM submissions WHERE project_id = ? limit ? offset ?', [project_id,limit,offset], function(tx, resp) {
 					var s = transformRows(resp.rows);
 					for (var i=0;i<s.length;i++) {
 						s[i].data = JSON.parse(s[i].data);
 					}
 					deferred.resolve(s);
-				}, deferred.reject);
+				},function(tx,error){
+					console.log(error)
+					 deferred.reject(error);
+				});
 			});
 		return deferred.promise;
 	};

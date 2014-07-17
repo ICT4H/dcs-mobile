@@ -2,6 +2,8 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     function($rootScope, $scope, $routeParams, $location, dcsService, localStore, msg){
     
     $scope.pageTitle = "Submissions";
+    $scope.pageSize = 5;
+
     msg.showLoadingWithInfo('Loading submissions');
 
     var project_id = $routeParams.project_id;
@@ -9,6 +11,32 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
     var serverSubmissions = [];
     $scope.outdateProject = false;
     $scope.deletedProject = false;
+
+
+    $scope.getSubmissions = function(start) {
+        $scope.from = start + 1;
+
+        localStore.getCountOfSubmissions(project_id)
+            .then(function(total) {
+                $scope.total = total;
+                localStore.getAllProjectSubmissions(project_id,start,$scope.pageSize)
+                    .then(function(submissions) {
+                        $scope.cols = Object.keys(submissions[0].data);
+                        $scope.to = start + submissions.length;
+                        $scope.submissions = submissions;
+
+                        $scope.next = start + $scope.pageSize;
+                        $scope.prev = start - $scope.pageSize;
+
+                        msg.hideAll();
+                    },function(data,error) {
+                        msg.hideLoadingWithErr(error+' Failed to load submissions');
+                        console.log('Error while loading local submissions');
+                    });
+            },function() {
+                console.log('Error while counting local submissions');
+            });
+    };
 
     var setObseleteProjectWarning = function(project) {
         delete $scope.projectWarning;
@@ -29,14 +57,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid;
             setObseleteProjectWarning(project);
-
-            localStore.getAllProjectSubmissions(project_id)
-                .then(function(localSubmissions) {
-                    $scope.submissions = localSubmissions || [];
-                    msg.hideAll();
-                }, function(e) {
-                    msg.hideLoadingWithErr('Unable to show local submissions');
-                });
+             $scope.getSubmissions(0);
         });
 
     $scope.$refreshContents = function() {
@@ -237,6 +258,25 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         }
         submitAfterConfirm();
     };
+    $scope.do_next = function() {
+        console.log('next clicked');
+        var allow = $scope.total > $scope.next;
+        if (allow)
+            $scope.getSubmissions($scope.next);
+    }
+
+    $scope.do_prev = function() {
+        console.log('prev clicked');
+        var allow = $scope.prev >= 0;
+        if (allow)
+            $scope.getSubmissions($scope.prev);
+    }
+
+    $scope.onPageSizeChange = function() {
+        msg.showLoadingWithInfo('Loading submissions');
+        $scope.pageSize = parseInt($scope.pageSize);
+        $scope.getSubmissions(0);
+    }
 
     var prettifyDate = function(serverDate) {
         var now = new Date(serverDate);
