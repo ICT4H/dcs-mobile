@@ -21,6 +21,10 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                 $scope.total = total;
                 localStore.getAllProjectSubmissions(project_id,start,$scope.pageSize)
                     .then(function(submissions) {
+                        if(submissions.length <1) {
+                            msg.hideLoadingWithInfo('No local submissions !');
+                            return;
+                        }
                         $scope.cols = Object.keys(submissions[0].data);
                         $scope.to = start + submissions.length;
                         $scope.submissions = submissions;
