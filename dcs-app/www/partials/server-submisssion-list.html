@@ -13,6 +13,7 @@
 </div>
 <div content-for="context-info">
   <span class="context-info">{{project_name}}</span>
+  <span class="pull-right"><li toggle="toggle" target-class="toggle-full-screen" class="fa fa-lg fa-chevron-up" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></span>
 </div>
 
 <div class="scrollable">  
@@ -20,8 +21,8 @@
         <div class="list-group alert-danger" ng-show="projectWarning">
             <p>{{projectWarning}}</p>
         </div>
-        <div class="list-group bg-white">
-            <ul class="nav nav-tabs submission-tab">
+        <div class="list-group top-padding-5px bg-white">
+            <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
               <li><a href="#submission-list/{{project_id}}">Installed</a></li>
               <li><a href="#Tab2" toggle="on" parent-active-class="active">Server</a></li>
             </ul>

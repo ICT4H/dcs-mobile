@@ -204,3 +204,7 @@ table.hide-first-col tr td:first-child {
     display: none;
   }
 }
+
+.top-padding-5px {
+  padding-top: 5px;
+}
