@@ -42,13 +42,13 @@
               <table id="local-submissions" class="bg-white table table-striped table-condensed">
                   <thead>
                   <tr>
-                      <th ng-repeat="c in cols">{{c}}</th>
+                      <th ng-repeat="(key, val) in headers">{{val}}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="item in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
-                      >
-                    <td ng-repeat="(k,v) in item.data">{{v}}</td>
+                    <td ng-repeat="(key, val) in headers">{{item.data[key]}}</td>
+                    <!-- <td ng-repeat="(k,v) in item.data">{{v}}</td> -->
                   </tr>
                 </tbody>
               </table>

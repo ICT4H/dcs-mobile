@@ -50,7 +50,7 @@ dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 
     $rootScope.httpRequest = function(uri) {
         var deferred = $q.defer();
         var user = auth.getCurrentUser();
-        console.log('calls user name: ' + user.name);
+        console.log('calls user name: ' + user.name + '; url: ' + user.serverUrl + uri);
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
         $http.get(user.serverUrl + uri).success(deferred.resolve).error(function(data, status, headers, config) {
             deferred.reject(status);
@@ -63,7 +63,7 @@ dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 
         var deferred = $q.defer();
 
         var user = auth.getCurrentUser();
-        console.log('calls user name: ' + user.name);
+        console.log('calls user name: ' + user.name + '; url: ' + user.serverUrl + uri);
         $http.defaults.headers.post["Content-Type"] = "text/plain";
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
         

@@ -25,7 +25,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                             msg.hideLoadingWithInfo('No local submissions !');
                             return;
                         }
-                        $scope.cols = Object.keys(submissions[0].data);
                         $scope.to = start + submissions.length;
                         $scope.submissions = submissions;
 
@@ -60,8 +59,11 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid;
+            $scope.headers = JSON.parse(project.headers);
+            delete $scope.headers.ds_name;
+            delete $scope.headers.date;
             setObseleteProjectWarning(project);
-             $scope.getSubmissions(0);
+            $scope.getSubmissions(0);
         });
 
     $scope.$refreshContents = function() {

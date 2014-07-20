@@ -24,7 +24,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 		console.log('db inside initTable: ' + db);
 		db.transaction (function(tx) {
-			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text)');
+			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text, headers text)');
 			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, is_modified integer, project_id integer, created text, data text, xml text)');
 			console.log('Project and submission tables created');
 			deferred.resolve();
@@ -36,7 +36,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql(
-					'INSERT INTO projects (project_uuid, version, status, name, xform) VALUES (?,?,?,?,?)', [project.project_uuid, project.version, 'both', project.name, project.xform],
+					'INSERT INTO projects (project_uuid, version, status, name, xform, headers) VALUES (?,?,?,?,?,?)', [project.project_uuid, project.version, 'both', project.name, project.xform, project.headers],
 					function(tx, resp){
 						deferred.resolve(resp.insertId);
 					}, deferred.reject
