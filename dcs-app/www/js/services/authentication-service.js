@@ -1,10 +1,10 @@
 dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', function($rootScope, $q, userService, localStore) {
 
-    var currentUser = {};
+    this.currentUser = {};
 
 
     this.validateLocalUser = function(user) {
-        currentUser = user;
+        this.currentUser = user;
         return checkDBFileExists(user)
             .then(userService.updateUrl)
             .then(localStore.init)
@@ -12,7 +12,7 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
     }
 
     this.createValidLocalStore = function(user) {
-        currentUser = user;
+        this.currentUser = user;
         return serverAuth(user)
             .then(userService.createUser)
             .then(userService.updateUrl)
@@ -26,15 +26,17 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
         // delete user_detail_db and create new db with new user password as key
 
     }
+ 
     this.logout = function() {
-        delete currentUser;
+        delete this.currentUser;
     };
 
     this.isLoggedIn = function() {
-        return angular.isDefined(currentUser);
+        return angular.isDefined(this.currentUser);
     };
+ 
     this.getCurrentUser = function() {
-        return currentUser;
+        return this.currentUser;
     }
 
     var checkDBFileExists = function(user) {
