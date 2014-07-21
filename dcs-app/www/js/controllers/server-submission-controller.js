@@ -47,13 +47,19 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     $scope.download = function() {
         console.log('download clicked');
         var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
-
+        var uuid;
         for (var i=0; i<selected_rows.length; i++) {
+            //TODO this value might need to be sanitised
+            uuid = selected_rows[i].cells[0].innerText;
 
-            downloadSubmission({submission_uuid: selected_rows[i].cells[0].innerText,
-                                project_id:$scope.project_id,
-                                project_uuid:$scope.project_uuid
-                            });
+            localStore.getSubmissionMetaByUuid(uuid)
+                .then(function(found) {
+                    if(found != 1) {
+                        downloadSubmission({submission_uuid: uuid,
+                                            project_id:$scope.project_id,
+                                            project_uuid:$scope.project_uuid});
+                    }
+                });
         }
     }
 

@@ -204,14 +204,23 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
          function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
-        localStore.deleteSubmission(submission.submission_id)
-            .then(function() {
-                updateScopeSubmission(submission);
-                msg.hideLoadingWithInfo("Submission deleted");
-            }, function(error){
-                msg.hideLoadingWithErr("Submission deletion failed")
-            });
-        };
+        var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
+        var submission_id;
+        for (var i=0; i<selected_rows.length; i++) {
+            //TODO this value might need to be sanitised
+            submission_id = selected_rows[i].cells[0].innerText;
+            // localStore.deleteSubmission(submission.submission_id)
+            //     .then(function() {
+            //         updateScopeSubmission(submission);
+            //         msg.hideLoadingWithInfo("Submission deleted");
+            //     }, function(error){
+            //         msg.hideLoadingWithErr("Submission deletion failed")
+            //     });
+            // };
+        }
+
+
+
         navigator.notification.confirm(
             'Do you want to delete ?',
             onConfirm,

@@ -219,6 +219,16 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
+	this.getSubmissionMetaByUuid = function(submission_id) {
+		var deferred = $q.defer();
+			db.transaction(function(tx) {
+				tx.executeSql('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid], function(tx, resp) {
+					deferred.resolve(resp.rows.length);
+				},deferred.reject);
+			});
+		return deferred.promise;
+	};
+
 	this.deleteSubmission = function(submission_id) {
 		var deferred = $q.defer();
 			db.transaction(function(tx) {
