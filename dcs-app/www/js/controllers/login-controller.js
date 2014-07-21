@@ -2,9 +2,9 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
 
     msg.showLoading();
     $scope.user = {};
-    $scope.user.loginType = 'loginType';
+    $scope.user.loginType = 'existing';
     $scope.user.name = 'emailAddress';
-    $scope.user.password = 'password';
+    $scope.user.password;
     $scope.user.serverUrl = 'serverUrl';
 
     delete $rootScope.projects; // clear cache when user comes to login page
