@@ -1,6 +1,6 @@
-dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
-    function($rootScope, $scope, $routeParams, $location, dcsService, localStore, msg){
-    
+dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
+    function($rootScope, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
+
     $scope.pageTitle = "Submissions";
     $scope.pageSize = 5;
 
@@ -21,12 +21,12 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                 $scope.total = total;
                 localStore.getAllProjectSubmissions(project_id,start,$scope.pageSize)
                     .then(function(submissions) {
+                        $scope.submissions = submissions;
                         if(submissions.length <1) {
                             msg.hideLoadingWithInfo('No local submissions !');
                             return;
                         }
                         $scope.to = start + submissions.length;
-                        $scope.submissions = submissions;
 
                         $scope.next = start + $scope.pageSize;
                         $scope.prev = start - $scope.pageSize;
@@ -82,7 +82,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
                     });
             });
     };
-
 
     var groupOnStatus = function(localSubmissions) {
         var statusLocal = [];
@@ -192,34 +191,77 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$routePa
        
     }
 
-    $scope.createSurveyResponse = function(project_id) {
+    $scope.createSurveyResponse = function() {
         $location.path('/project/' + project_id + '/submission/' + null);
     };
 
-    $scope.editSurveyResponse = function(submission) {
-        $location.path('/project/' + submission.project_id + '/submission/' + submission.submission_id);
+    $scope.editSurveyResponse = function() {
+        var submission_ids = selected_submission_ids();
+        if(submission_ids.length==1){
+        $location.path('/project/' + project_id + '/submission/' + submission_ids[0].submission_id);
+        return;
+        }
+        msg.displayInfo('you can edit only one submission at a time !');
+
     };
-
-    $scope.deleteSubmission = function(submission) {
-         function onConfirm(buttonIndex) {
-            if(buttonIndex==BUTTON_NO) return;
-
-        var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
-        var submission_id;
-        for (var i=0; i<selected_rows.length; i++) {
-            //TODO this value might need to be sanitised
-            submission_id = selected_rows[i].cells[0].innerText;
-            // localStore.deleteSubmission(submission.submission_id)
-            //     .then(function() {
-            //         updateScopeSubmission(submission);
-            //         msg.hideLoadingWithInfo("Submission deleted");
-            //     }, function(error){
-            //         msg.hideLoadingWithErr("Submission deletion failed")
-            //     });
-            // };
+    $scope.update_selected_submissions = function(currentSubmission) {
+        currentSubmission.selected = !currentSubmission.selected;
+        var submissions = selected_submissions();
+        console.log(submissions.length);
+        $scope.showEdit = submissions.length<=1? true:false;
+        if(currentSubmission.selected){
+            $scope.showActions = true;
+            $scope.showPagination = false;
+            return;
+        }
+        if(selected_submissions().length==1){
+        $scope.showPagination = true;
+        $scope.showActions= false;
         }
 
+    };
+    var selected_submissions = function() {
+        return document.getElementById('local-submissions').getElementsByClassName('success');
+    };
+    var selected_submission_ids = function() {
+        var submission_ids = [];
+            var submissions =  selected_submissions();
+            for (var i = 0; i < submissions.length; i++) {
+                submission_ids.push(submissions[i].cells[0].innerText);
+            };
+        return submission_ids;
+    };
+    $scope.postSubmissions = function() {
+        var isError = false;
+        msg.showLoading();
+        var multiplePromises = [];
+        selected_submission_ids().forEach(function(submission_id) {
+            multiplePromises.push(localStore.getSubmissionById(submission_id)
+            .then(dcsService.postSubmission)
+            .then(localStore.updateSubmissionMeta));
 
+        });
+
+        $q.all(multiplePromises)
+        .then(function(){
+            msg.hideLoadingWithInfo('Submitted successfully');
+        },function(error){
+            msg.hideLoadingWithErr('something went wrong '+error);
+        });
+        };
+    $scope.deleteSubmissions = function() {
+        function onConfirm(buttonIndex) {
+            if(buttonIndex==BUTTON_NO) return;
+
+            if(localStore.deleteSubmissions(selected_submission_ids())){
+                $scope.getSubmissions(0);
+                msg.hideLoadingWithInfo("Submission(s) deleted");
+
+            }
+            else{
+                msg.hideLoadingWithErr("Submission(s) deletion failed")
+            }
+        };
 
         navigator.notification.confirm(
             'Do you want to delete ?',

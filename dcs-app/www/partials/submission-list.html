@@ -1,6 +1,6 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="new">
-    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_id)"></i>
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
 </div>
 <div content-for="refreshContents">
     <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
@@ -22,7 +22,7 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
-           <div class="bg-white black-font table-bar line-bottom">
+           <div ng-show="showPagination" class="bg-white black-font table-bar line-bottom" ng-init="showPagination=true">
                   <span><a ng-click="download()"><li class="fa fa-lg fa-chevron-down"></li></a></span>
 
                   <span>{{from}} to {{to}} of {{total}}</span>
@@ -40,6 +40,11 @@
 
                   <span><a ng-click="do_next()"><li class="fa fa-lg fa-chevron-right"></li></a></span>
             </div>
+            <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
+                <i class="panel-title fa fa-upload fa-lg" ng-click="postSubmissions()"></i>
+                <i class="panel-title fa fa-times fa-lg" ng-click="deleteSubmissions()"></i>
+                <i ng-show="showEdit" class="panel-title fa fa-pencil fa-lg" ng-click="editSurveyResponse()"></i>
+            </div>
               <table id="local-submissions" class="hide-first-col bg-white table table-striped table-condensed">
                   <thead>
                   <tr>
@@ -47,10 +52,9 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="item in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
+                  <tr ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'success':selected}" ng-click="update_selected_submissions(this)">
                     <td>{{item.submission_id}}</td>
                     <td ng-repeat="(key, val) in headers">{{item.data[key]}}</td>
-                    <!-- <td ng-repeat="(k,v) in item.data">{{v}}</td> -->
                   </tr>
                 </tbody>
               </table>

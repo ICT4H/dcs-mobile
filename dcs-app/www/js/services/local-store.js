@@ -219,7 +219,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.getSubmissionMetaByUuid = function(submission_id) {
+	this.getSubmissionMetaByUuid = function(submission_uuid) {
 		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid], function(tx, resp) {
@@ -227,6 +227,14 @@ dcsApp.service('localStore', ['$q', function ($q) {
 				},deferred.reject);
 			});
 		return deferred.promise;
+	};
+	this.deleteSubmissions = function(submissions_ids) {
+		// var deferred = $q.defer();
+		// 	db.transaction(function(tx) {
+		// 		tx.executeSql('DELETE FROM submissions WHERE submission_id IN(?) ', [submission_ids], function(tx, resp) {deferred.resolve()}, deferred.reject);
+		// 	});
+		// return deferred.promise;
+		return submissions_ids.every(this.deleteSubmission);
 	};
 
 	this.deleteSubmission = function(submission_id) {
