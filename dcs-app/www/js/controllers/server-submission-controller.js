@@ -16,12 +16,10 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         });
 
     $scope.getSubmissions = function(start, pageSize) {
-        // 25 to 30 of 50
         $scope.from = start + 1;
 
         $rootScope.httpRequest('/client/submissions/?uuid='+$scope.project_uuid+'&start='+start+'&length='+pageSize)
             .then(function(responce) {
-                //var responce = resp;
                 $scope.cols = responce.headers;
 
                 $scope.to = start + responce.data.length;
@@ -79,13 +77,6 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
             });
     }
 
-    function isBigEnough(element) {
-      return element >= 10;
-    }
-
-    var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
-
-
     $scope.do_next = function() {
         console.log('next clicked');
         var allow = $scope.total > $scope.next;
@@ -106,5 +97,3 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         $scope.getSubmissions(0,$scope.pageSize);
     }
 }]);
-
-var resp = {"search_count": 51, "length": 5, "total": 51, "data": [["49d65204080a11e493f1001c42af7554", "Tester Pune", "Jul. 10, 2014, 08:15 AM", "10"], ["49f47da6080a11e493f1001c42af7554", "Tester Pune", "Jul. 10, 2014, 08:15 AM", "11"], ["4a03c75c080a11e493f1001c42af7554", "Tester Pune", "Jul. 10, 2014, 08:15 AM", "12"], ["4a133246080a11e493f1001c42af7554", "Tester Pune", "Jul. 10, 2014, 08:15 AM", "13"], ["4a2248c6080a11e493f1001c42af7554", "Tester Pune", "Jul. 10, 2014, 08:15 AM", "14"]], "start": 0}

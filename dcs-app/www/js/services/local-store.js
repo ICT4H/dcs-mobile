@@ -229,11 +229,6 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 	this.deleteSubmissions = function(submissions_ids) {
-		// var deferred = $q.defer();
-		// 	db.transaction(function(tx) {
-		// 		tx.executeSql('DELETE FROM submissions WHERE submission_id IN(?) ', [submission_ids], function(tx, resp) {deferred.resolve()}, deferred.reject);
-		// 	});
-		// return deferred.promise;
 		return submissions_ids.every(this.deleteSubmission);
 	};
 
