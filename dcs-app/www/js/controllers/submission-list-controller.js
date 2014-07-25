@@ -7,8 +7,11 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
     msg.showLoadingWithInfo('Loading submissions');
 
     var project_id = $routeParams.project_id;
-    $scope.project_id = project_id;
+    var selectedCount = 0;
     var serverSubmissions = [];
+    var selected_id_map = {};
+
+    $scope.project_id = project_id;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
@@ -195,85 +198,81 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
     };
 
     $scope.editSurveyResponse = function() {
-        var submission_ids = selected_submission_ids();
-        if(submission_ids.length==1){
-        $location.path('/project/' + project_id + '/submission/' + submission_ids[0].submission_id);
-        return;
+        if(selectedCount==1) {
+            $location.path('/project/' + project_id + '/submission/' + submission_ids[0].submission_id);
+            return;
         }
         msg.displayInfo('you can edit only one submission at a time !');
 
     };
 
-    $scope.select_all_submissions = function() {
-        var allSubmissions = document.getElementById('local-submissions').getElementsByClassName('submission');
-        for (var i = 0; i < allSubmissions.length; i++) {
-            allSubmissions[i].click();
-        };
+    var update_selected_submission_ids = function(submission_id) {
+
+        var selected = selected_id_map;
+
+        if (selected[submission_id]) {
+            delete selected[submission_id];
+            selectedCount--;
+        } else {
+            selected[submission_id] = true;
+            selectedCount++;
+        }
+        console.log(selected);
     };
 
-    $scope.update_selected_submissions = function(currentSubmission) {
-        currentSubmission.selected = !currentSubmission.selected;
-        var submissions = selected_submissions();
-        console.log(submissions.length);
-        if(currentSubmission.selected){
+    $scope.update_selected_submissions = function(submissionRow) {
+        submissionRow.selected = !submissionRow.selected;
+        update_selected_submission_ids(submissionRow.item.submission_id);
+        console.log('selectedCount: ' + selectedCount);
+
+        if(selectedCount == 0) {
+            $scope.showPagination = true;
+            $scope.showActions= false;
+        } else {
             $scope.showActions = true;
             $scope.showPagination = false;
-            return;
         }
-        if(selected_submissions().length==1){
-        $scope.showPagination = true;
-        $scope.showActions= false;
-        }
-
     };
 
-    var selected_submissions = function() {
-        return document.getElementById('local-submissions').getElementsByClassName('success');
-    };
-
-    var selected_submission_ids = function() {
-        var submission_ids = [];
-            var submissions =  selected_submissions();
-            for (var i = 0; i < submissions.length; i++) {
-                submission_ids.push(submissions[i].cells[0].innerText);
-            };
-        return submission_ids;
+    var getSelectedIds = function() {
+       return Object.keys(selected_id_map);
     };
 
     $scope.syncWithServer = function() {
-        selected_submission_ids().forEach(function(submission_id) {
+        for(submission_id in selected_id_map) {
             localStore.getSubmissionById(submission_id)
-            .then(function(submission){
-                if(angular.isUndefined(submission.submission_uuid) || submission.submission_uuid =="undefined"){
-                    dcsService.postSubmission(submission)
-                    .then(localStore.updateSubmissionMeta)
-                    .then(function() {
-                        console.log('submitted '+submission.submission_id);
-                    },function(error) {
-                        msg.displayError('error '+error);
-                    });
-                    return;
-                }
-                $scope.compare(submission);
-
-                },function(error) {
+                .then(function(submission) {
+                    if(angular.isUndefined(submission.submission_uuid) 
+                        || submission.submission_uuid == "undefined") {
+                        dcsService.postSubmission(submission)
+                            .then(localStore.updateSubmissionMeta)
+                            .then(function() {
+                                console.log('submitted '+submission.submission_id);
+                            },function(error) {
+                                msg.displayError('error '+error);
+                            });
+                        return;
+                    }
+                    $scope.compare(submission);
+                }, function(error) {
                 console.log('error '+error);
             })
-        });
+        }
     };
+
     var post_selected_submissions = function() {
         var multiplePromises = [];
-        selected_submission_ids().forEach(function(submission_id) {
-            multiplePromises.push(localStore.getSubmissionById(submission_id)
-            .then(dcsService.postSubmission)
-            .then(localStore.updateSubmissionMeta));
+        for(submission_id in selected_id_map) {
+            multiplePromises.push(
+                localStore.getSubmissionById(submission_id)
+                .then(dcsService.postSubmission)
+                .then(localStore.updateSubmissionMeta));
 
-        });
+        };
         return multiplePromises;
     };
 
     $scope.postSubmissions = function() {
-        var isError = false;
         msg.showLoading();
         $q.all(post_selected_submissions())
         .then(function(){
@@ -288,7 +287,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
-            localStore.deleteSubmissions(selected_submission_ids())
+            localStore.deleteSubmissions(getSelectedIds())
             .then(function(){
                 $scope.getSubmissions(0);
                 msg.hideLoadingWithInfo("Submission(s) deleted");
