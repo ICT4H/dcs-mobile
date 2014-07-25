@@ -100,6 +100,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		});
 		return deferred.promise;
 	};
+
 	this.getCountOfSubmissions = function(project_id) {
 		var deferred = $q.defer();
 		db.transaction(function(tx) {
@@ -109,6 +110,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		});
 		return deferred.promise;
 	};
+
 	this.getAllProjectSubmissions = function(project_id, offset, limit) {
 		var deferred = $q.defer();
 			db.transaction(function(tx) {
@@ -228,8 +230,18 @@ dcsApp.service('localStore', ['$q', function ($q) {
 			});
 		return deferred.promise;
 	};
+
 	this.deleteSubmissions = function(submissions_ids) {
-		return submissions_ids.every(this.deleteSubmission);
+		var deferred = $q.defer();
+			db.transaction(function(tx) {
+				tx.executeSql('DELETE FROM submissions WHERE submission_id IN(' +
+					submissions_ids.map(function() { return '?';}).join(',') + ')', submissions_ids, function(tx, resp) {
+					deferred.resolve()
+				}, function(tx ,error) {
+					deferred.reject(error);
+				});
+			});
+		return deferred.promise;
 	};
 
 	this.deleteSubmission = function(submission_id) {

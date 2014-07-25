@@ -142,7 +142,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
     };
 
     $scope.compare = function(localSubmission) {
-        msg.showLoadingWithInfo('Fetching latest server submission');
         localSubmission.project_uuid = $scope.project_uuid;
         dcsService.getSubmission(localSubmission)
             .then(function(serverSubmission) {
@@ -204,11 +203,18 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         msg.displayInfo('you can edit only one submission at a time !');
 
     };
+
+    $scope.select_all_submissions = function() {
+        var allSubmissions = document.getElementById('local-submissions').getElementsByClassName('submission');
+        for (var i = 0; i < allSubmissions.length; i++) {
+            allSubmissions[i].click();
+        };
+    };
+
     $scope.update_selected_submissions = function(currentSubmission) {
         currentSubmission.selected = !currentSubmission.selected;
         var submissions = selected_submissions();
         console.log(submissions.length);
-        $scope.showEdit = submissions.length<=1? true:false;
         if(currentSubmission.selected){
             $scope.showActions = true;
             $scope.showPagination = false;
@@ -220,9 +226,11 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         }
 
     };
+
     var selected_submissions = function() {
         return document.getElementById('local-submissions').getElementsByClassName('success');
     };
+
     var selected_submission_ids = function() {
         var submission_ids = [];
             var submissions =  selected_submissions();
@@ -231,9 +239,29 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
             };
         return submission_ids;
     };
-    $scope.postSubmissions = function() {
-        var isError = false;
-        msg.showLoading();
+
+    $scope.syncWithServer = function() {
+        selected_submission_ids().forEach(function(submission_id) {
+            localStore.getSubmissionById(submission_id)
+            .then(function(submission){
+                if(angular.isUndefined(submission.submission_uuid) || submission.submission_uuid =="undefined"){
+                    dcsService.postSubmission(submission)
+                    .then(localStore.updateSubmissionMeta)
+                    .then(function() {
+                        console.log('submitted '+submission.submission_id);
+                    },function(error) {
+                        msg.displayError('error '+error);
+                    });
+                    return;
+                }
+                $scope.compare(submission);
+
+                },function(error) {
+                console.log('error '+error);
+            })
+        });
+    };
+    var post_selected_submissions = function() {
         var multiplePromises = [];
         selected_submission_ids().forEach(function(submission_id) {
             multiplePromises.push(localStore.getSubmissionById(submission_id)
@@ -241,26 +269,35 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
             .then(localStore.updateSubmissionMeta));
 
         });
+        return multiplePromises;
+    };
 
-        $q.all(multiplePromises)
+    $scope.postSubmissions = function() {
+        var isError = false;
+        msg.showLoading();
+        $q.all(post_selected_submissions())
         .then(function(){
             msg.hideLoadingWithInfo('Submitted successfully');
         },function(error){
             msg.hideLoadingWithErr('something went wrong '+error);
         });
-        };
+    };
+
     $scope.deleteSubmissions = function() {
+        msg.showLoading();
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
-            if(localStore.deleteSubmissions(selected_submission_ids())){
+            localStore.deleteSubmissions(selected_submission_ids())
+            .then(function(){
                 $scope.getSubmissions(0);
                 msg.hideLoadingWithInfo("Submission(s) deleted");
 
             }
-            else{
-                msg.hideLoadingWithErr("Submission(s) deletion failed")
-            }
+            ,function(error){
+                console.log(error);
+                msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
+            });
         };
 
         navigator.notification.confirm(
