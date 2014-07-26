@@ -215,7 +215,9 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 			db.transaction(function(tx) {
 				tx.executeSql('SELECT * FROM submissions where submission_id = ?', [submission_id], function(tx, resp) {
-					deferred.resolve(transformRows(resp.rows)[0]);
+					var dbSubmission = transformRows(resp.rows)[0];
+					dbSubmission.data = JSON.parse(dbSubmission.data);
+					deferred.resolve(dbSubmission);
 				},deferred.reject);
 			});
 		return deferred.promise;

@@ -20,6 +20,10 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
         })
+        .when('/submission/conflict/id/:submission_id/project_id/:project_id',{
+          templateUrl: "partials/submission-conflict.html",
+          controller: 'submissionConflictController',
+        })
         .when('/about',{
           templateUrl: "partials/about.html",
           controller: 'projectListController',

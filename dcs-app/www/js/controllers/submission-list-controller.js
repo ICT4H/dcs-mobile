@@ -15,7 +15,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
-
     $scope.getSubmissions = function(start) {
         start = (typeof(start) == "number") ? start : 0;
         $scope.from = start + 1;
@@ -108,6 +107,15 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
 
         return $q.all(updatePromises);
     };
+
+    $scope.resolve = function() {
+        if(selectedCount==1) {
+            $location.path('/submission/conflict/id/' + getSelectedIds()[0] + '/project_id/' + project_id);
+            return;
+        }
+        msg.displayInfo('You can resolve only one submission at a time');
+
+    }
 
     $scope.compare = function(localSubmission) {
         localSubmission.project_uuid = $scope.project_uuid;

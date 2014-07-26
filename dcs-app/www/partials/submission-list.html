@@ -1,7 +1,6 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="new">
-    <!-- <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i> -->
-    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="select()"></i>
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
 </div>
 <div content-for="refreshContents">
     <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
@@ -44,6 +43,7 @@
             </div>
             <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
                 <span><button ng-click="syncWithServer()">sync with server</button></span>
+                <span><button ng-click="resolve()">Resolve</button></span>
                 <i class="panel-title fa fa-upload fa-lg" ng-click="postSubmissions()"></i>
                 <i class="panel-title fa fa-times fa-lg" ng-click="deleteSubmissions()"></i>
                 <i class="panel-title fa fa-pencil fa-lg" ng-click="editSurveyResponse()"></i>

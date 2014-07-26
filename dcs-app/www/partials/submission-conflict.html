@@ -1,0 +1,33 @@
+<div content-for="new">
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="select()"></i>
+</div>
+
+<div class="scrollable">  
+   <div class="scrollable-content">
+        <div class="list-group alert-danger" ng-show="projectWarning">
+            <p>{{projectWarning}}</p>
+        </div>
+    <div class="list-group top-padding-5px bg-white">
+      <div ng-show="showPagination" class="bg-white black-font table-bar line-bottom" ng-init="showPagination=true">
+          <span><button ng-click="select_all_submissions()">select all</button></span>
+        </div>
+        <table class="bg-white table table-condensed">
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Downloaded</th>
+              <th>Server</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="(key, val) in headers" ng-init="selectedCell=false">
+              <td>{{val}}</td>
+              <td ng-class="{'success':selectedCell}" ng-init="selectedCell=false" ng-click="selectedCell=!selectedCell; takeLocal(this)">{{localSubmission.data[key]}}</td>
+              <td ng-class="{'success':!selectedCell}" ng-init="selectedCell=false" ng-click="selectedCell=!selectedCell; takeServer(this)">{{serverSubmission[key]}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
