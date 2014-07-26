@@ -66,4 +66,17 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
         return deferred.promise;
     };
 
+    this.checkSubmissionVersions = function(id_versions) {
+        console.log('status_dict: '+ JSON.stringify(id_versions));
+
+        var deferred = $q.defer();
+        $rootScope.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions))
+        .then(function(id_status_dict) {
+            console.log('status_dict: '+ JSON.stringify(id_status_dict));
+            deferred.resolve(id_status_dict);
+        },deferred.reject);
+
+        return deferred.promise;
+    };
+
 }]);

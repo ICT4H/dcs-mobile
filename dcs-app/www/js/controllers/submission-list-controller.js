@@ -17,6 +17,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
 
 
     $scope.getSubmissions = function(start) {
+        start = (typeof(start) == "number") ? start : 0;
         $scope.from = start + 1;
 
         localStore.getCountOfSubmissions(project_id)
@@ -74,15 +75,11 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         msg.showLoadingWithInfo('Fetching server submissions');
         $scope.submissions = [];
 
-        localStore.getAllProjectSubmissions(project_id)
-            .then(function(localSubmissions) {
-                dcsService.getAllSubmissions($scope.project_uuid)
-                    .then(function(serverSubmissions) {
-                        updateSubmissionsToDisplay(localSubmissions, serverSubmissions);
-                        msg.hideAll();
-                    }, function(error){
-                        msg.hideLoadingWithErr('Unable to fetch submissions')
-                    });
+        localStore.getSubmissionVersions(project_id)
+            .then(dcsService.checkSubmissionVersions)
+            .then(updateSubmissionsToDisplay)
+            .then($scope.getSubmissions, function(e){
+                msg.hideLoadingWithErr('Unable to check submissions status')
             });
     };
 
@@ -99,49 +96,17 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         return {'local':statusLocal, 'non-local':statusNonLocal};
     }
 
-    var updateSubmissionsToDisplay = function(localSubmissions, serverSubmissions) {
+    var updateSubmissionsToDisplay = function(id_status_dict) {
+        var updatePromises = [];
 
-        var submissionByStatus = groupOnStatus(localSubmissions);
-        $scope.submissions = submissionByStatus['local'];
-        var nonLocalSubmissions = submissionByStatus['non-local'];
-
-        // What if there are 10,000 submissions on server?
-        var onServer, outdated;
-        nonLocalSubmissions.forEach(function(nonLocalSubmission) {
-            onServer = outdated = false;
-            serverSubmissions.forEach(function(serverSubmission) {
-                if (serverSubmission.submission_uuid == nonLocalSubmission.submission_uuid) {
-                    onServer = true;
-                    if (serverSubmission.version != nonLocalSubmission.version) {
-                        outdated = true;
-                    }
-                }
-            });
-            if(!onServer) {
-                nonLocalSubmission.status = SERVER_DELETED;
-                localStore.updateSubmissionStatus(nonLocalSubmission.submission_id, SERVER_DELETED);
-            } else if (outdated) {
-                nonLocalSubmission.status = OUTDATED;
-                localStore.updateSubmissionStatus(nonLocalSubmission.submission_id, OUTDATED);
-            }
-            $scope.submissions.push(nonLocalSubmission);
+        angular.forEach(id_status_dict, function(submission_uuids, status) {
+            if (submission_uuids.length > 0) {
+                updatePromises.push(
+                    localStore.updateSubmissionsStatus(submission_uuids, status));
+            };
         });
 
-        serverSubmissions.forEach(function(serverSubmission) {
-            serverSubmission.status = SERVER;
-            serverSubmission.created = prettifyDate(serverSubmission.created);
-            nonLocalSubmissions.forEach(function(nonLocalSubmission) {
-                if (serverSubmission.submission_uuid == nonLocalSubmission.submission_uuid) {
-                    serverSubmission.status = BOTH;
-                }
-            });
-
-            if(serverSubmission.status == SERVER) {
-                serverSubmission.project_id = project_id
-                $scope.submissions.push(serverSubmission);
-            }
-        });
-
+        return $q.all(updatePromises);
     };
 
     $scope.compare = function(localSubmission) {

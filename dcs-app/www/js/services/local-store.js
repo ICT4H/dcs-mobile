@@ -252,6 +252,38 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
+	this.getSubmissionVersions = function(project_id) {
+		var deferred = $q.defer();
+			db.transaction(function(tx) {
+				tx.executeSql('SELECT submission_uuid, version from submissions WHERE project_id = ? ', [project_id],
+					function(tx, resp) {
+						var s = transformRows(resp.rows);
+						var ret = {};
+						for (var i=0;i<s.length;i++) {
+							ret[s[i].submission_uuid] = s[i].version;
+						}
+						deferred.resolve(ret);
+					}, deferred.reject);
+			});
+		return deferred.promise;
+	};
+
+	this.updateSubmissionsStatus = function(submission_uuids, status) {
+
+		var deferred = $q.defer();
+		db.transaction (function(tx) {
+			tx.executeSql('UPDATE submissions SET status=? where ' +
+				'submission_uuid IN(' + getParamHolders(submission_uuids) + ')',
+				[status].concat(submission_uuids),
+				deferred.resolve, deferred.reject);
+		})
+		return deferred.promise;
+	}
+
+	var getParamHolders = function(paramArray) {
+		return paramArray.map(function() { return '?';}).join(',');
+	}
+
 	var transformRows = function(resultSet) {
 		var rows = [];
 		for (var i=0; i < resultSet.length; i++) {

@@ -1,6 +1,7 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="new">
-    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
+    <!-- <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i> -->
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="select()"></i>
 </div>
 <div content-for="refreshContents">
     <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
@@ -47,14 +48,16 @@
                 <i class="panel-title fa fa-times fa-lg" ng-click="deleteSubmissions()"></i>
                 <i class="panel-title fa fa-pencil fa-lg" ng-click="editSurveyResponse()"></i>
             </div>
-              <table id="local-submissions" class="hide-first-col bg-white table table-striped table-condensed">
+              <table id="local-submissions" class="hide-first-col bg-white table table-condensed">
                   <thead>
                   <tr>
                       <th ng-repeat="(key, val) in headers">{{val}}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="submission" ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'success':selected}" ng-click="update_selected_submissions(this)">
+                  <tr class="submission" ng-repeat="item in submissions" ng-init="selected=false"
+                      ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
+                      ng-click="update_selected_submissions(this)">
                     <td>{{item.submission_id}}</td>
                     <td ng-repeat="(key, val) in headers">{{item.data[key]}}</td>
                   </tr>
