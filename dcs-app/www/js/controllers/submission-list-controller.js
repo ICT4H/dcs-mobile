@@ -172,7 +172,7 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
 
     $scope.editSurveyResponse = function() {
         if(selectedCount==1) {
-            $location.path('/project/' + project_id + '/submission/' + submission_ids[0].submission_id);
+            $location.path('/project/' + project_id + '/submission/' + getSelectedIds()[0]);
             return;
         }
         msg.displayInfo('you can edit only one submission at a time !');
