@@ -26,6 +26,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		db.transaction (function(tx) {
 			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text, version text, status text, name text, xform text, headers text)');
 			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text, version text, status text, is_modified integer, project_id integer, created text, data text, xml text)');
+			tx.executeSql('CREATE INDEX project_id_index ON submissions (project_id)');
 			console.log('Project and submission tables created');
 			deferred.resolve();
 		});
