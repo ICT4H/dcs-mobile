@@ -182,7 +182,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 			db.transaction (function(tx) {
 				tx.executeSql('UPDATE submissions SET version=?, status=?, is_modified=? where submission_id = ?', 
-						[version, status, submission_id, 1], function(tx, resp) {
+						[version, status, 1, submission_id], function(tx, resp) {
 							deferred.resolve();
 						}, deferred.reject);
 			})

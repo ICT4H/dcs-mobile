@@ -3,13 +3,16 @@
 </div>
 
 <div class="scrollable">  
-   <div class="scrollable-content">
-        <div class="list-group alert-danger" ng-show="projectWarning">
-            <p>{{projectWarning}}</p>
-        </div>
+  <div class="scrollable-content">
+    <div class="list-group alert-danger" ng-show="projectWarning">
+        <p>{{projectWarning}}</p>
+    </div>
     <div class="list-group top-padding-5px bg-white">
-      <div ng-show="showPagination" class="bg-white black-font table-bar line-bottom" ng-init="showPagination=true">
-          <span><button ng-click="select_all_submissions()">select all</button></span>
+      <div class="list-group-item">
+        <div class="btn-group pull-right">
+          <button type="button" class="btn btn-default" ng-click="save()">Save</button>
+          <button type="button" class="btn btn-default" ng-click="takeLocal()">Take Local</button>
+          <button type="button" class="btn btn-default" ng-click="takeServer()">Take Server</button>
         </div>
         <table class="bg-white table table-condensed">
           <thead>
@@ -20,10 +23,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="(key, val) in headers" ng-init="selectedCell=false">
+            <tr ng-repeat="(key, val) in headers">
               <td>{{val}}</td>
-              <td ng-class="{'success':selectedCell}" ng-init="selectedCell=false" ng-click="selectedCell=!selectedCell; takeLocal(this)">{{localSubmission.data[key]}}</td>
-              <td ng-class="{'success':!selectedCell}" ng-init="selectedCell=false" ng-click="selectedCell=!selectedCell; takeServer(this)">{{serverSubmission[key]}}</td>
+              <td ng-class="{'success':selectLocal}">{{localSubmission.data[key]}}</td>
+              <td ng-class="{'success':!selectLocal}">{{serverSubmissionData[key]}}</td>
             </tr>
           </tbody>
         </table>

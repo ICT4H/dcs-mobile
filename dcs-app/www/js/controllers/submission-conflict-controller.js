@@ -3,17 +3,27 @@ dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$q',
 
     msg.showLoadingWithInfo('Loading submissions');
 
+    $scope.selectLocal = false;
+
     $scope.takeLocal = function(row) {
         //$scope.resolvedSubmission
         console.log('take local value');
-        $scope.resolvedSubmission[row.key] = $scope.localSubmission.data[row.key];
-        console.log('resolvedSubmission: ' + JSON.stringify($scope.resolvedSubmission));
+        $scope.selectLocal = true;
     }
 
     $scope.takeServer = function(row) {
         console.log('take server value');
-        $scope.resolvedSubmission[row.key] = $scope.serverSubmission[row.key];
-        console.log('resolvedSubmission: ' + JSON.stringify($scope.resolvedSubmission));
+        $scope.selectLocal = false;
+    }
+
+    $scope.save = function() {
+        if ($scope.selectLocal) {
+            localStore.updateSubmissionVersionAndStatus($scope.localSubmission.submission_id, $scope.serverSubmission.version, BOTH);
+            msg.displaySuccess('Local changes taken');
+        } else {
+            localStore.updateSubmission($scope.localSubmission.submission_id, $scope.serverSubmission);
+            msg.displaySuccess('Server changes taken');
+        }
     }
 
     localStore.getProjectById($routeParams.project_id)
@@ -29,10 +39,8 @@ dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$q',
 				    $scope.localSubmission = localSubmission;
 		    		dcsService.getSubmissionById(project.project_uuid, localSubmission.submission_uuid)
 		    			.then(function(serverSubmission) {
-		    				
-		    				serverSubmission.data = JSON.parse(serverSubmission.data);
-		    				$scope.serverSubmission = serverSubmission.data;
-		    				$scope.resolvedSubmission = angular.copy(serverSubmission.data);
+                        	$scope.serverSubmission	= serverSubmission;    				
+		    				$scope.serverSubmissionData = JSON.parse(serverSubmission.data);
 		    				msg.hideAll();
 		    			});
 		    	});

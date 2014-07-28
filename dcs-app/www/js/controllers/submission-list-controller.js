@@ -129,43 +129,6 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
             });
     }
 
-    $scope.takeLocalSubmission = function(s) {
-        function onConfirm(buttonIndex) {
-            if(buttonIndex==BUTTON_NO) return;
-
-            localStore.updateSubmissionVersionAndStatus(s.submission_id, s.serverSubmission.version, s.serverSubmission.status);
-            s.is_modified = 1;
-            msg.displaySuccess('Local changes taken');
-
-        };
-        navigator.notification.confirm(
-            'Do you want take local changes ?',
-            onConfirm,
-            'Submission',
-            ['Yes','No']
-        );
-    };
-
-    $scope.takeServerSubmission = function(s) {
-        function onConfirm(buttonIndex) {
-            if(buttonIndex==BUTTON_NO) return;
-
-            localStore.updateSubmission(s.submission_id, s.serverSubmission);
-            s.html = s.serverSubmission.html;
-            s.xml = s.serverSubmission.xml;
-            s.status = BOTH;
-            msg.displaySuccess('Server changes taken');
-
-        };
-        navigator.notification.confirm(
-            'Do you want take server changes ?',
-            onConfirm,
-            'Submission',
-            ['Yes','No']
-        );
-       
-    }
-
     $scope.createSurveyResponse = function() {
         $location.path('/project/' + project_id + '/submission/' + null);
     };
