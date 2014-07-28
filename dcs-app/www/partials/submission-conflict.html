@@ -23,10 +23,33 @@
             </tr>
           </thead>
           <tbody>
+
             <tr ng-repeat="(key, val) in headers">
-              <td>{{val}}</td>
-              <td ng-class="{'success':selectLocal}">{{localSubmission.data[key]}}</td>
-              <td ng-class="{'success':!selectLocal}">{{serverSubmissionData[key]}}</td>
+              <td ng-hide="isArray(localSubmission.data[key])">{{val}}</td>
+              <td ng-hide="isArray(localSubmission.data[key])" ng-class="{'success':selectLocal}">{{localSubmission.data[key]}}</td>
+              <td ng-hide="isArray(serverSubmissionData[key])" ng-class="{'success':!selectLocal}">{{serverSubmissionData[key]}}</td>
+
+              <td ng-show="isArray(localSubmission.data[key])">
+                <table class="table table-condensed" ng-repeat="v in localSubmission.data[key] track by $index">
+                  <tr ng-repeat="(k1, v1) in v">
+                    <td>{{k1}}</td>
+                  </tr>
+                </table>
+              </td>
+              <td ng-show="isArray(localSubmission.data[key])">
+                <table class="table table-condensed" ng-repeat="v in localSubmission.data[key] track by $index">
+                  <tr ng-repeat="(k1, v1) in v">
+                    <td ng-class="{'success':selectLocal}">{{v1}}</td>
+                  </tr>
+                </table>
+              </td>
+              <td ng-show="isArray(localSubmission.data[key])">
+                <table class="table table-condensed" ng-repeat="vs in serverSubmissionData[key] track by $index">
+                  <tr ng-repeat="(ks1, vs1) in vs">
+                    <td ng-class="{'success':!selectLocal}">{{vs1}}</td>
+                  </tr>
+                </table>
+              </td>
             </tr>
           </tbody>
         </table>
