@@ -5,7 +5,9 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
     $scope.pageSize = 5;
 
     msg.showLoadingWithInfo('Loading submissions');
-
+    
+    var MODIFIED = 1;
+    var UNMODIFIED = 0;
     var project_id = $routeParams.project_id;
     var selectedCount = 0;
     var serverSubmissions = [];
@@ -262,13 +264,13 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
         var submitAfterConfirm = function() {
         msg.showLoading();
         submission.status = BOTH;
-        submission.is_modified = 0;
+        submission.is_modified = UNMODIFIED;
         dcsService.postSubmission(submission)
             .then(localStore.updateSubmissionMeta)
             .then(function() {
                 msg.hideLoadingWithInfo('Submitted successfully');
             },function(error) {
-                submission.is_modified = 1;
+                submission.is_modified = MODIFIED;
                 msg.hideLoadingWithErr('Submitted to server, local status not updated.');
             });
         };
