@@ -19,9 +19,12 @@ dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$q',
     $scope.save = function() {
         if ($scope.selectLocal) {
             localStore.updateSubmissionVersionAndStatus($scope.localSubmission.submission_id, $scope.serverSubmission.version, BOTH);
+            localStore.updateSubmissionCreatedDate($scope.localSubmission.submission_id, $scope.serverSubmission.created);
             msg.displaySuccess('Local changes taken');
         } else {
             localStore.updateSubmission($scope.localSubmission.submission_id, $scope.serverSubmission);
+            localStore.updateSubmissionCreatedDate($scope.localSubmission.submission_id, $scope.serverSubmission.created);
+
             msg.displaySuccess('Server changes taken');
         }
     }

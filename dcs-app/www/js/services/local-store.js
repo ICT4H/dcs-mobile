@@ -282,6 +282,17 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	}
 
+	this.updateSubmissionCreatedDate = function(submission_id, newDate) {
+		var deferred = $q.defer();
+		db.transaction (function(tx) {
+			tx.executeSql('UPDATE submissions SET created=? where ' +
+				'submission_id = ?)',
+				[newDate,submission_id],
+				deferred.resolve, deferred.reject);
+		})
+		return deferred.promise;
+	};
+
 	var getParamHolders = function(paramArray) {
 		return paramArray.map(function() { return '?';}).join(',');
 	}
