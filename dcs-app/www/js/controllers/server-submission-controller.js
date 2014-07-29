@@ -43,18 +43,29 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     };
 
     $scope.formatSubmission = function(value) {
-        if (value instanceof Array) {
+        if (typeof value == "object") {
             var ret = '<table class="show-first-col no-margin-bottom table table-condensed">';
             ret += '<thead><tr>';
-            for(k in value[0]) {
+            
+            for(k in value[0] || value) {
                 ret += '<th>'+k+'</th>';
             }
             ret += '</tr></thead>';
 
-            for(var i=0; i<value.length; i++) {
+            // multiple repeat data
+            if (value instanceof Array) {
+                for(var i in value) {
+                    ret += '<tr>';
+                    for (key in value[i]) {
+                        ret += '<td>' + value[i][key] + '</td>';
+                    }
+                    ret += '</tr>';
+                }
+            // single repeat data
+            } else {
                 ret += '<tr>';
-                for (key in value[i]) {
-                    ret += '<td>' + value[i][key] + '</td>';
+                for(var i in value) {
+                    ret += '<td>' + value[i] + '</td>';
                 }
                 ret += '</tr>';
             }
