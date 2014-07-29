@@ -29,7 +29,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
                 .then(function() {
                     console.log('createValidLocalStore resolved');
                     $rootScope.isAuthenticated = true;
-                    $location.path('/project-list');
+                    $location.path('/local-project-list');
                 }, function() {
                     msg.hideLoadingWithErr('Server authentication failed');
                 });
@@ -39,7 +39,7 @@ dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'user
                 .then(function() {
                     msg.hideAll();
                     $rootScope.isAuthenticated = true;
-                    $location.path('/project-list');
+                    $location.path('/local-project-list');
                 }, function() {
                     msg.hideLoadingWithErr('Invalid login details');
                     $location.path('/');

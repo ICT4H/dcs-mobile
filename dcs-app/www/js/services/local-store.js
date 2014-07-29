@@ -73,11 +73,16 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.getAllLocalProjects = function() {
+	this.getProjects = function(offset,limit) {
 		var deferred = $q.defer();
-		sqlTransaction('SELECT * FROM projects', [], function(tx, resp) {
-				deferred.resolve(transformRows(resp.rows));
-			},deferred.reject);
+			sqlTransaction('SELECT * FROM projects limit ? offset ?', [limit,offset],
+				 function(tx, resp) {
+					var s = transformRows(resp.rows);
+					deferred.resolve(s);
+				},function(tx,error){
+					console.log(error)
+					 deferred.reject(error);
+				});
 		return deferred.promise;
 	};
 
@@ -105,7 +110,13 @@ dcsApp.service('localStore', ['$q', function ($q) {
 			},deferred.reject);
 		return deferred.promise;
 	};
-
+	this.getCountOfProjects = function() {
+		var deferred = $q.defer();
+		sqlTransaction('select count(*) as total FROM projects',[],function(tx, resp) {
+				deferred.resolve(resp.rows.item(0).total);
+			},deferred.reject);
+		return deferred.promise;
+	};
 	this.getAllProjectSubmissions = function(project_id, offset, limit) {
 		var deferred = $q.defer();
 			sqlTransaction('SELECT * FROM submissions WHERE project_id = ? limit ? offset ?', [project_id,limit,offset],

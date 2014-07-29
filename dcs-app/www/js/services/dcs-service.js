@@ -1,8 +1,7 @@
 dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
-
-    this.getQuestionnaires = function() {
+    this.getProjects = function(start,length) {
         var deferred = $q.defer();
-            $rootScope.httpRequest("/client/project/")
+            $rootScope.httpRequest("/client/project/?start="+start+"&length="+length)
             .then(function(projects) {
                 console.log('all projects: ' + JSON.stringify(projects));
                 deferred.resolve(projects);

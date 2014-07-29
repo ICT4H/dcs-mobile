@@ -12,9 +12,13 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/manage-columns.html",
           controller: 'manageColumnsController'
          })
-        .when('/project-list',{
-          templateUrl: "partials/project-list.html",
+        .when('/local-project-list',{
+          templateUrl: "partials/local-project-list.html",
           controller: 'projectListController'
+         })
+        .when('/server-project-list',{
+          templateUrl: "partials/server-project-list.html",
+          controller: 'serverProjectListController'
          })
         .when('/submission-list/:project_id',{
           templateUrl: "partials/submission-list.html",
