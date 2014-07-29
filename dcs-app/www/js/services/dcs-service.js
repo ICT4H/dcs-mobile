@@ -26,7 +26,14 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
             },deferred.reject);
         return deferred.promise;
     };
+    this.getSubmissions = function(project_uuid,start,length){
+        var deferred = $q.defer();
+            $rootScope.httpRequest('/client/submissions/?uuid='+project_uuid+'&start='+start+'&length='+length).then(function(serverSubmission) {
+                deferred.resolve(serverSubmission);
 
+            },deferred.reject);
+        return deferred.promise;
+    };
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
             $rootScope.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).then(function(serverSubmission) {

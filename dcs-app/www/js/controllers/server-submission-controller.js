@@ -18,7 +18,7 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     $scope.getSubmissions = function(start, pageSize) {
         $scope.from = start + 1;
 
-        $rootScope.httpRequest('/client/submissions/?uuid='+$scope.project_uuid+'&start='+start+'&length='+pageSize)
+        dcsService.getSubmissions($scope.project_uuid,start,pageSize)
             .then(function(responce) {
                 $scope.cols = responce.headers;
 
