@@ -71,6 +71,28 @@ dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$r
             $scope.getSubmissions(0);
         });
 
+    $scope.formatSubmission = function(value) {
+        if (value instanceof Array) {
+            var ret = '<table class="show-first-col no-margin-bottom table table-condensed">';
+            ret += '<thead><tr>';
+            for(k in value[0]) {
+                ret += '<th>'+k+'</th>';
+            }
+            ret += '</tr></thead>';
+
+            for(var i=0; i<value.length; i++) {
+                ret += '<tr>';
+                for (key in value[i]) {
+                    ret += '<td>' + value[i][key] + '</td>';
+                }
+                ret += '</tr>';
+            }
+            return ret += '</table>';
+        }
+
+        return value;
+    }
+
     $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
         msg.showLoadingWithInfo('Fetching server submissions');

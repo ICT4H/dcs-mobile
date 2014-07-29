@@ -42,6 +42,28 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
             });
     };
 
+    $scope.formatSubmission = function(value) {
+        if (value instanceof Array) {
+            var ret = '<table class="show-first-col no-margin-bottom table table-condensed">';
+            ret += '<thead><tr>';
+            for(k in value[0]) {
+                ret += '<th>'+k+'</th>';
+            }
+            ret += '</tr></thead>';
+
+            for(var i=0; i<value.length; i++) {
+                ret += '<tr>';
+                for (key in value[i]) {
+                    ret += '<td>' + value[i][key] + '</td>';
+                }
+                ret += '</tr>';
+            }
+            return ret += '</table>';
+        }
+
+        return value;
+    }
+
     $scope.download = function() {
         console.log('download clicked');
         var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');

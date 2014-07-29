@@ -59,7 +59,7 @@
                       ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
                       ng-click="update_selected_submissions(this)">
                     <td>{{item.submission_id}}</td>
-                    <td ng-repeat="(key, val) in headers">{{item.data[key]}}</td>
+                    <td ng-repeat="(key, val) in headers" ng-bind-html="formatSubmission(item.data[key])"></td>
                   </tr>
                 </tbody>
               </table>

@@ -170,8 +170,16 @@ h1 {
   color: #555 !important;
 }
 
-table.hide-first-col tr td:first-child {
+.hide-first-col tr td:first-child {
   display: none;
+}
+
+.show-first-col tr td:first-child {
+  display: block;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0px !important;
 }
 
 .select-in-bar {

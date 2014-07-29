@@ -55,7 +55,7 @@
                   </thead> 
                   <tbody>
                     <tr ng-repeat="items in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
-                      <td ng-repeat="item in items">{{ item }}</td>
+                      <td ng-repeat="item in items" ng-bind-html="formatSubmission(item)"></td>
                     </tr>
                   </tbody>
                 </table>
