@@ -200,9 +200,13 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	this.getSubmissionById = function(submission_id) {
 		var deferred = $q.defer();
 		sqlTransaction('SELECT * FROM submissions where submission_id = ?', [submission_id], function(tx, resp) {
-					var dbSubmission = transformRows(resp.rows)[0];
-					dbSubmission.data = JSON.parse(dbSubmission.data);
-					deferred.resolve(dbSubmission);
+					if (resp.rows.length == 0)
+						deferred.resolve();
+					else {
+						var dbSubmission = transformRows(resp.rows)[0];
+						dbSubmission.data = JSON.parse(dbSubmission.data);
+						deferred.resolve(dbSubmission);
+					}
 				},deferred.reject);
 		return deferred.promise;
 	};
