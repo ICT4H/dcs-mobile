@@ -147,6 +147,7 @@ h1 {
 .context-info {
   color: white;
   text-align: center;
+  padding: 4px;
 }
 
 .bg-white {
