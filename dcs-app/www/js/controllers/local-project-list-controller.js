@@ -1,4 +1,4 @@
-dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
+dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, $q, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
     $scope.context = 'local Project list';
@@ -58,41 +58,28 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
         $scope.getSubmissions(0);
     }
     
-    $scope.$refreshContents = function() {
+    $scope.$sync = function() {
+        msg.showLoading();
+        var promises = [];
+        $scope.projects.forEach(function(project) {
+            promises.push(dcsService.getQuestion(project.project_uuid)
+            .then(function(projectAtServer){
+                if(project.version !=projectAtServer.version){
+                    project.status = OUTDATED;
+                    localStore.updateProjectStatus(project.project_id,project.status);
+                }
+            },function(){
+                console.log('unable to get project details');
+            }));
+        });
+
+        $q.all(promises).then(function() {
+            msg.hideLoadingWithInfo('updated project list');
+        },function() {
+            msg.hideLoadingWithErr('projects not updated properly');
+        });
         console.log('projectListController refresh called');
     };
-
-    var updateProjectsToDisplay = function(projectsInScope, serverProjects){
-        serverProjects.forEach(function(serverProject){
-            addServerOnlyProject(projectsInScope,serverProject);
-        });
-        projectsInScope.forEach(function(localProject){
-            updateLocalProjectStatus(serverProjects, localProject);
-        });
-
-    };
-    var updateLocalProjectStatus = function(projects,localProject) {
-        for (var i = 0; i < projects.length; i++) {
-            if(localProject.project_uuid == projects[i].project_uuid) {
-                if(projects[i].version != localProject.version) {
-                    localProject.status = OUTDATED;
-                    localStore.updateProjectStatus(localProject.project_id, OUTDATED);
-                }
-                return;
-            }
-        }
-        localProject.status = SERVER_DELETED;
-        localStore.updateProjectStatus(localProject.project_id, SERVER_DELETED);
-    };
-
-    var addServerOnlyProject = function(projects,serverProject) {
-        for (var i = 0; i < projects.length; i++) {
-            if(serverProject.project_uuid == projects[i].project_uuid) return;
-        }
-        serverProject.status = SERVER;
-        projects.push(serverProject);
-    };
-
 
     $scope.deleteProject = function(project){
         function onConfirm(buttonIndex) {
@@ -101,6 +88,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', 'dcsService'
             msg.showLoading();
             localStore.deleteProject(project.project_id).then(function() {
                 project.status = SERVER;
+                $scope.getProjects($scope.from);
                 msg.hideLoadingWithInfo('Project deleted!');
             }, function(error) {
                 msg.handleError(error,'Project cannot be deleted');
