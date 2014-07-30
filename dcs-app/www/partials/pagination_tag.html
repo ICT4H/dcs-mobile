@@ -1,0 +1,12 @@
+<span>{{from}} to {{to}} of {{total}}</span>
+<span>
+    <select class="select-in-bar" ng-model="pageSize" ng-change="onPageSizeChange()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+    </select>
+</span>
+<span ng-click="do_prev()" class="fa fa-lg fa-chevron-left"/>
+<span ng-click="do_next()" class="fa fa-lg fa-chevron-right"/>

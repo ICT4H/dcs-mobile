@@ -1,4 +1,5 @@
-dcsApp.controller('submissionListController', ['$rootScope', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
+dcsApp.controller('submissionListController', 
+    ['$rootScope', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
     function($rootScope, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Submissions";
