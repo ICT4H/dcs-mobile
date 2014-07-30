@@ -1,0 +1,17 @@
+<span content-for="title">{{pageTitle}}</span>
+<div content-for="new">
+    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_id)"></i>
+</div>
+<div content-for="refreshContents">
+    <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
+</div>
+<div content-for="context-info">
+  <span class="context-info">{{project_name}}</span>
+</div>
+
+<div class="scrollable">  
+   <div class="scrollable-content">
+      <p>Grid follows </p>
+      <div class="gridStyle" ng-grid="gridOptions"></div>
+    </div>
+</div>
