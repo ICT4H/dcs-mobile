@@ -20,7 +20,9 @@ dcsApp.service('userService', ['$q', function($q) {
 					'INSERT INTO users (user_name, url) VALUES (?,?)', [user.name, user.serverUrl],
 					function(tx, resp){
 						deferred.resolve(user);
-					}, deferred.reject
+					},function(tx,error) {
+						deferred.reject(error);
+					}
 				);
 			});
 		return deferred.promise;
