@@ -48,7 +48,8 @@
                 <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
                 <span><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span>
             </div>
-              <table id="local-submissions" class="hide-first-col bg-white table table-condensed">
+            <div style="overflow-x:auto;">
+              <table id="local-submissions" style="margin-bottom:0px;" class="hide-first-col bg-white table table-condensed">
                   <thead>
                   <tr>
                       <th ng-repeat="(key, val) in headers">{{val}}</th>
@@ -63,6 +64,7 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
           </div>
         </div>
         </div>
