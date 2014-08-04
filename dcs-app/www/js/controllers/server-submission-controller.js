@@ -52,20 +52,12 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
             }
             ret += '</tr></thead>';
 
-            // multiple repeat data
-            if (value instanceof Array) {
-                for(var i in value) {
-                    ret += '<tr>';
-                    for (key in value[i]) {
-                        ret += '<td>' + value[i][key] + '</td>';
-                    }
-                    ret += '</tr>';
-                }
-            // single repeat data
-            } else {
+            for(var i in value) {
+                if (i == "$$hashKey")
+                    continue;
                 ret += '<tr>';
-                for(var i in value) {
-                    ret += '<td>' + value[i] + '</td>';
+                for (key in value[i]) {
+                    ret += '<td>' + value[i][key] + '</td>';
                 }
                 ret += '</tr>';
             }

@@ -47,19 +47,20 @@
 
                   <span><a ng-click="do_next()"><li class="fa fa-lg fa-chevron-right"></li></a></span>
                 </div>
-
-                <table id="server-submissions" class="bg-white hide-first-col table table-striped table-condensed">
-                  <thead>
-                    <tr>
-                        <th ng-repeat="c in cols">{{c}}</th>
-                    </tr>
-                  </thead> 
-                  <tbody>
-                    <tr ng-repeat="items in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
-                      <td ng-repeat="item in items" ng-bind-html="formatSubmission(item)"></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div style="overflow-x:auto;">
+                  <table id="server-submissions" class="bg-white hide-first-col table table-striped table-condensed" style="margin-bottom:0px">
+                    <thead>
+                      <tr>
+                          <th ng-repeat="c in cols">{{c}}</th>
+                      </tr>
+                    </thead> 
+                    <tbody>
+                      <tr ng-repeat="items in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
+                        <td ng-repeat="item in items" ng-bind-html="formatSubmission(item)"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div> <!-- table panel -->
             </div>
         </div>
