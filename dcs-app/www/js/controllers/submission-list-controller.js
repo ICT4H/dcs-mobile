@@ -13,26 +13,10 @@ dcsApp.controller('submissionListController',
     var selectedCount = 0;
     var serverSubmissions = [];
     var selected_id_map = {};
-    var metaField = ["date", "ds_id", "ds_name"];
 
     $scope.project_id = project_id;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
-
-    localStore.getProjectById(project_id)
-        .then(function(project) {
-            $scope.project_name = project.name;
-            $scope.project_uuid = project.project_uuid;
-            $scope.headerLabels = JSON.parse(project.header_labels);
-            $scope.headers = JSON.parse(project.headers);
-            delete $scope.headers.ds_name;
-            delete $scope.headers.date;
-            setObseleteProjectWarning(project);
-
-            $scope.headerRows = createSubmissionHeaders($scope.headers, $scope.headerLabels);
-
-            $scope.getSubmissions(0);
-        });
 
     $scope.getSubmissions = function(start) {
         start = (typeof(start) == "number") ? start : 0;
@@ -44,8 +28,6 @@ dcsApp.controller('submissionListController',
                 localStore.getAllProjectSubmissions(project_id,start,$scope.pageSize)
                     .then(function(submissions) {
                         $scope.submissions = submissions;
-                        $scope.s = createSubmissionRows($scope.headers, $scope.submissions);
-
                         if(submissions.length <1) {
                             msg.hideLoadingWithInfo('No local submissions !');
                             return;
@@ -65,99 +47,6 @@ dcsApp.controller('submissionListController',
             });
     };
 
-    var createSubmissionHeaders = function(headers, headerLabels) {
-
-      var tableHeaders = [];
-      var topQuestionNames = headers["_main"];
-      var maxLength = (Object.keys(headers).length > 1) ? 2 : 0;
-
-      var tableHeader = [];
-      var repeatRows = [];
-      topQuestionNames.forEach(function(topQuestionName) {
-        var isRepeatQuestion = (undefined != headers[topQuestionName]);
-        if (isRepeatQuestion) {
-            tableHeader.push({
-                l: headerLabels[topQuestionName],
-                c: headers[topQuestionName].length,
-                r: 0
-            });
-            var repeats = headers[topQuestionName];
-            repeats.forEach(function(repeat) {
-                repeatRows.push({
-                    l: headerLabels[repeat],
-                    c: 0,
-                    r: 0
-                });
-            });
-        } else {
-            if (metaField.indexOf(topQuestionName) == -1) {
-              tableHeader.push({
-                l: headerLabels[topQuestionName],
-                c: 0,
-                r: maxLength
-              });
-            }
-        }
-      });
-      tableHeaders.push(tableHeader);
-      if (repeatRows.length > 0)
-        tableHeaders.push(repeatRows);
-      
-      return tableHeaders;
-    }
-
-    var createSubmissionRows = function(headers, submissions) {
-      var firstHeaderRow = headers["_main"];
-      var submissionRows = [];
-      submissions.forEach(function(s) {
-        var submission = s.data;
-        var maxLength = findMaxLength(submission);
-        var srow = [];
-        var repeatsInNewRow = []
-        firstHeaderRow.forEach(function(firstHeaderCell) {
-          var cell = {};
-          var hasRepeat = (undefined != headers[firstHeaderCell]);
-          if (hasRepeat) {
-            var repeat = headers[firstHeaderCell];
-            var repeatSubmission = submission[firstHeaderCell];
-            repeatsInNewRow = [];
-            repeatSubmission.forEach(function(repeatRow, i) {
-                
-                repeat.forEach(function(rName) {
-                    cell = {};
-                    cell["v"]=repeatRow[rName]; cell["r"]=0; cell["c"]=maxLength-repeatSubmission.length;
-                    if (i==0)
-                        srow.push(cell);
-                    else
-                        repeatsInNewRow.push(cell);
-                });
-            });
-          } else {            
-            if (metaField.indexOf(firstHeaderCell) == -1) {
-
-                cell["v"]=submission[firstHeaderCell]; cell["r"]=maxLength+1; cell["c"]=0;
-                srow.push(cell);
-            }
-          }
-        });
-        submissionRows.push(srow);
-        if (repeatsInNewRow.length>0)
-            submissionRows.push(repeatsInNewRow);
-      });
-      return submissionRows;
-    }
-
-    var findMaxLength = function(object) {
-      var maxLength = 0;
-      Object.keys(object).forEach(function(key) {
-      if (object.key instanceof Array ) {
-        if (object[key].length > maxLength)
-          maxLength = object[key].length;
-      }
-      });
-      return maxLength;
-    }
-
     var setObseleteProjectWarning = function(project) {
         delete $scope.projectWarning;
 
@@ -172,7 +61,51 @@ dcsApp.controller('submissionListController',
         }
     }
 
-     $scope.$refreshContents = function() {
+    localStore.getProjectById(project_id)
+        .then(function(project) {
+            $scope.project_name = project.name;
+            $scope.project_uuid = project.project_uuid;
+            $scope.headers = JSON.parse(project.headers);
+            delete $scope.headers.ds_name;
+            delete $scope.headers.date;
+            setObseleteProjectWarning(project);
+            $scope.getSubmissions(0);
+        });
+
+    $scope.formatSubmission = function(value) {
+        if (typeof value == "object") {
+            var ret = '<table class="show-first-col no-margin-bottom table table-condensed">';
+            ret += '<thead><tr>';
+            
+            for(k in value[0] || value) {
+                ret += '<th>'+k+'</th>';
+            }
+            ret += '</tr></thead>';
+
+            // multiple repeat data
+            if (value instanceof Array) {
+                for(var i in value) {
+                    ret += '<tr>';
+                    for (key in value[i]) {
+                        ret += '<td>' + value[i][key] + '</td>';
+                    }
+                    ret += '</tr>';
+                }
+            // single repeat data
+            } else {
+                ret += '<tr>';
+                for(var i in value) {
+                    ret += '<td>' + value[i] + '</td>';
+                }
+                ret += '</tr>';
+            }
+            return ret += '</table>';
+        }
+
+        return value;
+    }
+
+    $scope.$refreshContents = function() {
         console.log('submissions refreshContents clicked');
         msg.showLoadingWithInfo('Fetching server submissions');
         $scope.submissions = [];
@@ -184,6 +117,19 @@ dcsApp.controller('submissionListController',
                 msg.hideLoadingWithErr('Unable to check submissions status')
             });
     };
+
+    var groupOnStatus = function(localSubmissions) {
+        var statusLocal = [];
+        var statusNonLocal = [];
+        localSubmissions.forEach(function(submission) {
+            if (submission.status == LOCAL) {
+                statusLocal.push(submission);
+            } else {
+                statusNonLocal.push(submission);
+            }
+        });
+        return {'local':statusLocal, 'non-local':statusNonLocal};
+    }
 
     var updateSubmissionsToDisplay = function(id_status_dict) {
         var updatePromises = [];
@@ -205,6 +151,18 @@ dcsApp.controller('submissionListController',
         }
         msg.displayInfo('You can resolve only one submission at a time');
 
+    }
+
+    $scope.compare = function(localSubmission) {
+        localSubmission.project_uuid = $scope.project_uuid;
+        dcsService.getSubmission(localSubmission)
+            .then(function(serverSubmission) {
+                serverSubmission.status = BOTH;
+                localSubmission.serverSubmission = serverSubmission;
+                msg.hideAll();
+            }, function(e){
+                msg.hideLoadingWithErr('Failed to get server submission');
+            });
     }
 
     $scope.createSurveyResponse = function() {

@@ -48,20 +48,21 @@
                 <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
                 <span><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="table bg-white" style="margin-bottom:0px">
-                <thead>
-                  <tr ng-repeat="(i,header) in headerRows">
-                    <th rowspan="{{h.r}}" colspan="{{h.c}}" ng-repeat="(k,h) in header">{{h.l}}</th>
+              <table id="local-submissions" class="hide-first-col bg-white table table-condensed">
+                  <thead>
+                  <tr>
+                      <th ng-repeat="(key, val) in headers">{{val}}</th>
                   </tr>
                 </thead>
-                <tbody ng-repeat="(i,submission) in s">
-                  <tr>
-                    <td rowspan="{{h.r}}" colspan="{{h.c}}" ng-repeat="(k,h) in submission">{{h.v}}</td>
+                <tbody>
+                  <tr class="submission" ng-repeat="item in submissions" ng-init="selected=false"
+                      ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
+                      ng-click="update_selected_submissions(this)">
+                    <td>{{item.submission_id}}</td>
+                    <td ng-repeat="(key, val) in headers" ng-bind-html="formatSubmission(item.data[key])"></td>
                   </tr>
                 </tbody>
               </table>
-            </div>
           </div>
         </div>
         </div>
