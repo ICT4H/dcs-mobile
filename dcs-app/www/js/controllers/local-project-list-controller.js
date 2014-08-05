@@ -1,7 +1,6 @@
 dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, $q, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-    $scope.context = 'local Project list';
 
     $scope.pageSize = 5;
 
@@ -42,20 +41,20 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
         console.log('next clicked');
         var allow = $scope.total > $scope.next;
         if (allow)
-            $scope.getSubmissions($scope.next);
+            $scope.getProjects($scope.next);
     }
 
     $scope.do_prev = function() {
         console.log('prev clicked');
         var allow = $scope.prev >= 0;
         if (allow)
-            $scope.getSubmissions($scope.prev);
+            $scope.getProjects($scope.prev);
     }
 
     $scope.onPageSizeChange = function() {
         msg.showLoadingWithInfo('Loading submissions');
         $scope.pageSize = parseInt($scope.pageSize);
-        $scope.getSubmissions(0);
+        $scope.getProjects(0);
     }
     
     $scope.$sync = function() {
