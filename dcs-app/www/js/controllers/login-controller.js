@@ -1,6 +1,6 @@
 dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userService', 'auth', 'messageService', function($rootScope, $scope, $location, userService, auth, msg) {
     msg.showLoading();
-    $scope.users = [{'name':'new', 'password': '', 'serverUrl':'https://172.18.29.3'}];
+    $scope.users = [{'name':'New', 'password': '', 'serverUrl':'https://172.18.29.3'}];
     userService.getUsers().then(function(users) {
         // TODO User will be selcting existing/new check box to selct/enter user name
         // For now assuming there will be only one user per app.
