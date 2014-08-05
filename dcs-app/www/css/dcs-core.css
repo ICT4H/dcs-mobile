@@ -217,3 +217,7 @@ h1 {
 .top-padding-5px {
   padding-top: 5px;
 }
+
+.bg-transparent {
+  background-color: transparent !important;
+}

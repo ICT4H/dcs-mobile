@@ -74,7 +74,7 @@ dcsApp.controller('submissionListController',
 
     $scope.formatSubmission = function(value) {
         if (typeof value == "object") {
-            var ret = '<table class="show-first-col no-margin-bottom table table-condensed">';
+            var ret = '<table class="bg-transparent show-first-col no-margin-bottom table table-condensed">';
             ret += '<thead><tr>';
             
             for(k in value[0] || value) {
