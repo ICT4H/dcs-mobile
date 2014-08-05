@@ -80,21 +80,20 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
         var uuid;
         for (var i=0; i<selected_rows.length; i++) {
-            //TODO this value might need to be sanitised
             uuid = selected_rows[i].cells[0].innerText;
-
-            localStore.getSubmissionMetaByUuid(uuid)
-                .then(function(found) {
-                    if(found != 1) {
-                        downloadSubmission({submission_uuid: uuid,
+            localStore.submissionExists(uuid)
+                .then(function(downloadUuid) {
+                    if(downloadUuid) {
+                        downloadSubmission({submission_uuid: downloadUuid,
                                             project_id:$scope.project_id,
                                             project_uuid:$scope.project_uuid});
                     }
+                    // TODO what to be done for existing submissions.
                 });
         }
     }
 
-    function downloadSubmission(submission) {
+    var downloadSubmission = function(submission) {
         msg.showLoading();
         submission.status = BOTH;
 

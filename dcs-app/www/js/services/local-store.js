@@ -222,10 +222,13 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.getSubmissionMetaByUuid = function(submission_uuid) {
+	this.submissionNotExists = function(submission_uuid) {
 		var deferred = $q.defer();
 		sqlTransaction('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid], function(tx, resp) {
-					deferred.resolve(resp.rows.length);
+					if (resp.rows.length > 0)
+						deferred.resolve(0);
+					else
+						deferred.resolve(submission_uuid);
 				},deferred.reject);
 		return deferred.promise;
 	};
