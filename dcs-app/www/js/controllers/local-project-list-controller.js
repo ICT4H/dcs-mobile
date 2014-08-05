@@ -64,12 +64,16 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
         $scope.projects.forEach(function(project) {
             promises.push(dcsService.getQuestion(project.project_uuid)
             .then(function(projectAtServer){
-                if(project.version !=projectAtServer.version){
+                if(project.version != projectAtServer.version){
                     project.status = OUTDATED;
                     localStore.updateProjectStatus(project.project_id,project.status);
                 }
-            },function(){
+            },function(error){
                 console.log('unable to get project details');
+                if (404 == error) {
+                    project.status = SERVER_DELETED;
+                    localStore.updateProjectStatus(project.project_id,project.status);
+                }
             }));
         });
 
