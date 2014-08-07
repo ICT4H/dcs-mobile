@@ -2,7 +2,8 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "mobile-angular-ui",
     "mobile-angular-ui.touch",
     "mobile-angular-ui.scrollable",
-    "ngSanitize"
+    "ngSanitize",
+    "ngI18n"
 ]);
 
 var isEmulator = false;
@@ -20,11 +21,19 @@ function convertToSlug(text) {
         .replace(/[^\w-]+/g,'');
 }
 
-dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', function($http, $rootScope, $location, $q, auth, msg) {
+dcsApp.value('ngI18nConfig', {
+    defaultLocale:'en',
+    supportedLocales:['en'],
+    basePath:'i18n',
+    cache:true
+});
+
+dcsApp.run(['$http', '$rootScope', '$location', '$q', 'auth', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', function($http, $rootScope, $location, $q, auth, msg, ngI18nResourceBundle, ngI18nConfig) {
 
     $rootScope.title = 'D Collector';
-
-
+    ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
+        $rootScope.resourceBundle = resourceBundle;
+    });
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
 
         console.log('going to ' + $location.path());

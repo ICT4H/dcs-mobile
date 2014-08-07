@@ -1,7 +1,6 @@
 dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, $q, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-
     $scope.pageSize = 5;
 
     msg.showLoadingWithInfo('Loading projects');
