@@ -19,7 +19,7 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
                     msg.hideLoadingWithInfo('No server projects !');
                     return;
                 }
-                $scope.to = start + projects.length;
+                $scope.to = start + $scope.projects.length;
 
                 $scope.next = start + $scope.pageSize;
                 $scope.prev = start - $scope.pageSize;
