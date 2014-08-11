@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$routeParams', 'localStore', 'messageService', function($routeParams, localStore, msg){
+dcsApp.controller('submissionController', ['$routeParams', '$location', 'localStore', 'messageService', function($routeParams, $location, localStore, msg){
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
@@ -11,7 +11,12 @@ dcsApp.controller('submissionController', ['$routeParams', 'localStore', 'messag
         return date.concat(' '+time)
     };
 
+    var redirect = function(path){
+        $location.path(path);            
+    };
+
     options = {
+        'redirect': redirect,
         'localStore': localStore,
         'buttonLabel': buttonLabel,
         'project_id': $routeParams.project_id,

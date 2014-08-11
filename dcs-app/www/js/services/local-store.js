@@ -138,7 +138,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_id, created, data, xml)'+
 		'VALUES (?,?,?,?,?,?,?,?)';
-		var values =[submission.submission_uuid, submission.version, submission.status, 1, submission.project_id,
+		var values =[submission.submission_uuid, submission.version, "changed", 1, submission.project_id,
 			submission.created, submission.data, submission.xml];
 		var onSuccess= function(tx, resp){
 			submission.submission_id = resp.insertId;
@@ -148,20 +148,11 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.updateSubmissionStatus = function(submission_id, new_status) {
-		sqlTransaction('UPDATE submissions SET status=? where submission_id = ?',
-			[new_status, submission_id], function(tx, resp) {
-				console.log('submission '+ submission_id + ' status updated to ' + new_status);
-			}, function(e) {
-				console.log('Cannot update the status of submission ' + submission_id);
-		});
-	};
-
 	// used by enketo update
 	this.updateSubmissionData = function(submission_id, submission) {
 		var deferred = $q.defer();
-			sqlTransaction('UPDATE submissions SET data=?, xml=?, created=? where submission_id = ?',
-						[submission.data, submission.xml, submission.created, submission_id], function(tx, resp) {
+			sqlTransaction('UPDATE submissions SET data=?, xml=?, created=?, status=? where submission_id = ?',
+						[submission.data, submission.xml, submission.created, "changed", submission_id], function(tx, resp) {
 							deferred.resolve();
 						}, deferred.reject);
 		return deferred.promise;
