@@ -30,11 +30,11 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		var deferred = $q.defer();
 		console.log('db inside initTable: ' + db);
 		db.transaction (function(tx) {
-			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_id integer primary key, project_uuid text,'+
+			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,'+
 							'version text, status text, name text, xform text, headers text)');
 			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
-							 'version text, status text, is_modified integer, project_id integer, created text, data text, xml text)');
-			tx.executeSql('CREATE INDEX project_id_index ON submissions (project_id)');
+							 'version text, status text, is_modified integer, project_uuid integer, created text, data text, xml text)');
+			tx.executeSql('CREATE INDEX project_uuid_index ON submissions (project_uuid)');
 			console.log('Project and submission tables created');
 			deferred.resolve();
 		});
@@ -53,21 +53,21 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.updateProjectStatus = function(project_id, newStatus) {
-		sqlTransaction('UPDATE projects SET status=? where project_id=?', [newStatus, project_id],
+	this.updateProjectStatus = function(project_uuid, newStatus) {
+		sqlTransaction('UPDATE projects SET status=? where project_uuid=?', [newStatus, project_uuid],
 			function(tx, resp){
 				// TODO how success and failure will be tracked
 				//doning nothing here
-				console.log('Project ' + project_id + ' status changed to ' + newStatus);
+				console.log('Project ' + project_uuid + ' status changed to ' + newStatus);
 			}, function(e) {
-				console.log('Project ' + project_id + ' status NOT changed to ' + newStatus);
+				console.log('Project ' + project_uuid + ' status NOT changed to ' + newStatus);
 			}
 		);
 	}
 
-	this.getProjectById = function(project_id) {
+	this.getProjectById = function(project_uuid) {
 		var deferred = $q.defer();
-		sqlTransaction('SELECT * FROM projects where project_id = ?', [project_id], function(tx, resp) {
+		sqlTransaction('SELECT * FROM projects where project_uuid = ?', [project_uuid], function(tx, resp) {
 				deferred.resolve(transformRows(resp.rows)[0]);
 			},deferred.reject);
 		return deferred.promise;
@@ -86,26 +86,26 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.deleteProject = function(project_id) {
+	this.deleteProject = function(project_uuid) {
 		var deferred = $q.defer();
 
-		console.log('1 isEmulator: ' + isEmulator + ' deleting submission for project_id: ' + project_id);
+		console.log('1 isEmulator: ' + isEmulator + ' deleting submission for project_uuid: ' + project_uuid);
 		
 		//TODO This needs to be improved.
-		sqlTransaction('DELETE FROM submissions where project_id=?', [project_id], function(tx, resp) {
-				console.log('Submissions of the project deleted: ' + project_id);
+		sqlTransaction('DELETE FROM submissions where project_uuid=?', [project_uuid], function(tx, resp) {
+				console.log('Submissions of the project deleted: ' + project_uuid);
 			}, deferred.reject);
 
-		sqlTransaction('DELETE FROM projects WHERE project_id = ? ', [project_id], function(tx, resp) {
-				console.log('Project deleted succssfully: ' + project_id);
+		sqlTransaction('DELETE FROM projects WHERE project_uuid = ? ', [project_uuid], function(tx, resp) {
+				console.log('Project deleted succssfully: ' + project_uuid);
 				deferred.resolve();
 			}, deferred.reject);
 		return deferred.promise;
 	};
 
-	this.getCountOfSubmissions = function(project_id) {
+	this.getCountOfSubmissions = function(project_uuid) {
 		var deferred = $q.defer();
-		sqlTransaction('select count(*) as total FROM submissions where project_id = ?',[project_id],function(tx, resp) {
+		sqlTransaction('select count(*) as total FROM submissions where project_uuid = ?',[project_uuid],function(tx, resp) {
 				deferred.resolve(resp.rows.item(0).total);
 			},deferred.reject);
 		return deferred.promise;
@@ -117,9 +117,9 @@ dcsApp.service('localStore', ['$q', function ($q) {
 			},deferred.reject);
 		return deferred.promise;
 	};
-	this.getAllProjectSubmissions = function(project_id, offset, limit) {
+	this.getAllProjectSubmissions = function(project_uuid, offset, limit) {
 		var deferred = $q.defer();
-			sqlTransaction('SELECT * FROM submissions WHERE project_id = ? limit ? offset ?', [project_id,limit,offset],
+			sqlTransaction('SELECT * FROM submissions WHERE project_uuid = ? limit ? offset ?', [project_uuid,limit,offset],
 				 function(tx, resp) {
 					var s = transformRows(resp.rows);
 					for (var i=0;i<s.length;i++) {
@@ -136,9 +136,9 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	// used by download & enketo
 	this.createSubmission = function(submission) {
 		var deferred = $q.defer();
-		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_id, created, data, xml)'+
+		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml)'+
 		'VALUES (?,?,?,?,?,?,?,?)';
-		var values =[submission.submission_uuid, submission.version, "changed", 1, submission.project_id,
+		var values =[submission.submission_uuid, submission.version, "changed", 1, submission.project_uuid,
 			submission.created, submission.data, submission.xml];
 		var onSuccess= function(tx, resp){
 			submission.submission_id = resp.insertId;
@@ -242,9 +242,9 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	this.getSubmissionVersions = function(project_id) {
+	this.getSubmissionVersions = function(project_uuid) {
 		var deferred = $q.defer();
-		sqlTransaction('SELECT submission_uuid, version from submissions WHERE project_id = ? ', [project_id],
+		sqlTransaction('SELECT submission_uuid, version from submissions WHERE project_uuid = ? ', [project_uuid],
 			function(tx, resp) {
 				var s = transformRows(resp.rows);
 				var ret = {};

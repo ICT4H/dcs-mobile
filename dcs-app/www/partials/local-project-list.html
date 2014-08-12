@@ -28,7 +28,7 @@
             </div>
             <div ng-repeat="project in projects  | filter:searchText" href="#local-project-list" class="list-group-item" ng-class="project.status" >
                 <i class="fa fa-times fa-lg pull-right" ng-click="onDelete(project)"></i>
-                <a href="#submission-list/{{project.project_id}}">{{ project.name }}</a>
+                <a href="#submission-list/{{project.project_uuid}}">{{ project.name }}</a>
             </div>
         </div>
     </div>

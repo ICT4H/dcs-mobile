@@ -61,8 +61,8 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
 
         dcsService.getQuestion(project_uuid)
             .then(localStore.createProject)
-            .then(function(project_id) {
-                project.project_id = project_id;
+            .then(function(project_uuid) {
+                project.project_uuid = project_uuid;
                 if (project.status == OUTDATED) {
                     var tmpPrj = angular.copy(project);
                     tmpPrj.status = BOTH;

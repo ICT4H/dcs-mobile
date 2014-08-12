@@ -9,12 +9,12 @@ dcsApp.controller('submissionListController',
     
     var MODIFIED = 1;
     var UNMODIFIED = 0;
-    var project_id = $routeParams.project_id;
+    var project_uuid = $routeParams.project_uuid;
     var selectedCount = 0;
     var serverSubmissions = [];
     var selected_id_map = {};
 
-    $scope.project_id = project_id;
+    $scope.project_uuid = project_uuid;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
@@ -22,10 +22,10 @@ dcsApp.controller('submissionListController',
         start = (typeof(start) == "number") ? start : 0;
         $scope.from = start + 1;
 
-        localStore.getCountOfSubmissions(project_id)
+        localStore.getCountOfSubmissions(project_uuid)
             .then(function(total) {
                 $scope.total = total;
-                localStore.getAllProjectSubmissions(project_id,start,$scope.pageSize)
+                localStore.getAllProjectSubmissions(project_uuid,start,$scope.pageSize)
                     .then(function(submissions) {
                         $scope.submissions = submissions;
                         if(submissions.length <1) {
@@ -61,7 +61,7 @@ dcsApp.controller('submissionListController',
         }
     }
 
-    localStore.getProjectById(project_id)
+    localStore.getProjectById(project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid;
@@ -110,7 +110,7 @@ dcsApp.controller('submissionListController',
         msg.showLoadingWithInfo('Fetching server submissions');
         $scope.submissions = [];
 
-        localStore.getSubmissionVersions(project_id)
+        localStore.getSubmissionVersions(project_uuid)
             .then(dcsService.checkSubmissionVersions)
             .then(updateSubmissionsToDisplay)
             .then($scope.getSubmissions, function(e){
@@ -146,7 +146,7 @@ dcsApp.controller('submissionListController',
 
     $scope.resolve = function() {
         if(selectedCount==1) {
-            $location.path('/submission/conflict/id/' + getSelectedIds()[0] + '/project_id/' + project_id);
+            $location.path('/submission/conflict/id/' + getSelectedIds()[0] + '/project_uuid/' + project_uuid);
             return;
         }
         msg.displayInfo('You can resolve only one submission at a time');
@@ -166,12 +166,12 @@ dcsApp.controller('submissionListController',
     }
 
     $scope.createSurveyResponse = function() {
-        $location.path('/project/' + project_id + '/submission/' + null);
+        $location.path('/project/' + project_uuid + '/submission/' + null);
     };
 
     $scope.editSurveyResponse = function() {
         if(selectedCount==1) {
-            $location.path('/project/' + project_id + '/submission/' + getSelectedIds()[0]);
+            $location.path('/project/' + project_uuid + '/submission/' + getSelectedIds()[0]);
             return;
         }
         msg.displayInfo('you can edit only one submission at a time !');

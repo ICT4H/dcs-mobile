@@ -19,7 +19,7 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'localSt
         'redirect': redirect,
         'localStore': localStore,
         'buttonLabel': buttonLabel,
-        'project_id': $routeParams.project_id,
+        'project_uuid': $routeParams.project_uuid,
         'submission_id': submission_id,
         'onSuccess': msg.displaySuccess,
         'onError': msg.displayError,

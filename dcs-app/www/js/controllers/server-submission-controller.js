@@ -6,9 +6,9 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
 
     $scope.pageSize = 5;
 
-    $scope.project_id = $routeParams.project_id;
+    $scope.project_uuid = $routeParams.project_uuid;
 
-    localStore.getProjectById($scope.project_id)
+    localStore.getProjectById($scope.project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid
@@ -81,11 +81,10 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         var uuid;
         for (var i=0; i<selected_rows.length; i++) {
             uuid = selected_rows[i].cells[0].innerText;
-            localStore.submissionExists(uuid)
+            localStore.submissionNotExists(uuid)
                 .then(function(downloadUuid) {
                     if(downloadUuid) {
                         downloadSubmission({submission_uuid: downloadUuid,
-                                            project_id:$scope.project_id,
                                             project_uuid:$scope.project_uuid});
                     }
                     // TODO what to be done for existing submissions.

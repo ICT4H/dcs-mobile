@@ -4,7 +4,7 @@ dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routePar
     $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading columns');
 
-    $scope.project_id = $routeParams.project_id;
+    $scope.project_uuid = $routeParams.project_uuid;
     
     console.log('in column ctrl');
 
@@ -13,7 +13,7 @@ dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routePar
     // $scope.project_name = 'project name';
     // $scope.project_uuid = '1';
 
-    localStore.getProjectById($scope.project_id)
+    localStore.getProjectById($scope.project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid

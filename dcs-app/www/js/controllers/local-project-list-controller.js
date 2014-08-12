@@ -17,7 +17,6 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
         localStore.getCountOfProjects().then(function(total){
             $scope.total = total;
         });
-        console.log("loading projects pageNumber: " + pageNumber);
         msg.showLoadingWithInfo(resourceBundle.loading_projects);
         localStore.getProjects(pageNumber * $scope.pageSize.value, $scope.pageSize.value)
         .then(assignProjects, ErrorLoadingProjects);
@@ -30,15 +29,13 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
     };
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize.value < $scope.total){
+        if(pageNumber * $scope.pageSize.value < $scope.total)
             loadProjects(pageNumber);
-        }
     };
 
    $scope.onPrevious = function(pageNumber) {
-        if (pageNumber >= 0) {
+        if (pageNumber >= 0) 
             loadProjects(pageNumber);
-        }
     };
 
     $scope.onPageSizeChange = function() {
@@ -49,7 +46,7 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
         function onConfirm(buttonIndex) {
             if(buttonIndex!=BUTTON_NO){
                 console.log("Clicked Yes and deleting project: " +  project.name);
-                localStore.deleteProject(project.project_id).then(function() {
+                localStore.deleteProject(project.project_uuid).then(function() {
                     loadProjects($scope.pageNumber);
                     msg.hideLoadingWithInfo(resourceBundle.project_deleted);
                 }, function(error) {
@@ -75,13 +72,13 @@ dcsApp.controller('projectListController', ['$rootScope', '$scope', '$q', 'dcsSe
             .then(function(projectAtServer){
                 if(project.version != projectAtServer.version){
                     project.status = OUTDATED;
-                    localStore.updateProjectStatus(project.project_id,project.status);
+                    localStore.updateProjectStatus(project.project_uuid,project.status);
                 }
             },function(error){
                 console.log('unable to get project details');
                 if (404 == error) {
                     project.status = SERVER_DELETED;
-                    localStore.updateProjectStatus(project.project_id,project.status);
+                    localStore.updateProjectStatus(project.project_uuid,project.status);
                 }
             }));
         });

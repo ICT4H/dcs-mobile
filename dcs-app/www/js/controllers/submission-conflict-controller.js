@@ -31,7 +31,7 @@ dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$q',
         }
     }
 
-    localStore.getProjectById($routeParams.project_id)
+    localStore.getProjectById($routeParams.project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.headers = JSON.parse(project.headers);

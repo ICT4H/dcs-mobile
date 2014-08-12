@@ -4,11 +4,11 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/login.html",
           controller: 'loginController'
          })
-        .when('/server-submissions/:project_id',{
+        .when('/server-submissions/:project_uuid',{
           templateUrl: "partials/server-submisssion-list.html",
           controller: 'serverSubmissionController'
          })
-        .when('/manage-columns/:project_id',{
+        .when('/manage-columns/:project_uuid',{
           templateUrl: "partials/manage-columns.html",
           controller: 'manageColumnsController'
          })
@@ -20,11 +20,11 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/server-project-list.html",
           controller: 'serverProjectListController'
          })
-        .when('/submission-list/:project_id',{
+        .when('/submission-list/:project_uuid',{
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
         })
-        .when('/submission/conflict/id/:submission_id/project_id/:project_id',{
+        .when('/submission/conflict/id/:submission_id/project_uuid/:project_uuid',{
           templateUrl: "partials/submission-conflict.html",
           controller: 'submissionConflictController',
         })
@@ -36,7 +36,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/settings.html",
           controller: 'settingsController'
         })
-        .when('/project/:project_id/submission/:submission_id', {
+        .when('/project/:project_uuid/submission/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
         })
