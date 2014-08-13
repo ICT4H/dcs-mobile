@@ -1,7 +1,6 @@
 dcsApp.service('localStore', ['$q', function ($q) {
 	var db;
 	var version = '1.0';
-
 	this.init =  function(user) {
 		var dbName = convertToSlug(user.name);
 		var deferred = $q.defer();
@@ -20,12 +19,6 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		return deferred.promise;
 	};
 
-	var sqlTransaction = function(query,values,onSuccess,onError) {
-		db.transaction(function(tx) {
-			tx.executeSql(query,values,onSuccess,onError);
-		});
-	};
-
 	this.createStore = function() {
 		var deferred = $q.defer();
 		console.log('db inside initTable: ' + db);
@@ -39,251 +32,113 @@ dcsApp.service('localStore', ['$q', function ($q) {
 			deferred.resolve();
 		});
 		return deferred.promise;
-	}
+	};
+	var isSingleRecord = false;
+	var sqlTransaction = function(query,values, isSingleRecord) {
+		var deferred = $q.defer();
+		db.transaction(function(tx) {
+			tx.executeSql(query,values, function(tx, resp){
+				deferred.resolve(transformRows(resp.rows, isSingleRecord));
+			},function(tx, error){
+				deferred.reject(error);
+			});
+		});
+		return deferred.promise;
+	};
+	
+	// Projects table related queries
 
 	this.createProject = function(project) {
-		var deferred = $q.defer();
-		sqlTransaction(
+		return sqlTransaction(
 			'INSERT INTO projects (project_uuid, version, status, name, xform, headers) VALUES (?,?,?,?,?,?)',
-			[project.project_uuid, project.version, 'both', project.name, project.xform, project.headers],
-			function(tx, resp){
-				deferred.resolve(resp.insertId);
-			}, deferred.reject
-		);
-		return deferred.promise;
+			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers]);
 	};
 
-	this.updateProjectStatus = function(project_uuid, newStatus) {
-		sqlTransaction('UPDATE projects SET status=? where project_uuid=?', [newStatus, project_uuid],
-			function(tx, resp){
-				// TODO how success and failure will be tracked
-				//doning nothing here
-				console.log('Project ' + project_uuid + ' status changed to ' + newStatus);
-			}, function(e) {
-				console.log('Project ' + project_uuid + ' status NOT changed to ' + newStatus);
-			}
-		);
-	}
-
-	this.getProjectById = function(project_uuid) {
-		var deferred = $q.defer();
-		sqlTransaction('SELECT * FROM projects where project_uuid = ?', [project_uuid], function(tx, resp) {
-				deferred.resolve(transformRows(resp.rows)[0]);
-			},deferred.reject);
-		return deferred.promise;
+	this.updateProject = function(project_uuid, project) {
+		return sqlTransaction('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', getProjectValues(project).push(project_uuid));
 	};
 
-	this.getProjects = function(offset,limit) {
-		var deferred = $q.defer();
-			sqlTransaction('SELECT * FROM projects limit ? offset ?', [limit,offset],
-				 function(tx, resp) {
-					var s = transformRows(resp.rows);
-					deferred.resolve(s);
-				},function(tx,error){
-					console.log(error)
-					 deferred.reject(error);
-				});
-		return deferred.promise;
+	var getProjectValues = function(project){
+		return [project.version, project.status, project.name, project.xform, project.headers];
 	};
 
 	this.deleteProject = function(project_uuid) {
-		var deferred = $q.defer();
-
-		console.log('1 isEmulator: ' + isEmulator + ' deleting submission for project_uuid: ' + project_uuid);
-		
-		//TODO This needs to be improved.
-		sqlTransaction('DELETE FROM submissions where project_uuid=?', [project_uuid], function(tx, resp) {
-				console.log('Submissions of the project deleted: ' + project_uuid);
-			}, deferred.reject);
-
-		sqlTransaction('DELETE FROM projects WHERE project_uuid = ? ', [project_uuid], function(tx, resp) {
-				console.log('Project deleted succssfully: ' + project_uuid);
-				deferred.resolve();
-			}, deferred.reject);
-		return deferred.promise;
+		return sqlTransaction('DELETE FROM submissions where project_uuid=?', [project_uuid])
+		.then(function(tx, resp){
+			sqlTransaction('DELETE FROM projects WHERE project_uuid = ? ', [project_uuid]);
+		});
 	};
 
-	this.getCountOfSubmissions = function(project_uuid) {
-		var deferred = $q.defer();
-		sqlTransaction('select count(*) as total FROM submissions where project_uuid = ?',[project_uuid],function(tx, resp) {
-				deferred.resolve(resp.rows.item(0).total);
-			},deferred.reject);
-		return deferred.promise;
-	};
 	this.getCountOfProjects = function() {
-		var deferred = $q.defer();
-		sqlTransaction('select count(*) as total FROM projects',[],function(tx, resp) {
-				deferred.resolve(resp.rows.item(0).total);
-			},deferred.reject);
-		return deferred.promise;
-	};
-	this.getAllProjectSubmissions = function(project_uuid, offset, limit) {
-		var deferred = $q.defer();
-			sqlTransaction('SELECT * FROM submissions WHERE project_uuid = ? limit ? offset ?', [project_uuid,limit,offset],
-				 function(tx, resp) {
-					var s = transformRows(resp.rows);
-					for (var i=0;i<s.length;i++) {
-						s[i].data = JSON.parse(s[i].data);
-					}
-					deferred.resolve(s);
-				},function(tx,error){
-					console.log(error)
-					 deferred.reject(error);
-				});
-		return deferred.promise;
+		return sqlTransaction('select count(*) as total FROM projects',[], true);
 	};
 
-	// used by download & enketo
+	this.getProjects = function(offset,limit) {
+		return sqlTransaction('SELECT * FROM projects limit ? offset ?', [limit,offset]);
+	};
+
+	this.getProjectById = function(project_uuid) {
+		return sqlTransaction('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
+	};
+
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// Submission table related queries
+
 	this.createSubmission = function(submission) {
-		var deferred = $q.defer();
 		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml)'+
 		'VALUES (?,?,?,?,?,?,?,?)';
+		return sqlTransaction(query, getSubmissionAsValues(submission));
+	};
+	
+	this.updateSubmission = function(submission_id, submission) {
+		return sqlTransaction('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, project_uuid=?, created=?, data=?, xml=? where submission_id = ?', 
+			getSubmissionAsValues(submission).push(submission_id));
+	};
+
+	var getSubmissionAsValues = function(submission){
 		var values =[submission.submission_uuid, submission.version, "changed", 1, submission.project_uuid,
 			submission.created, submission.data, submission.xml];
-		var onSuccess= function(tx, resp){
-			submission.submission_id = resp.insertId;
-			deferred.resolve(submission);
-		};
-		sqlTransaction(query, values, onSuccess, deferred.reject);
-		return deferred.promise;
-	};
-
-	// used by enketo update
-	this.updateSubmissionData = function(submission_id, submission) {
-		var deferred = $q.defer();
-			sqlTransaction('UPDATE submissions SET data=?, xml=?, created=?, status=? where submission_id = ?',
-						[submission.data, submission.xml, submission.created, "changed", submission_id], function(tx, resp) {
-							deferred.resolve();
-						}, deferred.reject);
-		return deferred.promise;
-	};
-
-	// used by post submission
-	this.updateSubmissionMeta = function(submission) {
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, created=?'+
-			'where submission_id = ?',
-			[submission.submission_uuid, submission.version, submission.status, 0, submission.created,
-			submission.submission_id], function(tx, resp) {
-					deferred.resolve();
-				}, deferred.reject);
-		return deferred.promise;
-	};
-
-	this.updateSubmissionVersionAndStatus = function(submission_id, version, status) {
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET version=?, status=?, is_modified=? where submission_id = ?',
-			[version, status, 1, submission_id], function(tx, resp) {
-				deferred.resolve();
-				}, deferred.reject);
-		return deferred.promise;
-	};
-
-	this.updateSubmissionModified = function(submission_id,status) {
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET is_modified=? where submission_id = ?',
-				[status, submission_id], function(tx, resp) {
-					deferred.resolve();
-				}, deferred.reject);
-		return deferred.promise;
-	};
-
-	this.updateSubmission = function(submission_id, submission) {
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, data=?, xml=?,'+
-			'created=? where submission_id = ?',
-			[submission.submission_uuid, submission.version, submission.status, 1, submission.data, submission.xml,
-			submission.created, submission_id], function(tx, resp) {
-					deferred.resolve();
-				}, deferred.reject);
-		return deferred.promise;
-	};
-
-	this.getSubmissionById = function(submission_id) {
-		var deferred = $q.defer();
-		sqlTransaction('SELECT * FROM submissions where submission_id = ?', [submission_id], function(tx, resp) {
-					if (resp.rows.length == 0)
-						deferred.resolve();
-					else {
-						var dbSubmission = transformRows(resp.rows)[0];
-						dbSubmission.data = JSON.parse(dbSubmission.data);
-						deferred.resolve(dbSubmission);
-					}
-				},deferred.reject);
-		return deferred.promise;
-	};
-
-	this.submissionNotExists = function(submission_uuid) {
-		var deferred = $q.defer();
-		sqlTransaction('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid], function(tx, resp) {
-					if (resp.rows.length > 0)
-						deferred.resolve(0);
-					else
-						deferred.resolve(submission_uuid);
-				},deferred.reject);
-		return deferred.promise;
+		return values;
 	};
 
 	this.deleteSubmissions = function(submissions_ids) {
-		var deferred = $q.defer();
-		sqlTransaction('DELETE FROM submissions WHERE submission_id IN(' +
-					submissions_ids.map(function() { return '?';}).join(',') + ')', submissions_ids, function(tx, resp) {
-					deferred.resolve()
-				}, function(tx ,error) {
-					deferred.reject(error);
-				});
-		return deferred.promise;
+		return sqlTransaction('DELETE FROM submissions WHERE submission_id IN(' +
+					getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
 
-	this.deleteSubmission = function(submission_id) {
-		var deferred = $q.defer();
-		sqlTransaction('DELETE FROM submissions WHERE submission_id = ? ', [submission_id],
-				function(tx, resp) {deferred.resolve()}, deferred.reject);
-		return deferred.promise;
+	this.getCountOfSubmissions = function(project_uuid) {
+		return sqlTransaction('select count(*) as total FROM submissions where project_uuid = ?',[project_uuid], true);
 	};
 
-	this.getSubmissionVersions = function(project_uuid) {
-		var deferred = $q.defer();
-		sqlTransaction('SELECT submission_uuid, version from submissions WHERE project_uuid = ? ', [project_uuid],
-			function(tx, resp) {
-				var s = transformRows(resp.rows);
-				var ret = {};
-				for (var i=0;i<s.length;i++) {
-					ret[s[i].submission_uuid] = s[i].version;
-				}
-				deferred.resolve(ret);
-			}, deferred.reject);
-		return deferred.promise;
+	this.getSubmissionById = function(submission_id) {
+		return sqlTransaction('SELECT * FROM submissions where submission_id = ?', [submission_id], true);
 	};
 
-	this.updateSubmissionsStatus = function(submission_uuids, status) {
+	this.submissionNotExists = function(submission_uuid) {
+		return sqlTransaction('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid]);
+	};
 
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET status=? where ' +
-				'submission_uuid IN(' + getParamHolders(submission_uuids) + ')',
-				[status].concat(submission_uuids),
-				deferred.resolve, deferred.reject);
-		return deferred.promise;
-	}
-
-	this.updateSubmissionCreatedDate = function(submission_id, newDate) {
-		var deferred = $q.defer();
-		sqlTransaction('UPDATE submissions SET created=? where submission_id = ?)',
-				[newDate,submission_id],
-				deferred.resolve, deferred.reject);
-		return deferred.promise;
+	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
+		return sqlTransaction('SELECT * FROM submissions WHERE project_uuid = ? limit ? offset ?', [project_uuid, limit, offset]);
 	};
 
 	var getParamHolders = function(paramArray) {
 		return paramArray.map(function() { return '?';}).join(',');
-	}
+	};
 
-	var transformRows = function(resultSet) {
+	this.getSubmissionVersions = function(project_uuid) {
+		return sqlTransaction('SELECT submission_uuid, version from submissions WHERE project_uuid = ? ', [project_uuid]);
+	};
+
+	//--------------------------------------------------------------------------
+	var transformRows = function(resultSet, isSingleRecord) {
 		var rows = [];
-		for (var i=0; i < resultSet.length; i++) {
-			 rows.push(resultSet.item(i));
-		}
+		if(isSingleRecord && resultSet.length > 0)
+			return angular.copy(resultSet.item(0));
 
+		for (var i=0; i < resultSet.length; i++) 
+			 rows.push(resultSet.item(i));
+		
 		return angular.copy(rows);
 	};
 }]);

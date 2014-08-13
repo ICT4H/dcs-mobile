@@ -8,11 +8,6 @@ dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routePar
     
     console.log('in column ctrl');
 
-    // var header_str = '{"data": {"ds_name": {"label":"Data Sender", "selected":true}'+
-    //  ', "date": {"label":"Submission Date", "selected":false}}}';
-    // $scope.project_name = 'project name';
-    // $scope.project_uuid = '1';
-
     localStore.getProjectById($scope.project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;

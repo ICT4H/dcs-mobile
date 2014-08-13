@@ -5,7 +5,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           controller: 'loginController'
          })
         .when('/server-submissions/:project_uuid',{
-          templateUrl: "partials/server-submisssion-list.html",
+          templateUrl: "partials/server-submission-list.html",
           controller: 'serverSubmissionController'
          })
         .when('/manage-columns/:project_uuid',{
@@ -14,7 +14,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
          })
         .when('/local-project-list',{
           templateUrl: "partials/local-project-list.html",
-          controller: 'projectListController'
+          controller: 'localProjectListController'
          })
         .when('/server-project-list',{
           templateUrl: "partials/server-project-list.html",
@@ -30,7 +30,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
         })
         .when('/about',{
           templateUrl: "partials/about.html",
-          controller: 'projectListController',
+          controller: 'localProjectListController',
         })
         .when('/settings',{
           templateUrl: "partials/settings.html",

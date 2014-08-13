@@ -3,8 +3,7 @@ dcsApp.controller('submissionListController',
     function($rootScope, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Submissions";
-    $scope.pageSize = 5;
-
+    $scope.pageSizes = [5, 10, 15, 20];
     msg.showLoadingWithInfo('Loading submissions');
     
     var MODIFIED = 1;
@@ -18,33 +17,56 @@ dcsApp.controller('submissionListController',
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
-    $scope.getSubmissions = function(start) {
-        start = (typeof(start) == "number") ? start : 0;
-        $scope.from = start + 1;
+    var assignSubmissions = function(submissions){
+        if(submissions.length == 0)
+            msg.hideLoadingWithInfo('No local submissions !');
+        submissions.forEach(function(submission){
+            submission.data = JSON.parse(submission.data);
+        });
+        $scope.submissions = submissions;
+    };
 
-        localStore.getCountOfSubmissions(project_uuid)
-            .then(function(total) {
-                $scope.total = total;
-                localStore.getAllProjectSubmissions(project_uuid,start,$scope.pageSize)
-                    .then(function(submissions) {
-                        $scope.submissions = submissions;
-                        if(submissions.length <1) {
-                            msg.hideLoadingWithInfo('No local submissions !');
-                            return;
-                        }
-                        $scope.to = start + submissions.length;
+    var ErrorLoadingSubmissions = function(data,error) {
+        msg.hideLoadingWithErr(error+' Failed to load Submissions');
+    };
+    var loadSubmissions = function(pageNumber) {
+        $scope.pageNumber = pageNumber;
+        localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
+            $scope.total = result.total;
+        });
+        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        localStore.getSubmissionsByProjectId($scope.project_uuid, pageNumber * $scope.pageSize.value, $scope.pageSize.value)
+        .then(assignSubmissions, ErrorLoadingSubmissions);
+        msg.hideAll();
+    };
 
-                        $scope.next = start + $scope.pageSize;
-                        $scope.prev = start - $scope.pageSize;
+    $scope.onLoad = function() {
+        $scope.pageSize = {'value':$scope.pageSizes[0]};
+        localStore.getProjectById(project_uuid)
+            .then(function(project) {
+                $scope.project_name = project.name;
+                $scope.project_uuid = project.project_uuid;
+                $scope.headers = JSON.parse(project.headers);
+                delete $scope.headers.ds_name;
+                delete $scope.headers.date;
+                setObseleteProjectWarning(project);
+                loadSubmissions(0);
+        });
+    };
+    $scope.onLoad();
 
-                        msg.hideAll();
-                    },function(data,error) {
-                        msg.hideLoadingWithErr(error+' Failed to load submissions');
-                        console.log('Error while loading local submissions');
-                    });
-            },function() {
-                console.log('Error while counting local submissions');
-            });
+    $scope.onNext = function(pageNumber) {
+        if(pageNumber * $scope.pageSize.value < $scope.total)
+            loadSubmissions(pageNumber);
+    };
+
+   $scope.onPrevious = function(pageNumber) {
+        if (pageNumber >= 0) 
+            loadSubmissions(pageNumber);
+    };
+
+    $scope.onPageSizeChange = function() {
+        loadSubmissions(0);
     };
 
     var setObseleteProjectWarning = function(project) {
@@ -59,18 +81,7 @@ dcsApp.controller('submissionListController',
             $scope.deletedProject = true;
             $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
         }
-    }
-
-    localStore.getProjectById(project_uuid)
-        .then(function(project) {
-            $scope.project_name = project.name;
-            $scope.project_uuid = project.project_uuid;
-            $scope.headers = JSON.parse(project.headers);
-            delete $scope.headers.ds_name;
-            delete $scope.headers.date;
-            setObseleteProjectWarning(project);
-            $scope.getSubmissions(0);
-        });
+    };
 
     $scope.formatSubmission = function(value) {
         if (typeof value == "object") {
@@ -323,25 +334,6 @@ dcsApp.controller('submissionListController',
         }
         submitAfterConfirm();
     };
-    $scope.do_next = function() {
-        console.log('next clicked');
-        var allow = $scope.total > $scope.next;
-        if (allow)
-            $scope.getSubmissions($scope.next);
-    }
-
-    $scope.do_prev = function() {
-        console.log('prev clicked');
-        var allow = $scope.prev >= 0;
-        if (allow)
-            $scope.getSubmissions($scope.prev);
-    }
-
-    $scope.onPageSizeChange = function() {
-        msg.showLoadingWithInfo('Loading submissions');
-        $scope.pageSize = parseInt($scope.pageSize);
-        $scope.getSubmissions(0);
-    }
 
     var prettifyDate = function(serverDate) {
         var now = new Date(serverDate);

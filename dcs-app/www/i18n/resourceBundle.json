@@ -1,6 +1,9 @@
 {
     "text_view_1": "It is an application created using angularjs and android simulators. This app can be used on Android Devices and Smart Phones.",
     "loading_projects" : "Loading Projects",
+    "loading_submissions" : "Loading Submissions",
+    "fetching_projects" : "Fetching Projects",
     "project_deleted" : "Project Deleted",
-    "project_delete_error" : "Project cannot be deleted"
+    "project_delete_error" : "Project cannot be deleted",
+    "page_number": "Page :"
 }

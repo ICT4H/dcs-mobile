@@ -43,7 +43,7 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     };
 
     $scope.formatSubmission = function(value) {
-        if (typeof value == "object") {
+        if (typeof value == "object" && value != null) {
             var ret = '<table class="bg-transparent show-first-col no-margin-bottom table table-condensed">';
             ret += '<thead><tr>';
             
@@ -82,9 +82,9 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         for (var i=0; i<selected_rows.length; i++) {
             uuid = selected_rows[i].cells[0].innerText;
             localStore.submissionNotExists(uuid)
-                .then(function(downloadUuid) {
-                    if(downloadUuid) {
-                        downloadSubmission({submission_uuid: downloadUuid,
+                .then(function(result) {
+                    if(result) {
+                        downloadSubmission({submission_uuid: uuid,
                                             project_uuid:$scope.project_uuid});
                     }
                     // TODO what to be done for existing submissions.
@@ -95,13 +95,9 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     var downloadSubmission = function(submission) {
         msg.showLoading();
         submission.status = BOTH;
-
         dcsService.getSubmission(submission)
             .then(localStore.createSubmission)
             .then(function(resp) {
-                submission.submission_id = resp.submission_id;
-                submission.data = resp.data;
-                submission.xml = resp.xml;
                 msg.hideLoadingWithInfo("Submission downloaded.");
             }, function(error) {
                 msg.hideLoadingWithErr('Unable to download submission.');
