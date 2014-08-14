@@ -8,23 +8,20 @@
 list-group-item-success -->
 <div class="scrollable">  
    <div class="scrollable-content">
-    <div class="list-group">
-
-        <div class="list-group-item alert-danger" ng-show="projectWarning">
-            <p>{{projectWarning}}</p>
-        </div>
-        <div class="list-group bg-white">
+        <div class="list-group">
+            <div class="list-group bg-white">
                 <div class="line-bottom bg-white black-font">
-                    <p style="margin:4px">Tap to add/remove column of submission table</p>
+                    <p style="margin:4px">{{resourceBundle.manage_columns_info}}</p>
                 </div>
-				<div class="panel-body">
-					<ul ng-repeat="(key,val) in headers" class="list-group">
-					  <li class="list-group-item" ng-class="{'list-group-item-success':val.selected}" ng-click="toggle(key)"
-					  data-key="{{key}}">{{val.label}}</li>
-					</ul>
-				</div>
+				        <div class="panel-body">
+                    <ul ng-repeat="(key,val) in headers" class="list-group" >
+                        <li class="list-group-item" ng-class="{'list-group-item-success':selected}" ng-click="updateSelectedList(this)"data-key="{{key}}">{{val}}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-
+        <div>
+            <button class="btn btn-primary" ng-click="updateSubmissionViewColumns()">Update</button>
+				</div>
     </div>
-  </div>
 </div>

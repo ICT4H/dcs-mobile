@@ -1,43 +1,58 @@
-dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
-    function($rootScope, $scope, $routeParams, $location, dcsService, localStore, msg){
+dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routeParams', '$location', 'localStore', 'messageService',
+    function($rootScope, $scope, $routeParams, $location, localStore, msg){
 
-    $scope.pageTitle = "Server";
-    msg.showLoadingWithInfo('Loading columns');
-
+    $scope.pageTitle = $rootScope.resourceBundle.manage_columns_page_title;
     $scope.project_uuid = $routeParams.project_uuid;
-    
-    console.log('in column ctrl');
+    var selected_columns_map = {};
+
+    msg.showLoadingWithInfo('Loading columns');
 
     localStore.getProjectById($scope.project_uuid)
         .then(function(project) {
             $scope.project_name = project.name;
             $scope.project_uuid = project.project_uuid
-            $scope.getSubmissions();
+            showSubmissionHeaders();
         });
-
-    $scope.getSubmissions = function() {
-
-        $rootScope.httpRequest('/client/submission-headers/?uuid='+$scope.project_uuid)
-            .then(function(responce) {
-                $scope.headers = responce.data;
-                // $scope.headers = JSON.parse(header_str).data;
-                // console.log($scope.headers);
-                // console.log('responce: ');
-                // console.log(responce);
-
-                msg.hideAll();
+    var showSubmissionHeaders = function() {
+        localStore.getLocalSubmissionHeaders($scope.project_uuid)
+        .then(function(result) {
+            $scope.headers = result.headers;
+            msg.hideAll();
+        },function() {
+            localStore.getSubmissionHeaders($scope.project_uuid)
+            .then(function(headers) {
+                console.log(headers);
+            $scope.headers = headers;
+            msg.hideAll();
             },function() {
-                msg.hideLoadingWithErr('Failed to load columns');
-                console.log('errored');
+            msg.hideLoadingWithErr('Failed to load columns');
+            console.log('errored');
             });
+        });
     };
 
-    // TODO remove this, used while dev
-    // $scope.getSubmissions();
+    $scope.updateSelectedList = function(submissionRow) {
+        submissionRow.selected = !submissionRow.selected;
+        console.log(submissionRow);
+        var selected = selected_columns_map;
+        submission_column = submissionRow.val;
+        if (selected[submissionRow.key]) {
+            delete selected[submissionRow.key];
+        }
+        else {
+            selected[submissionRow.key] = submission_column;
+        }
+    };
 
-    $scope.toggle = function(key) {
-    	console.log('header: ' + key);
-    	$scope.headers[key].selected = !$scope.headers[key].selected;
-    }
+
+    $scope.updateSubmissionViewColumns = function() {
+        localStore.setSubmissionHeaders($scope.project_uuid,selected_columns_map)
+        .then(function() {
+            console.log('set submission header');
+            $location.path('/server-submissions/'+ $scope.project_id);
+        },function() {
+            console.log('unable to update submission header');
+        });
+    };
 }]);
     

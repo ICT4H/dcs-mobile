@@ -24,7 +24,7 @@ dcsApp.service('localStore', ['$q', function ($q) {
 		console.log('db inside initTable: ' + db);
 		db.transaction (function(tx) {
 			tx.executeSql('CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,'+
-							'version text, status text, name text, xform text, headers text)');
+							'version text, status text, name text, xform text, headers text, local_headers text)');
 			tx.executeSql('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
 							 'version text, status text, is_modified integer, project_uuid integer, created text, data text, xml text)');
 			tx.executeSql('CREATE INDEX project_uuid_index ON submissions (project_uuid)');
@@ -80,6 +80,17 @@ dcsApp.service('localStore', ['$q', function ($q) {
 	this.getProjectById = function(project_uuid) {
 		return sqlTransaction('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
 	};
+
+	this.getSubmissionHeaders = function(project_uuid) {
+        return sqlTransaction('SELECT local_headers as headers from projects WHERE project_uuid = ?',[project_uuid], true);
+       };
+
+       this.setSubmissionHeaders = function(project_uuid, headers) {
+               var deferred = $q.defer();
+               sqlTransaction('UPDATE projects SET local_headers = ? WHERE project_uuid = ?',[JSON.stringify(headers), project_uuid],
+                               deferred.resolve, deferred.reject);
+               return deferred.promise;
+       };
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Submission table related queries

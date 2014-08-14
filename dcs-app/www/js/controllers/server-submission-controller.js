@@ -15,13 +15,25 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
             $scope.getSubmissions(0,$scope.pageSize);
         });
 
+    localStore.getSubmissionHeaders($scope.project_uuid)  //changed in localstore fix it
+        .then(function(headers) {
+            $scope.headers = headers;
+            msg.hideAll();
+        },function() {
+            dcsService.getSubmissionHeaders($scope.project_uuid)
+            .then(function(headers) {
+            $scope.headers = headers;
+            msg.hideAll();
+            },function() {
+            msg.hideLoadingWithErr('Failed to load columns');
+            console.log('errored');
+            });
+        });
     $scope.getSubmissions = function(start, pageSize) {
         $scope.from = start + 1;
 
         dcsService.getSubmissions($scope.project_uuid,start,pageSize)
             .then(function(responce) {
-                $scope.cols = responce.headers;
-
                 $scope.to = start + responce.data.length;
                 $scope.total = responce.total;
 

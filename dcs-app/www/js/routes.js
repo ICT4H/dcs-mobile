@@ -32,17 +32,9 @@ dcsApp.config(['$routeProvider', '$httpProvider', '$provide', function ($routePr
           templateUrl: "partials/about.html",
           controller: 'localProjectListController',
         })
-        .when('/settings',{
-          templateUrl: "partials/settings.html",
-          controller: 'settingsController'
-        })
         .when('/project/:project_uuid/submission/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
-        })
-        .when('/import', {
-          templateUrl: "partials/import.html",
-          controller: 'importController'
         }); 
 
     $httpProvider.defaults.timeout = 1000;

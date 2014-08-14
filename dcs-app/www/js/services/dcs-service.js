@@ -45,6 +45,15 @@ dcsApp.service('dcsService', ['$q', '$rootScope', function($q, $rootScope) {
         return deferred.promise;
     };
 
+    this.getSubmissionHeaders = function(project_uuid) {
+        var deferred = $q.defer();
+        $rootScope.httpRequest('/client/submission-headers/?uuid='+project_uuid).then(function(response) {
+        deferred.resolve(response.data);
+        },deferred.reject);
+
+        return deferred.promise;
+    };
+
     this.getSubmissionById = function(project_uuid, submission_uuid) {
         var deferred = $q.defer();
             $rootScope.httpRequest("/client/project/" + project_uuid + "/submission/" + submission_uuid).then(function(serverSubmission) {
