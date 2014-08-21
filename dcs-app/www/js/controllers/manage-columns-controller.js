@@ -1,4 +1,4 @@
-dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routeParams', '$location', 'localStore', 'messageService',
+dcsApp.controller('manageColumnsController', ['$rootScope', '$scope', '$routeParams', '$location', 'store', 'messageService',
     function($rootScope, $scope, $routeParams, $location, localStore, msg){
 
     $scope.pageTitle = $rootScope.resourceBundle.manage_columns_page_title;

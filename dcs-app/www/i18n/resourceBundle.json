@@ -7,5 +7,6 @@
     "project_delete_error" : "Project cannot be deleted",
     "page_number": "Page :",
     "manage_columns_info" : "Tap to add/remove column of submission table",
-    "manage_columns_page_title" : "Server"
+    "manage_columns_page_title" : "Server",
+    "right_menu_header": "Notification"
 }

@@ -1,9 +1,35 @@
 dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
 
+    $rootScope.messages = {};
+    $rootScope.notificationLength = 0;
+    function message(backUrl, css) {
+        this.backUrl = backUrl;
+        this.css = css;
+    };
+
+    this.addInfo = function(text) {
+       $rootScope.messages[text] = new message("", "alert-info"); 
+       $rootScope.notificationLength = Object.keys($rootScope.messages).length;
+       apply();
+    };
+
+    this.addError = function(error){
+        $rootScope.messages[error] = new message("", "alert-danger");
+        $rootScope.notificationLength = Object.keys($rootScope.messages).length;
+        console.log($rootScope.notificationLength);
+        apply();
+    };
+
     var enableMessage = function(MessageType, message) {
         $rootScope.css = MessageType;
         $rootScope.message_to_display = message;
         $rootScope.showMessage = true;
+        apply();
+    };
+
+    this.removeMessage = function(index){
+        delete $rootScope.messages[index];
+        $rootScope.notificationLength = Object.keys($rootScope.messages).length;
         apply();
     };
 
@@ -19,16 +45,11 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
         apply();
     };
 
-    // this.hideLoading = function() {
-    //     $rootScope.loading = false;
-    //     apply();
-    // }
     this.handleError = function(status,message) {
         if(status == 404){
         this.hideLoadingWithErr('unable to reach server');
         return;
         }
-
         this.hideLoadingWithErr(message);
 
     };
@@ -53,21 +74,22 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
         apply();
     }
 
-    this.showLoadingWithInfo = function(message) {
+    this.showLoadingWithInfo = function(msg) {
         $rootScope.loading = true;
-        this.displaySuccess(message);
+        this.displaySuccess(msg);
     }
 
-    this.displaySuccess = function(message) {
-        enableMessage("alert-success", message);
+    this.displaySuccess = function(msg) {
+        console.log($rootScope.messages);
+        enableMessage("alert-success", msg);
     };
 
     this.displayInfo = function(message) {
         enableMessage("alert-info", message);
     };
 
-    this.displayError = function(message) {
-        enableMessage("alert-danger", message);
+    this.displayError = function(msg) {
+        enableMessage("alert-danger", msg);
     };
 
 }])

@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$routeParams', '$location', 'localStore', 'messageService', function($routeParams, $location, localStore, msg){
+dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', function($routeParams, $location, localStore, msg){
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';

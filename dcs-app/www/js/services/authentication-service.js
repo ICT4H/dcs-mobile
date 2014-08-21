@@ -1,32 +1,24 @@
-dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', function($rootScope, $q, userService, localStore) {
+dcsApp.service('auth', ['globalService', '$q', 'userDao', 'store', function(app, $q, userDao, localStore) {
 
     this.currentUser = {};
-
-
     this.validateLocalUser = function(user) {
         this.currentUser = user;
         return checkDBFileExists(user)
-            .then(userService.updateUrl)
-            .then(localStore.init)
-            .then(localStore.createStore);
+            .then(userDao.updateUrl)
+            .then(function(response){
+                return localStore.openUserStore(user);  
+            });
     }
 
     this.createValidLocalStore = function(user) {
         this.currentUser = user;
         return serverAuth(user)
-            .then(userService.createUser)
-            .then(userService.updateUrl)
-            .then(localStore.init)
-            .then(localStore.createStore);
-    }
+            .then(userDao.createUser)
+            .then(function(response){
+                return localStore.openUserStore(user);  
+            });
+    };
 
-    this.changePassword = function() {
-        // get user key from server
-        // fail if user credentails not matched
-        // delete user_detail_db and create new db with new user password as key
-
-    }
- 
     this.logout = function() {
         delete this.currentUser;
     };
@@ -34,10 +26,6 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
     this.isLoggedIn = function() {
         return angular.isDefined(this.currentUser);
     };
- 
-    this.getCurrentUser = function() {
-        return this.currentUser;
-    }
 
     var checkDBFileExists = function(user) {
 
@@ -49,7 +37,7 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
         }
 
         window.resolveLocalFileSystemURL(cordova.file.applicationStorageDirectory + 
-            '/databases/'+convertToSlug(user.name)+'.db', gotFileEntry, fail);
+            '/databases/'+ app.convertToSlug(user.name)+'.db', gotFileEntry, fail);
 
         function gotFileEntry(fileEntry) {
             console.log('dbfile found' + cordova.file.applicationStorageDirectory);
@@ -67,9 +55,8 @@ dcsApp.service('auth', ['$rootScope', '$q', 'userService', 'localStore', functio
 
     var serverAuth = function(user) {
         var deferred = $q.defer();
-
         console.log('trying to auth from server')
-        $rootScope.httpRequest('/client/auth/')
+        app.httpRequest('/client/auth/', user)
             .then(function() {
                 console.log('server auth pass');
                 deferred.resolve(user);

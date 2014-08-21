@@ -1,4 +1,4 @@
-dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'localStore', 'messageService', function($rootScope, $scope, $q, dcsService, localStore, msg) {
+dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'projectDao', 'messageService', function($rootScope, $scope, $q, dcsService, projectDao, msg) {
 
     resourceBundle = $rootScope.resourceBundle;
     $scope.pageTitle = $rootScope.title + ' - Projects';
@@ -14,16 +14,36 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
 
     var loadProjects  = function(pageNumber) {
         $scope.pageNumber = pageNumber;
-        localStore.getCountOfProjects().then(function(result){
+        projectDao.getCountOfProjects().then(function(result){
             $scope.total = result.total;
         });
+
         msg.showLoadingWithInfo(resourceBundle.loading_projects);
-        localStore.getProjects(pageNumber * $scope.pageSize.value, $scope.pageSize.value)
+        projectDao.getProjects(pageNumber * $scope.pageSize.value, $scope.pageSize.value)
         .then(assignProjects, ErrorLoadingProjects);
         msg.hideAll();
     };
 
+    var checkForProjectUpdates = function(){
+        setInterval(function(){
+            console.log("working");
+            $scope.projects.forEach(function(project) {
+                dcsService.getQuestion(project.project_uuid)
+                .then(function(projectAtServer){
+                    if(project.version != projectAtServer.version){
+                        project.status = OUTDATED;
+                        notification.addInfo(project.name + " is outdated.");
+                    }
+                }, function(error){
+                    notification.addError(error);
+                });
+            });
+        }, 10000);
+    };
+
     $scope.onLoad = function() {
+        msg.hideMessage();
+        // checkForProjectUpdates();
         $scope.pageSize = {'value':$scope.pageSizes[0]};
         loadProjects(0);
     };
@@ -46,7 +66,7 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
         function onConfirm(buttonIndex) {
             if(buttonIndex!=BUTTON_NO){
                 console.log("Clicked Yes and deleting project: " +  project.name);
-                localStore.deleteProject(project.project_uuid).then(function(response) {
+                projectDao.deleteProject(project.project_uuid).then(function(response) {
                     loadProjects($scope.pageNumber);
                     msg.hideLoadingWithInfo(resourceBundle.project_deleted);
                 }, function(error) {
@@ -72,13 +92,13 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
             .then(function(projectAtServer){
                 if(project.version != projectAtServer.version){
                     project.status = OUTDATED;
-                    localStore.updateProject(project.project_uuid,project);
+                    projectDao.updateProject(project.project_uuid,project);
                 }
             },function(error){
                 console.log('unable to get project details');
                 if (404 == error) {
                     project.status = SERVER_DELETED;
-                    localStore.updateProject(project.project_uuid,project);
+                    projectDao.updateProject(project.project_uuid,project);
                 }
             }));
         });
