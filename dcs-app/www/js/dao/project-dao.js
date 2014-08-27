@@ -7,7 +7,9 @@ dcsApp.service('projectDao',['store', function(store){
 	};
 
 	this.updateProject = function(project_uuid, project) {
-		return store.execute('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', getProjectValues(project).push(project_uuid));
+		var values = getProjectValues(project);
+		values.push(project_uuid);
+		return store.execute('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
 	};
 
 	this.deleteProject = function(project_uuid) {

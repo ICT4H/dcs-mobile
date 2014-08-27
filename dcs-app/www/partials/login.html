@@ -3,24 +3,24 @@
     <div bs-panel>
         <div class="form-group">
             <label>User</label>
-            <select class="form-control" ng-model="current_user" ng-options="user.name for user in users"></select>
+            <select class="form-control" ng-model="currentUser" ng-options="user.name for user in users"></select>
         </div>
-        <div ng-show="current_user.name=='New'" class ="form-group">
+        <div ng-show="currentUser.name=='New'" class ="form-group">
             <label>Username</label>
             <input class="form-control" type ="text" ng-model="new_user.name" autofocus></input>
          </div>
         <div class ="form-group">
             <label>Password</label>
-            <input ng-hide="current_user.name=='New'" class="form-control" type ="password" ng-model="current_user.password" autofocus> 
-            <input ng-show="current_user.name=='New'" class="form-control" type ="password" ng-model="new_user.password"> 
+            <input ng-hide="currentUser.name=='New'" class="form-control" type ="password" ng-model="currentUser.password" autofocus> 
+            <input ng-show="currentUser.name=='New'" class="form-control" type ="password" ng-model="new_user.password"> 
         </div>
         <div class="form-group">
             <label>Url</label>    
-            <input ng-hide="current_user.name=='New'" class=" form-control" type ="text" ng-model="current_user.serverUrl">
-            <input ng-show="current_user.name=='New'" class=" form-control" type ="text" ng-model="new_user.serverUrl">
+            <input ng-hide="currentUser.name=='New'" class=" form-control" type ="text" ng-model="currentUser.url">
+            <input ng-show="currentUser.name=='New'" class=" form-control" type ="text" ng-model="new_user.url">
         </div>
-        <button ng-show="current_user.name=='New'" class="btn btn-primary" ng-click="createNewUser(new_user)">Login</button>
-        <button ng-hide="current_user.name=='New'" class="btn btn-primary" ng-click="loginExisting(current_user)">Login</button>
+        <button ng-show="currentUser.name=='New'" class="btn btn-primary" ng-click="newUser(new_user)">Login</button>
+        <button ng-hide="currentUser.name=='New'" class="btn btn-primary" ng-click="existingUser(currentUser)">Login</button>
     </div>
 </div>
  

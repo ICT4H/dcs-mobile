@@ -55,6 +55,11 @@ dcsApp.service('submissionDao',['store', function(store){
 	this.getSubmissionVersions = function(project_uuid) {
 		return store.execute('SELECT submission_uuid, version from submissions WHERE project_uuid = ? and submission_uuid!= ? ', [project_uuid, undefined]);
 	};
+
+	this.updateSubmissionsStatus = function(submission_uuids, status) {
+		return store.execute('UPDATE submissions SET status=? where ' +
+				'submission_uuid IN(' + getParamHolders(submission_uuids) + ')',[status].concat(submission_uuids));
+	}
 	
 
 }]);	

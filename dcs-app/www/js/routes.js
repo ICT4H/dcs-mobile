@@ -1,4 +1,4 @@
-dcsApp.config(['$routeProvider', '$httpProvider', 'storeProvider', function ($routeProvider, $httpProvider, storeProvider) {
+dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
     $routeProvider
         .when('/',{
           templateUrl: "partials/login.html",
@@ -36,7 +36,5 @@ dcsApp.config(['$routeProvider', '$httpProvider', 'storeProvider', function ($ro
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
         }); 
-
     $httpProvider.defaults.timeout = 1000;
-    storeProvider.openUsersStore();
 }]);

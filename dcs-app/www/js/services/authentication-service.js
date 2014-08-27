@@ -1,12 +1,12 @@
 dcsApp.service('auth', ['globalService', '$q', 'userDao', 'store', function(app, $q, userDao, localStore) {
 
     this.currentUser = {};
-    this.validateLocalUser = function(user) {
+    this.validateUser = function(user) {
         this.currentUser = user;
         return checkDBFileExists(user)
             .then(userDao.updateUrl)
             .then(function(response){
-                return localStore.openUserStore(user);  
+                return localStore.createUserTable(user);  
             });
     }
 
@@ -15,7 +15,7 @@ dcsApp.service('auth', ['globalService', '$q', 'userDao', 'store', function(app,
         return serverAuth(user)
             .then(userDao.createUser)
             .then(function(response){
-                return localStore.openUserStore(user);  
+                return localStore.createUserTable(user);  
             });
     };
 
@@ -56,7 +56,7 @@ dcsApp.service('auth', ['globalService', '$q', 'userDao', 'store', function(app,
     var serverAuth = function(user) {
         var deferred = $q.defer();
         console.log('trying to auth from server')
-        app.httpRequest('/client/auth/', user)
+        app.httpRequest('/client/auth/')
             .then(function() {
                 console.log('server auth pass');
                 deferred.resolve(user);

@@ -4,54 +4,56 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
     $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading submissions');
 
-    $scope.pageSize = 5;
-
+    $scope.pageSizes = [5, 10, 15, 20];
     $scope.project_uuid = $routeParams.project_uuid;
 
-    localStore.getProjectById($scope.project_uuid)
-        .then(function(project) {
-            $scope.project_name = project.name;
-            $scope.project_uuid = project.project_uuid
-            $scope.getSubmissions(0,$scope.pageSize);
+    var assignSubmissions = function(submissions){
+        msg.hideAll();
+        if(submissions.length == 0)
+            msg.hideLoadingWithInfo('No server submissions !');
+        // submissions.data.forEach(function(submission){
+        //     submission = JSON.parse(submission);
+        // });
+        $scope.submissions = submissions.data;
+    };
+
+    var ErrorLoadingSubmissions = function(data,error) {
+        msg.hideLoadingWithErr(error+' Failed to load Submissions');
+    };
+    var loadSubmissions = function(pageNumber) {
+        $scope.pageNumber = pageNumber;
+        localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
+            $scope.total = result.total;
         });
+        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize.value, $scope.pageSize.value)
+        .then(assignSubmissions, ErrorLoadingSubmissions);
+    };
 
-    localStore.getSubmissionHeaders($scope.project_uuid)  //changed in localstore fix it
-        .then(function(headers) {
-            $scope.headers = headers;
-            msg.hideAll();
-        },function() {
-            dcsService.getSubmissionHeaders($scope.project_uuid)
-            .then(function(headers) {
-            $scope.headers = headers;
-            msg.hideAll();
-            },function() {
-            msg.hideLoadingWithErr('Failed to load columns');
-            console.log('errored');
-            });
+    $scope.onLoad = function() {
+        $scope.pageSize = {'value':$scope.pageSizes[0]};
+        localStore.getProjectById($scope.project_uuid)
+            .then(function(project) {
+                $scope.project_name = project.name;
+                $scope.project_uuid = project.project_uuid;
+                $scope.headers = JSON.parse(project.headers);
+                loadSubmissions(0);
         });
-    $scope.getSubmissions = function(start, pageSize) {
-        $scope.from = start + 1;
+    };
+    $scope.onLoad();
 
-        dcsService.getSubmissions($scope.project_uuid,start,pageSize)
-            .then(function(responce) {
-                $scope.to = start + responce.data.length;
-                $scope.total = responce.total;
+    $scope.onNext = function(pageNumber) {
+        if(pageNumber * $scope.pageSize.value < $scope.total)
+            loadSubmissions(pageNumber);
+    };
 
-                $scope.submissions = responce.data;
+   $scope.onPrevious = function(pageNumber) {
+        if (pageNumber >= 0) 
+            loadSubmissions(pageNumber);
+    };
 
-                $scope.next = start + pageSize;
-                $scope.prev = start - pageSize;
-
-                console.log('responce: ');
-                console.log(responce);
-
-                // pages 
-
-                msg.hideAll();
-            },function() {
-                msg.hideLoadingWithErr('Failed to load submissions');
-                console.log('errored');
-            });
+    $scope.onPageSizeChange = function() {
+        loadSubmissions(0);
     };
 
     $scope.formatSubmission = function(value) {
@@ -114,25 +116,5 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
             }, function(error) {
                 msg.hideLoadingWithErr('Unable to download submission.');
             });
-    }
-
-    $scope.do_next = function() {
-        console.log('next clicked');
-        var allow = $scope.total > $scope.next;
-        if (allow)
-            $scope.getSubmissions($scope.next, $scope.pageSize);
-    }
-
-    $scope.do_prev = function() {
-        console.log('prev clicked');
-        var allow = $scope.prev >= 0;
-        if (allow)
-            $scope.getSubmissions($scope.prev, $scope.pageSize);
-    }
-
-    $scope.onPageSizeChange = function() {
-        msg.showLoadingWithInfo('Loading submissions');
-        $scope.pageSize = parseInt($scope.pageSize);
-        $scope.getSubmissions(0,$scope.pageSize);
     }
 }]);

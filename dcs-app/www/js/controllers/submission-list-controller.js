@@ -122,9 +122,15 @@ dcsApp.controller('submissionListController',
         $scope.submissions = [];
 
         localStore.getSubmissionVersions(project_uuid)
-            .then(dcsService.checkSubmissionVersions)
+            .then(function(submissions){
+                var sub={};
+                submissions.forEach(function(submission){
+                    sub[submission.submission_uuid] = submission.version;
+                })
+                return dcsService.checkSubmissionVersions(sub);
+            })
             .then(updateSubmissionsToDisplay)
-            .then($scope.getSubmissions, function(e){
+            .then($scope.loadSubmissions, function(e){
                 msg.hideLoadingWithErr('Unable to check submissions status')
             });
     };
@@ -272,7 +278,7 @@ dcsApp.controller('submissionListController',
 
             localStore.deleteSubmissions(getSelectedIds())
             .then(function(){
-                $scope.getSubmissions(0);
+                loadSubmissions(0);
                 msg.hideLoadingWithInfo("Submission(s) deleted");
 
             }
