@@ -3,10 +3,11 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "mobile-angular-ui.touch",
     "mobile-angular-ui.scrollable",
     "ngSanitize",
-    "ngI18n"
+    "ngI18n",
+    "angucomplete-alt",
 ]);
 
-var isEmulator = false;
+var isEmulator = true;
 var BUTTON_NO = isEmulator ? 3 : 2;
 
 var SERVER = 'server';
@@ -22,7 +23,7 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$rootScope', '$location', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'settings', 'store', function($rootScope, $location, msg, ngI18nResourceBundle, ngI18nConfig, settings, store) {
+dcsApp.run(['$rootScope', '$location', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'store', function($rootScope, $location, msg, ngI18nResourceBundle, ngI18nConfig, app, store) {
     $rootScope.title = 'D Collector';
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
@@ -31,14 +32,14 @@ dcsApp.run(['$rootScope', '$location', 'messageService', 'ngI18nResourceBundle',
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
 
         console.log('going to ' + $location.path());
-        if ($location.path() != '/' && !settings.isAuthenticated) {
+        if ($location.path() != '/' && !app.isAuthenticated) {
             $location.path('/');
         }
     }); 
 
     $rootScope.logout = function() {
         console.log('logout');
-        settings.isAuthenticated = false;
+        app.isAuthenticated = false;
         msg.showLoadingWithInfo('Logging out, please wait');
         setTimeout(function(){
             $location.path('/');

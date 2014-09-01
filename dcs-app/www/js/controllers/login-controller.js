@@ -1,43 +1,44 @@
-var loginController = function($scope, $location, userDao, auth, msg, settings) {
+var loginController = function($q, $scope, $location, userDao, msg, app, dcsService) {
     $scope.users = [];
-    var onLoad = function(){
-        msg.showLoading();
-        $scope.users = [{'name':'New', 'password': '', 'url':''}];
-        userDao.createTable()
-        .then(userDao.getUsers)
-        .then(function(users) {
-            users.forEach(function(user) {
-                $scope.users.push({'name':user.name, 'password':'', 'url':user.url});
-            });
-            $scope.currentUser = $scope.users[$scope.users.length - 1];
-            msg.hideAll();
-        });
-    };
-    
-    $scope.newUser = function(user) {
-        settings.user = user;
-        auth.createValidLocalStore(user)
-            .then(function() {
-                settings.isAuthenticated = true;
-                $location.path('/local-project-list');
-            }, function(error) {
-                msg.hideLoadingWithErr('Server authentication failed '+ error);
-        });
+    $scope.user = {};
+    var isNewUser = true;
+
+    $scope.userSelected = function(user){
+        if(user){
+            if(user.$$hashKey)
+                isNewUser = false;
+            $scope.user = user.originalObject;
+        }
     };
 
-    $scope.existingUser =  function(user) {
-        settings.user = user;
-        auth.validateUser(user)
-            .then(function() {
-                settings.isAuthenticated = true;
+    $scope.login = function(){  
+        msg.showLoading();
+        app.user = $scope.user;
+        if(isNewUser){
+            return dcsService.verifyUser($scope.user)
+            .then(userDao.addUser($scope.user)).then(function(){
+                msg.hideAll();
+                app.isAuthenticated = true;
                 $location.path('/local-project-list');
-            }, function() {
-                msg.hideLoadingWithErr('Invalid login details');
-                $location.path('/');
             });
+        } else {
+            return userDao.updateUrl($scope.user).then(function(){
+                msg.hideAll();
+                app.isAuthenticated = true;
+                $location.path('/local-project-list');
+            });
+        }
+        checkDBFileExists($scope.user).then(ifExists, ifNotExists);
+    };
+
+    var onLoad = function(){
+        userDao.createRegister()
+        .then(userDao.getUsers().then(function(users){
+            $scope.users = users;
+        }));
     };
 
     onLoad();
 
 };
-dcsApp.controller('loginController', ['$scope', '$location', 'userDao', 'auth', 'messageService', 'settings', loginController]);
+dcsApp.controller('loginController', ['$q', '$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', loginController]);

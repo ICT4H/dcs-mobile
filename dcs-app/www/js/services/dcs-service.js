@@ -1,4 +1,4 @@
-dcsApp.service('dcsService', ['$q', '$rootScope','globalService', function($q, $rootScope, app) {
+dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope, app) {
     this.getProjects = function(start,length) {
         var deferred = $q.defer();
             app.httpRequest("/client/project/?start="+start+"&length="+length)
@@ -6,6 +6,13 @@ dcsApp.service('dcsService', ['$q', '$rootScope','globalService', function($q, $
                 console.log('all projects: ' + JSON.stringify(projects));
                 deferred.resolve(projects);
                 },deferred.reject);
+        return deferred.promise;
+    };
+
+    this.verifyUser = function() {
+        var deferred = $q.defer();
+            app.httpRequest("/client/auth/")
+            .then(deferred.resolve, deferred.reject);
         return deferred.promise;
     };
 

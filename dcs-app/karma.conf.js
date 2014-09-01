@@ -22,7 +22,7 @@ module.exports = function(config) {
         'js/*.js',
         'js/controllers/*.js',
         'js/services/*.js',
-        'test/controllers/login-controller-spec.js'
+        'test/**/*.js'
     ],
 
 
