@@ -68,24 +68,19 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     $scope.$sync = function() {
         msg.showLoading();
         var promises = [];
-        $scope.projects.forEach(function(project) {
-            promises.push(dcsService.getQuestion(project.project_uuid)
-            .then(function(projectAtServer){
-                if(project.version != projectAtServer.version){
-                    project.status = OUTDATED;
-                    projectDao.updateProject(project.project_uuid,project);
-                }
-            },function(error){
-                console.log('unable to get project details');
-                if (404 == error) {
-                    project.status = SERVER_DELETED;
-                    projectDao.updateProject(project.project_uuid,project);
-                }
-            }));
+
+        projectDao.getAll().then(function(projects){ 
+            dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
+                outdatedProjects.forEach(function(outdatedProject) {
+                    promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status)); 
+                });
+            });
         });
 
         $q.all(promises).then(function() {
             msg.hideLoadingWithInfo('updated project list');
+             $scope.pageSize = {'value':$scope.total};
+             loadProjects(0);
         },function() {
             msg.hideLoadingWithErr('projects not updated properly');
         });

@@ -8,6 +8,11 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpRequest("/client/auth/");
     };
 
+    this.checkProjectsStatus = function(projects) {
+         // return app.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions));
+        return app.httpPostRequest('/client/projects/validate/', 'projects=' + JSON.stringify(projects));
+    };
+
     this.getQuestion = function(project_uuid) {
         return app.httpRequest("/client/project/" + project_uuid);
     };

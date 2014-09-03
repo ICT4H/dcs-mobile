@@ -6,6 +6,14 @@ dcsApp.service('projectDao',['store', function(store){
 			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers]);
 	};
 
+	this.getAll = function() {
+		return store.execute('select project_uuid as id, version as rev from projects', []);
+	};
+
+	this.setprojectStatus = function(project_uuid, status) {
+		return store.execute('update projects set status=? where project_uuid=?',[status, project_uuid])
+	};
+
 	this.updateProject = function(project_uuid, project) {
 		var values = getProjectValues(project);
 		values.push(project_uuid);
