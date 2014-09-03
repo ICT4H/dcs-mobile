@@ -51,38 +51,19 @@
 <body >
 
 <div ng-include="'partials/sidebar.html'" class="sidebar sidebar-left" toggleable parent-active-class="sidebar-left-in" id="mainSidebar"></div>
-<div ng-include="'partials/notification.html'" class="sidebar sidebar-right" toggleable parent-active-class="sidebar-right-in"                 id="notification"></div>
+<div ng-include="'partials/notification.html'" class="sidebar sidebar-right" toggleable parent-active-class="sidebar-right-in" id="notification"></div>
   <div class="toggle-full-screen app" toggleable default="inactive" inactive-class="has-navbar-top">
     <!-- Navbar -->
       <div class="navbar-app navbar-absolute-top toggle-full-screen" toggleable default="active" inactive-class="hide">
 
-        <div class="btn-group pull-left">
-          <div ng-click="toggle('mainSidebar')" class="btn btn-navbar sidebar-toggle">
-            <i class="fa fa-lg fa-bars"></i>
-          </div>
-        </div>
-
+        <div yield-to="left" class="btn-group pull-left"></div>
+        <div yield-to="custom_left" class="btn-group pull-left"></div>
         <div class="navbar-brand navbar-brand-left hide-for-small" yield-to="title">
           <span>D Collector</span>
         </div>
-        <div class="btn-group pull-right">
-            <div class="btn btn-navbar sidebar-toggle" ng-click="toggle('notification')">
-                <a><i class="fa fa-lg fa-exclamation-circle"></i><sup> {{notificationLength}} </sup></a>
-            </div>
-        </div>
-        <div ng-hide="isHome" class="btn-group pull-right">
-            <div class="btn btn-navbar" ng-click="$back()" >
-                <a><i class="fa fa-lg fa-arrow-left"></i></a>
-            </div>
-        </div>
-        <div class="btn-group navbar-brand-left" >
-            <div yield-to="refreshContents" class="btn btn-navbar">
-            </div>
-        </div>
-        <div class="btn-group pull-right" >
-            <div yield-to="new" class="btn btn-navbar">
-            </div>
-        </div>
+        <div yield-to="refreshContents" class="btn-group navbar-brand-left btn btn-navbar"></div>
+        <div yield-to="right" class="btn-group pull-right"></div>
+        <div yield-to="new" class="btn-group pull-right btn btn-navbar"></div>
     </div>
 
     <div class="app-body" ng-class="{loading: loading}">
@@ -97,7 +78,7 @@
           <div ng-show="loading" class="app-content-loading">
             <i class="fa fa-spinner fa-spin loading-spinner"></i>
           </div>
-          <div class="context-info" yield-to="context-info"></div>
+          <div yield-to="context-info"></div>
           <ng-view class="app-content" ng-hide="loading"></ng-view>
     </div>
 

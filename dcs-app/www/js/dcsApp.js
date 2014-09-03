@@ -52,8 +52,8 @@ dcsApp.run(['$rootScope', '$location', 'messageService', 'ngI18nResourceBundle',
     } 
 
     $rootScope.$back = function() {
-        console.log('back clicked');
-        window.history.back();
+        if($location.path() != '/local-project-list')
+            window.history.back();
     };
 
 }]);

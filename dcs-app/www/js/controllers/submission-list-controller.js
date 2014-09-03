@@ -214,10 +214,18 @@ dcsApp.controller('submissionListController',
         update_selected_submission_ids(submissionRow.item.submission_id);
         console.log('selectedCount: ' + selectedCount);
 
+
+
         if(selectedCount == 0) {
             $scope.showPagination = true;
             $scope.showActions= false;
+        } else if(selectedCount == 1) {
+                $scope.showEdit = true;
+                $scope.showActions = true;
+                $scope.showPagination = false;
+
         } else {
+            $scope.showEdit = false;
             $scope.showActions = true;
             $scope.showPagination = false;
         }

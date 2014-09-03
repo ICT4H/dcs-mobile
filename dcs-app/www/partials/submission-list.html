@@ -1,11 +1,14 @@
-<span content-for="title">{{pageTitle}}</span>
+<div ng-include="'partials/menu-bar.html'"></div>
+
 <div content-for="new">
     <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
 </div>
+<span content-for="title">{{pageTitle}}</span>
+
 <div content-for="refreshContents">
     <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
 </div>
-<div content-for="context-info">
+<div content-for="context-info" class="context-info">
   <span class="context-info">{{project_name}}</span>
   <span class="pull-right"><li toggle="toggle" target-class="toggle-full-screen" class="fa fa-lg fa-chevron-up" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></span>
 </div>
@@ -18,8 +21,8 @@
     <div class="list-group bg-white">
       <div class="list-group-item">
       <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
-        <li><a href="#Tab1" toggle="on" parent-active-class="active">Installed</a></li>
-        <li><a href="#server-submissions/{{project_uuid}}">Server</a></li>
+        <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
+        <li><a href="#server-submissions/{{project_uuid}}">{{resourceBundle.server}}</a></li>
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
@@ -39,7 +42,7 @@
                 <span><button ng-click="resolve()">Resolve</button></span>
                 <span><i class="fa fa-lg fa-upload" ng-click="postSubmissions()"></i></span>
                 <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
-                <span><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span>
+                <span ng-show="showEdit"><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span>
             </div>
             <div style="overflow-x:auto;">
               <table id="local-submissions" style="margin-bottom:0px;" class="hide-first-col bg-white table table-condensed">
