@@ -64,24 +64,10 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$q', '$pa
       '    <div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseover="hoverRow($index)" ng-class="{\'angucomplete-selected-row\': $index == currentIndex}">' +
       '      <div class="angucomplete-title" ng-if="matchClass" ng-bind-html="result.title"></div>' +
       '      <div class="angucomplete-title" ng-if="!matchClass">{{ result.title }}</div>' +
-      '      <div ng-if="matchClass && result.description && result.description != \'\'" class="angucomplete-description" ng-bind-html="result.description"></div>' +
-      '      <div ng-if="!matchClass && result.description && result.description != \'\'" class="angucomplete-description">{{result.description}}</div>' +
       '    </div>' +
       '  </div>' +
       '</div>',
       
-    // template:
-    //   '<div class="angucomplete-holder">' +
-    //   '  <input id="{{id}}_value" ng-model="searchStr" type="text" placeholder="{{placeholder}}" class="{{inputClass}}" ng-focus="resetHideResults()" ng-blur="hideResults()" autocapitalize="off" autocorrect="off" autocomplete="off" ng-change="inputChangeHandler(searchStr)"/>' +
-    //   '  <div id="{{id}}_dropdown" class="angucomplete-dropdown" ng-if="showDropdown">' +
-    //   '    <div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseover="hoverRow($index)" ng-class="{\'angucomplete-selected-row\': $index == currentIndex}">' +
-    //   '      <div class="angucomplete-title" ng-if="matchClass" ng-bind-html="result.title"></div>' +
-    //   '      <div class="angucomplete-title" ng-if="!matchClass">{{ result.title }}</div>' +
-    //   '      <div ng-if="matchClass && result.description && result.description != \'\'" class="angucomplete-description" ng-bind-html="result.description"></div>' +
-    //   '      <div ng-if="!matchClass && result.description && result.description != \'\'" class="angucomplete-description">{{result.description}}</div>' +
-    //   '    </div>' +
-    //   '  </div>' +
-    //   '</div>',
     link: function(scope, elem, attrs, ctrl) {
       var inputField = elem.find('input');
       var minlength = MIN_LENGTH;
@@ -193,11 +179,6 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$q', '$pa
             searchTimer = $timeout(function() {
               scope.searchTimerComplete(scope.searchStr);
             }, scope.pause);
-          }
-
-          if (validState && validState !== scope.searchStr) {
-            callOrAssign(undefined);
-            handleRequired(false);
           }
         }
       }
@@ -363,6 +344,7 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$q', '$pa
             }
 
             scope.results[scope.results.length] = {
+              isNew: false,
               title: text,
               description: description,
               image: image,
@@ -371,12 +353,13 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$q', '$pa
           }
         } else {
           var unregisteredUser = {
+            isNew: true,
             originalObject: {
               name:str
             }
           };
           callOrAssign(unregisteredUser);
-          scope.results = [];
+          clearResults();
         }
       };
 

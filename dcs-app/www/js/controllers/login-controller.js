@@ -1,34 +1,33 @@
-var loginController = function($q, $scope, $location, userDao, msg, app, dcsService) {
+var loginController = function($scope, $location, userDao, msg, app, dcsService) {
     $scope.users = [];
     $scope.user = {};
-    var isNewUser = true;
+    var isNewUser;
 
     $scope.userSelected = function(user){
-        if(user){
-            if(user.$$hashKey)
-                isNewUser = false;
-            $scope.user = user.originalObject;
-        }
+        isNewUser = user.isNew;
+        $scope.user = user.originalObject;
     };
+
+    var onSuccess = function(){
+        app.isAuthenticated = true;
+        msg.hideAll();
+        $location.path('/local-project-list');
+    };
+
+    var onError = function(error){
+        msg.hideLoadingWithErr(error);
+        $location.path('/');
+    }
 
     $scope.login = function(){  
         msg.showLoading();
         app.user = $scope.user;
-        if(isNewUser){
-            return dcsService.verifyUser($scope.user)
-            .then(userDao.addUser($scope.user)).then(function(){
-                msg.hideAll();
-                app.isAuthenticated = true;
-                $location.path('/local-project-list');
-            });
-        } else {
-            return userDao.updateUrl($scope.user).then(function(){
-                msg.hideAll();
-                app.isAuthenticated = true;
-                $location.path('/local-project-list');
-            });
-        }
-        checkDBFileExists($scope.user).then(ifExists, ifNotExists);
+        if(!isNewUser)
+            userDao.updateUrl($scope.user).then(onSuccess, onError);
+        else 
+            dcsService.verifyUser($scope.user).then(function() {
+                            userDao.addUser($scope.user).then(onSuccess, onError);
+            }, onError);    
     };
 
     var onLoad = function(){
@@ -41,4 +40,4 @@ var loginController = function($q, $scope, $location, userDao, msg, app, dcsServ
     onLoad();
 
 };
-dcsApp.controller('loginController', ['$q', '$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', loginController]);
+dcsApp.controller('loginController', ['$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', loginController]);

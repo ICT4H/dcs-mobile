@@ -21,7 +21,7 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         .then(assignProjects, ErrorLoadingProjects);
     };
 
-    $scope.onLoad = function() {
+    var onLoad = function() {
         $scope.pageSize = {'value':$scope.pageSizes[0]};
         fetchProjects(0);
     };
@@ -40,7 +40,7 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         fetchProjects(0);
     };
 
-    $scope.onLoad();
+    onLoad();
 
     $scope.downloadProject = function(project) {
         msg.showLoadingWithInfo('Downloading project');
@@ -49,7 +49,7 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         .then(function() {      
             msg.hideLoadingWithInfo('Project downloaded.');
         }, function(error) {
-            msg.hideLoadingWithInfo('this project is allready downloaded.');
+            msg.hideLoadingWithInfo('this project is already downloaded.');
         });
     };
 }]);

@@ -1,46 +1,25 @@
 dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope, app) {
+
     this.getProjects = function(start,length) {
-        var deferred = $q.defer();
-            app.httpRequest("/client/project/?start="+start+"&length="+length)
-            .then(function(projects) {
-                console.log('all projects: ' + JSON.stringify(projects));
-                deferred.resolve(projects);
-                },deferred.reject);
-        return deferred.promise;
+        return app.httpRequest("/client/project/?start="+start+"&length="+length);
     };
 
     this.verifyUser = function() {
-        var deferred = $q.defer();
-            app.httpRequest("/client/auth/")
-            .then(deferred.resolve, deferred.reject);
-        return deferred.promise;
+        return app.httpRequest("/client/auth/");
     };
 
     this.getQuestion = function(project_uuid) {
-        var deferred = $q.defer();
-            app.httpRequest("/client/project/" + project_uuid).then(function(project) {
-                console.log('project: ' + JSON.stringify(project));
-                deferred.resolve(project);
-              },deferred.reject);
-        return deferred.promise;
+        return app.httpRequest("/client/project/" + project_uuid);
     };
 
     this.getAllSubmissions = function(project_uuid) {
-        var deferred = $q.defer();
-            app.httpRequest("/client/project/" + project_uuid + "/submission/").then(function(serverProjects) {
-                console.log('all submissions: ' + JSON.stringify(serverProjects));
-                deferred.resolve(serverProjects);
-            },deferred.reject);
-        return deferred.promise;
+        return app.httpRequest("/client/project/" + project_uuid + "/submission/");
     };
+    
     this.getSubmissions = function(project_uuid,start,length){
-        var deferred = $q.defer();
-            app.httpRequest('/client/submissions/?uuid='+project_uuid+'&start='+start+'&length='+length).then(function(serverSubmission) {
-                deferred.resolve(serverSubmission);
-
-            },deferred.reject);
-        return deferred.promise;
+        return app.httpRequest('/client/submissions/?uuid='+project_uuid+'&start='+start+'&length='+length);
     };
+
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
             app.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).then(function(serverSubmission) {
@@ -62,11 +41,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.getSubmissionById = function(project_uuid, submission_uuid) {
-        var deferred = $q.defer();
-            app.httpRequest("/client/project/" + project_uuid + "/submission/" + submission_uuid).then(function(serverSubmission) {
-                deferred.resolve(serverSubmission);
-            },deferred.reject);
-        return deferred.promise;
+        return app.httpRequest("/client/project/" + project_uuid + "/submission/" + submission_uuid);
     };
 
     this.postSubmission = function(submission) {
@@ -95,16 +70,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.checkSubmissionVersions = function(id_versions) {
-        console.log('status_dict: '+ JSON.stringify(id_versions));
-
-        var deferred = $q.defer();
-        app.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions))
-        .then(function(id_status_dict) {
-            console.log('status_dict: '+ JSON.stringify(id_status_dict));
-            deferred.resolve(id_status_dict);
-        },deferred.reject);
-
-        return deferred.promise;
+        return app.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions));
     };
 
 }]);

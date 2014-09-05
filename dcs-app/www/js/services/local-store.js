@@ -84,7 +84,8 @@ dcsApp.service('store',['$q', function($q){
 				console.log("success: " + query);
 				deferred.resolve(transformRows(resp.rows, isSingleRecord));
 			},function(tx, error){
-				console.log("error: " + error);
+				console.log("fail: ");
+				console.log(error);
 				deferred.reject(error);
 			});
 		});

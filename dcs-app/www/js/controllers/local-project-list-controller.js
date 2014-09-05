@@ -1,4 +1,4 @@
-dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'projectDao', 'messageService', function($rootScope, $scope, $q, dcsService, projectDao, msg) {
+var localProjectListController = function($rootScope, $scope, $q, dcsService, projectDao, msg) {
 
     resourceBundle = $rootScope.resourceBundle;
     $scope.pageTitle = $rootScope.title + ' - Projects';
@@ -14,36 +14,17 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
 
     var loadProjects  = function(pageNumber) {
         $scope.pageNumber = pageNumber;
-        projectDao.getCountOfProjects().then(function(result){
-            $scope.total = result.total;
-        });
-
         msg.showLoadingWithInfo(resourceBundle.loading_projects);
         projectDao.getProjects(pageNumber * $scope.pageSize.value, $scope.pageSize.value)
         .then(assignProjects, ErrorLoadingProjects);
         msg.hideAll();
     };
 
-    var checkForProjectUpdates = function(){
-        setInterval(function(){
-            console.log("working");
-            $scope.projects.forEach(function(project) {
-                dcsService.getQuestion(project.project_uuid)
-                .then(function(projectAtServer){
-                    if(project.version != projectAtServer.version){
-                        project.status = OUTDATED;
-                        notification.addInfo(project.name + " is outdated.");
-                    }
-                }, function(error){
-                    notification.addError(error);
-                });
-            });
-        }, 10000);
-    };
-
-    $scope.onLoad = function() {
+    var onLoad = function() {
+        projectDao.getCountOfProjects().then(function(result){
+            $scope.total = result.total;
+        });
         msg.hideMessage();
-        // checkForProjectUpdates();
         $scope.pageSize = {'value':$scope.pageSizes[0]};
         loadProjects(0);
     };
@@ -53,7 +34,7 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
             loadProjects(pageNumber);
     };
 
-   $scope.onPrevious = function(pageNumber) {
+    $scope.onPrevious = function(pageNumber) {
         if (pageNumber >= 0) 
             loadProjects(pageNumber);
     };
@@ -61,6 +42,8 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
     $scope.onPageSizeChange = function() {
         loadProjects(0);
     };
+
+    onLoad();
 
     $scope.onDelete = function(project){
         function onConfirm(buttonIndex) {
@@ -81,8 +64,6 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
             ['Yes','No']
         );
     };
-
-    $scope.onLoad();
     
     $scope.$sync = function() {
         msg.showLoading();
@@ -109,6 +90,6 @@ dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', '
             msg.hideLoadingWithErr('projects not updated properly');
         });
     };
+};
 
-
-}]);
+dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'projectDao', 'messageService', localProjectListController]);
