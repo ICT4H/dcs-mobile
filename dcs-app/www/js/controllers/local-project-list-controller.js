@@ -58,7 +58,7 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
             }
         };
         navigator.notification.confirm(
-            'Do you want to delete ' + project.name + ' ?',
+            'Do you want to delete "' + project.name + '"?',
             onConfirm,
             'Delete project',
             ['Yes','No']

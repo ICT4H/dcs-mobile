@@ -61,9 +61,9 @@
         <div class="navbar-brand navbar-brand-left hide-for-small" yield-to="title">
           <span>D Collector</span>
         </div>
-        <div yield-to="refreshContents" class="btn-group navbar-brand-left btn btn-navbar"></div>
         <div yield-to="right" class="btn-group pull-right"></div>
         <div yield-to="new" class="btn-group pull-right btn btn-navbar"></div>
+        <div yield-to="refreshContents" class="btn-group pull-right btn btn-navbar"></div>
     </div>
 
     <div class="app-body" ng-class="{loading: loading}">
@@ -78,7 +78,9 @@
           <div ng-show="loading" class="app-content-loading">
             <i class="fa fa-spinner fa-spin loading-spinner"></i>
           </div>
-          <div yield-to="context-info"></div>
+          <div yield-to="context-info">
+
+          </div>
           <ng-view class="app-content" ng-hide="loading"></ng-view>
     </div>
 
