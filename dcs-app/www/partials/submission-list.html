@@ -41,24 +41,28 @@
                   <span><a ng-click="onNext(pageNumber+1)"><li class="fa fa-lg fa-chevron-right"></li></a></span>
             </div>
             <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
-                <span><button ng-click="resolve()">Resolve</button></span>
                 <span><i class="fa fa-lg fa-upload" ng-click="postSubmissions()"></i></span>
                 <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
-                <span ng-show="showEdit"><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span>
+                <!-- <span ng-show="showEdit"><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span> -->
             </div>
-            <div style="overflow-x:auto;">
-              <table id="local-submissions" style="margin-bottom:0px;" class="hide-first-col bg-white table table-condensed">
+            <div ng-init="selectedField='all'">
+                  <select class="form-control pull-left" style="width:20%" ng-model="selectedField">
+                    <option ng-repeat="(name, label) in searchFields " value="{{name}}">{{label}}</option>
+                  </select>
+                <input type="search" class="form-control app-search" style="width:80%" placeholder="Search.." ng-model="searchStr"/>
+            </div>
+
+              <table id="local-submissions" style="margin-bottom:0px;" class="bg-white table table-condensed">
                   <thead>
                   <tr>
-                      <th ng-repeat="(key, val) in headers">{{val}}</th>
+                      <th ng-repeat="order in orderHeaders" >{{headers[order]}}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="submission" ng-repeat="item in submissions" ng-init="selected=false"
+                  <tr class="submission" ng-repeat="item in submissions | filter:isSubmissionDisplayable " ng-init="selected=false"
                       ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
-                      ng-click="update_selected_submissions(this)">
-                    <td>{{item.submission_id}}</td>
-                    <td ng-repeat="(key, val) in headers" ng-bind-html="formatSubmission(item.data[key])"></td>
+                      ng-click="update_selected_submissions(this)"
+                      ng-bind-html="formatSubmission(item)">
                   </tr>
                 </tbody>
               </table>

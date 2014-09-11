@@ -17,6 +17,15 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         $scope.submissions = submissions.data;
     };
 
+    $scope.isSubmissionDisplayable = function(submission) {
+        if(!$scope.searchStr || !$scope.selectedField)
+            return true;
+        
+        if(submission.data[$scope.selectedField].indexOf($scope.searchStr) >= 0)
+            return true;
+        return false;
+    };
+
     var ErrorLoadingSubmissions = function(data,error) {
         msg.hideLoadingWithErr(error+' Failed to load Submissions');
     };

@@ -32,6 +32,12 @@
 
                   <span><a ng-click="onNext(pageNumber+1)"><li class="fa fa-lg fa-chevron-right"></li></a></span>
                 </div>
+                <div>
+                  <select class="form-control pull-left" style="width:20%" ng-model="selectedField" ng-selected="0">
+                    <option ng-repeat="(name, label) in headers" value="{{name}}">{{label}}</option>
+                  </select>
+                <input type="search" class="form-control app-search" style="width:80%" placeholder="Search.." ng-model="searchStr"/>
+                </div>
                 <div style="overflow-x:auto;">
                   <table id="server-submissions" style="margin-bottom:0px;" class="bg-white hide-first-col table table-striped table-condensed">
                     <thead>

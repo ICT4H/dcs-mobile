@@ -30,11 +30,5 @@ dcsApp.service('app', ['$q', '$http', function($q, $http){
         });
         return deferred.promise;
     };
-    
- //    this.convertToSlug = function(text) {
- //    	return text
- //    	    .toLowerCase()
- //        	.replace(/[^\w-]+/g,'');
-	// };
 
 }]);
