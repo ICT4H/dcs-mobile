@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', function($routeParams, $location, localStore, msg){
+dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', function($routeParams, $location, localStore, msg, dcsService){
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
@@ -12,7 +12,11 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
     };
 
     var redirect = function(path){
-        $location.path(path);            
+        $location.path(path);
+    };
+
+    var getSubmissionFromServer = function(submissionId) {
+        return dcsService.getSubmission({'project_uuid':$routeParams.project_uuid, 'submission_uuid': submissionId});
     };
 
     options = {
@@ -23,7 +27,9 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
         'submission_id': submission_id,
         'onSuccess': msg.displaySuccess,
         'onError': msg.displayError,
-        'getDate':getDate
+        'getDate': getDate,
+        'getSubmissionFromServer': getSubmissionFromServer, 
+        'isServerSubmission' : $routeParams.server ? true : false 
     };
     loadEnketo(options);
 

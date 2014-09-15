@@ -6,7 +6,7 @@
 <span content-for="title">{{pageTitle}}</span>
 
 <div content-for="refreshContents">
-    <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i>
+    <!-- <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i> -->
 </div>
 <div content-for="context-info">
     <div class="context-info">
@@ -28,7 +28,7 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
-           <div ng-show="showPagination" class="bg-white black-font table-bar line-bottom" ng-init="showPagination=true">
+           <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom">
 
                   <span>{{resourceBundle.page_number}}{{pageNumber+1}}</span>
                   <span>
@@ -43,7 +43,6 @@
             <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
                 <span><i class="fa fa-lg fa-upload" ng-click="postSubmissions()"></i></span>
                 <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
-                <!-- <span ng-show="showEdit"><i class="fa fa-lg fa-pencil" ng-click="editSurveyResponse()"></i></span> -->
             </div>
             <div ng-init="selectedField='all'">
                   <select class="form-control pull-left" style="width:20%" ng-model="selectedField">

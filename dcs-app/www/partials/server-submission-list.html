@@ -20,8 +20,8 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
-                <div class="bg-white black-font table-bar line-bottom">
-                  <span><a ng-click="download()"><li class="fa fa-lg fa-chevron-down"></li></a></span>
+                <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom">
+                  <!-- <span><a ng-click="download()"><li class="fa fa-lg fa-chevron-down"></li></a></span> -->
                   <span>{{resourceBundle.page_number}}{{pageNumber+1}}</span>
                   <span>
                       <select class="select-in-bar" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()">
@@ -32,26 +32,29 @@
 
                   <span><a ng-click="onNext(pageNumber+1)"><li class="fa fa-lg fa-chevron-right"></li></a></span>
                 </div>
-                <div>
-                  <select class="form-control pull-left" style="width:20%" ng-model="selectedField" ng-selected="0">
-                    <option ng-repeat="(name, label) in headers" value="{{name}}">{{label}}</option>
+                <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
+                  <span><i class="fa fa-lg fa-download" ng-click="download()"></i></span>
+                 </div>
+                <div ng-init="selectedField='all'">
+                  <select class="form-control pull-left" style="width:20%" ng-model="selectedField">
+                    <option ng-repeat="(name, label) in searchFields " value="{{name}}">{{label}}</option>
                   </select>
                 <input type="search" class="form-control app-search" style="width:80%" placeholder="Search.." ng-model="searchStr"/>
-                </div>
-                <div style="overflow-x:auto;">
-                  <table id="server-submissions" style="margin-bottom:0px;" class="bg-white hide-first-col table table-striped table-condensed">
+            </div>
+                  <table id="server-submissions" style="margin-bottom:0px;" class="bg-white table table-condensed">
                     <thead>
-                      <tr>
-                          <th ng-repeat="c in headers">{{c}}</th>
-                      </tr>
-                    </thead> 
-                    <tbody>
-                      <tr ng-repeat="items in submissions" ng-init="seleted=false" ng-class="{'success':seleted}" ng-click='seleted=!seleted'>
-                        <td ng-repeat="item in items" ng-bind-html="formatSubmission(item)"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                    <tr>
+                        <th ng-repeat="order in orderHeaders" >{{headers[order]}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="submission" ng-repeat="item in submissions | filter:isSubmissionDisplayable "
+                        ng-class="{'success':selected}"
+                        ng-click="update_selected_submissions(this)"
+                        ng-bind-html="formatSubmission(item)">
+                    </tr>
+                  </tbody>
+                </table>
               </div> <!-- table panel -->
             </div>
         </div>

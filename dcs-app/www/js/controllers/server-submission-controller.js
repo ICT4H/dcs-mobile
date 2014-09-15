@@ -1,19 +1,20 @@
-dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
-    function($rootScope, $scope, $routeParams, $location, dcsService, localStore, msg){
+dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
+    function(app, $scope, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading submissions');
-
+    $scope.displayHeaders = {}; 
+    $scope.orderHeaders = []; 
+    $scope.searchFields = {all: 'All'}; 
+    $scope.showActions = false;  
     $scope.pageSizes = [5, 10, 15, 20];
     $scope.project_uuid = $routeParams.project_uuid;
+    var selected = [];
 
     var assignSubmissions = function(submissions){
         msg.hideAll();
         if(submissions.length == 0)
             msg.hideLoadingWithInfo('No server submissions !');
-        // submissions.data.forEach(function(submission){
-        //     submission = JSON.parse(submission);
-        // });
         $scope.submissions = submissions.data;
     };
 
@@ -26,9 +27,10 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         return false;
     };
 
-    var ErrorLoadingSubmissions = function(data,error) {
+    var ErrorLoadingSubmissions = function(data, error) {
         msg.hideLoadingWithErr(error+' Failed to load Submissions');
     };
+
     var loadSubmissions = function(pageNumber) {
         $scope.pageNumber = pageNumber;
         localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
@@ -46,6 +48,8 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
                 $scope.project_name = project.name;
                 $scope.project_uuid = project.project_uuid;
                 $scope.headers = JSON.parse(project.headers);
+                $scope.orderHeaders = app.extractHeaders($scope.headers);
+                angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
                 loadSubmissions(0);
         });
     };
@@ -65,65 +69,65 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', '$scope', '$route
         loadSubmissions(0);
     };
 
-    $scope.formatSubmission = function(value) {
-        if (typeof value == "object" && value != null) {
-            var ret = '<table class="bg-transparent show-first-col no-margin-bottom table table-condensed">';
-            ret += '<thead><tr>';
-            
-            for(k in value[0] || value) {
-                ret += '<th>'+k+'</th>';
-            }
-            ret += '</tr></thead>';
-
-            // multiple repeat data
-            if (value instanceof Array) {
-                for(var i in value) {
-                    ret += '<tr>';
-                    for (key in value[i]) {
-                        ret += '<td>' + value[i][key] + '</td>';
-                    }
-                    ret += '</tr>';
-                }
-            // single repeat data
-            } else {
-                ret += '<tr>';
-                for(var i in value) {
-                    ret += '<td>' + value[i] + '</td>';
-                }
-                ret += '</tr>';
-            }
-            return ret += '</table>';
-        }
-
-        return value;
+    $scope.isSubmissionDisplayable = function(submissionData) {
+        return app.isSubmissionDisplayable(submissionData, $scope.searchStr, $scope.selectedField);
     }
+
+    $scope.formatSubmission = function(submission) {
+        var ret = '';
+        angular.forEach($scope.orderHeaders, function(header) {
+              if(header == "more") 
+                ret += "<td><a class='fa fa-lg fa-external-link' href='#project/" + $scope.project_uuid + "/submission/" + submission.id[0] + "?server=true'></a></td>";
+            else
+                ret += "<td>" + submission[header] + "</td>";
+        });
+        return ret;
+    };
 
     $scope.download = function() {
-        console.log('download clicked');
-        var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
-        var uuid;
-        for (var i=0; i<selected_rows.length; i++) {
-            uuid = selected_rows[i].cells[0].innerText;
-            localStore.submissionNotExists(uuid)
-                .then(function(result) {
-                    if(result) {
-                        downloadSubmission({submission_uuid: uuid,
-                                            project_uuid:$scope.project_uuid});
-                    }
-                    // TODO what to be done for existing submissions.
-                });
-        }
-    }
-
-    var downloadSubmission = function(submission) {
         msg.showLoading();
-        submission.status = BOTH;
-        dcsService.getSubmission(submission)
-            .then(localStore.createSubmission)
-            .then(function(resp) {
+        var downloadSubmissionPromise = [];
+        selected.forEach(function(submissionId) {
+            localStore.submissionNotExists(submissionId).then(function(result) {
+                if(result.length == 0)
+                    downloadSubmissionPromise.push(downloadSubmission({submission_uuid: submissionId, project_uuid:$scope.project_uuid}));
+            });
+        });
+
+        app.promises(downloadSubmissionPromise, function(resp) {
                 msg.hideLoadingWithInfo("Submission downloaded.");
             }, function(error) {
                 msg.hideLoadingWithErr('Unable to download submission.');
             });
+    };
+
+    // $scope.download = function() {
+    //     console.log('download clicked');
+    //     var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
+    //     var uuid;
+    //     for (var i=0; i<selected_rows.length; i++) {
+    //         uuid = selected_rows[i].cells[0].innerText;
+    //         localStore.submissionNotExists(uuid)
+    //             .then(function(result) {
+    //                 if(result) {
+    //                     downloadSubmission({submission_uuid: uuid,
+    //                                         project_uuid:$scope.project_uuid});
+    //                 }
+    //                 // TODO what to be done for existing submissions.
+    //             });
+    //     }
+    // }
+
+    $scope.update_selected_submissions = function(submissionRow) {
+        submissionRow.selected = !submissionRow.selected;
+        app.flickArray(selected, submissionRow.item.id[0]);
+        $scope.showActions = (selected.length >= 1);
+    };
+
+    var downloadSubmission = function(submission) {
+        submission.status = BOTH;
+        dcsService.getSubmission(submission)
+            .then(localStore.createSubmission);
+            
     }
 }]);
