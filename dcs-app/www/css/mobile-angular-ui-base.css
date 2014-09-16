@@ -5455,7 +5455,12 @@ a.list-group-item-danger.active:focus {
   padding: 15px;
 }
 
+.panel-heading h1{
+  font-weight: bold;
+}
+
 .panel-heading {
+  opacity: 0.7;
   padding: 10px 15px;
   border-bottom: 1px solid transparent;
   border-top-right-radius: 3px;
@@ -7117,7 +7122,7 @@ html .panel-group .panel-title {
 
 .panel-title {
   color: #999999;
-  font-weight: 200;
+  font-weight: bold;
   font-size: 20px;
 }
 

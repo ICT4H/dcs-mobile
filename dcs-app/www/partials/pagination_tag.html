@@ -1,4 +1,4 @@
-<span>{{ resourceBundle.page_number}}{{pageNumber+1}}</span>
+<span>{{ resourceBundle.page_number}}{{pageNumber+1}} of {{total % pageSize.value}}</span>
 <span>
     <select class="select-in-bar" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()">
     </select>

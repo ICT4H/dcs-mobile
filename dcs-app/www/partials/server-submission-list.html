@@ -22,7 +22,7 @@
               <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
                 <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom">
                   <!-- <span><a ng-click="download()"><li class="fa fa-lg fa-chevron-down"></li></a></span> -->
-                  <span>{{resourceBundle.page_number}}{{pageNumber+1}}</span>
+                  <span>{{resourceBundle.page_number}}{{pageNumber+1}} of {{total % pageSize.value}}</span>
                   <span>
                       <select class="select-in-bar" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()">
                       </select>

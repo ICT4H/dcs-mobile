@@ -8,6 +8,7 @@ dcsApp.controller('submissionListController',
     $scope.displayHeaders = {}; 
     $scope.orderHeaders = []; 
     $scope.showActions = false;
+    $scope.total = 1;
 
     
     msg.showLoadingWithInfo('Loading submissions');
@@ -39,7 +40,8 @@ dcsApp.controller('submissionListController',
     var loadSubmissions = function(pageNumber) {
         $scope.pageNumber = pageNumber;
         localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-            $scope.total = result.total;
+            if(result.total!=0)
+                $scope.total = result.total;
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         localStore.getSubmissionsByProjectId($scope.project_uuid, pageNumber * $scope.pageSize.value, $scope.pageSize.value)

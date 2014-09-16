@@ -8,6 +8,7 @@ dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams'
     $scope.searchFields = {all: 'All'}; 
     $scope.showActions = false;  
     $scope.pageSizes = [5, 10, 15, 20];
+    $scope.total =1;
     $scope.project_uuid = $routeParams.project_uuid;
     var selected = [];
 
@@ -34,7 +35,8 @@ dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams'
     var loadSubmissions = function(pageNumber) {
         $scope.pageNumber = pageNumber;
         localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-            $scope.total = result.total;
+            if(result.total!=0)
+                $scope.total = result.total;
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize.value, $scope.pageSize.value)

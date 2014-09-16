@@ -3,6 +3,7 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     resourceBundle = $rootScope.resourceBundle;
     $scope.pageTitle = $rootScope.title + ' - Projects';
     $scope.pageSizes = [5, 10, 15, 20];
+    $scope.total = 1;
 
     var assignProjects = function(projects) {
         $scope.projects = projects;
@@ -22,7 +23,8 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
 
     var onLoad = function() {
         projectDao.getCountOfProjects().then(function(result){
-            $scope.total = result.total;
+            if(result.total!=0)
+                $scope.total = result.total;
         });
         msg.hideMessage();
         $scope.pageSize = {'value':$scope.pageSizes[0]};
