@@ -65,7 +65,6 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
 
     this.hideMessage = function() {
         $rootScope.showMessage = false;
-        $rootScope.loading = false;
         apply();
     };
 

@@ -26,7 +26,6 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
             if(result.total!=0)
                 $scope.total = result.total;
         });
-        msg.hideMessage();
         $scope.pageSize = {'value':$scope.pageSizes[0]};
         loadProjects(0);
     };
@@ -34,11 +33,13 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     $scope.onNext = function(pageNumber) {
         if(pageNumber * $scope.pageSize.value < $scope.total)
             loadProjects(pageNumber);
+
     };
 
     $scope.onPrevious = function(pageNumber) {
         if (pageNumber >= 0) 
             loadProjects(pageNumber);
+
     };
 
     $scope.onPageSizeChange = function() {
@@ -71,20 +72,20 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
         msg.showLoading();
         var promises = [];
 
+
         projectDao.getAll().then(function(projects){ 
-            dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
+            promises.push(dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
                 outdatedProjects.forEach(function(outdatedProject) {
                     promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status)); 
                 });
-            });
-        });
-
-        $q.all(promises).then(function() {
+            }));
+            $q.all(promises).then(function() {
             msg.hideLoadingWithInfo('updated project list');
              $scope.pageSize = {'value':$scope.total};
              loadProjects(0);
-        },function() {
-            msg.hideLoadingWithErr('projects not updated properly');
+            },function() {
+                msg.hideLoadingWithErr('projects not updated properly');
+            });
         });
     };
 };
