@@ -7,7 +7,7 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "angucomplete-alt",
 ]);
 
-var isEmulator = false;
+var isEmulator = true;
 var BUTTON_NO = isEmulator ? 3 : 2;
 
 var SERVER = 'server';
