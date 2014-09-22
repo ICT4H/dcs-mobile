@@ -28,16 +28,7 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
-           <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom">
-                  <span>{{resourceBundle.page_number}}{{pageNumber+1}} of {{total % pageSize.value}}</span>
-                  <span>
-                      <select class="select-in-bar" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()">
-                      </select>
-                  </span>
-
-                  <span><a ng-click="onPrevious(pageNumber-1)"><li class="fa fa-lg fa-chevron-left"></li></a></span>
-
-                  <span><a ng-click="onNext(pageNumber+1)"><li class="fa fa-lg fa-chevron-right"></li></a></span>
+           <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom" ng-include="'partials/pagination_tag.html'">
             </div>
             <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
                 <span><i class="fa fa-lg fa-upload" ng-click="postSubmissions()"></i></span>
@@ -60,9 +51,14 @@
                   <tr class="submission" ng-repeat="item in submissions | filter:isSubmissionDisplayable " ng-init="selected=false"
                       ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
                       ng-click="update_selected_submissions(this)"
-                      ng-bind-html="formatSubmission(item)">
+                      ng-bind-html="formatSubmission($index, item)">
                   </tr>
-                </tbody>
+                  <tr ng-show="total>=5">
+                    <td colspan="{{orderHeaders.length}}">
+                      <div ng-include="'partials/pagination_tag.html'">
+                    </td>
+                  </tr>
+                 </tbody>
               </table>
             </div>
           </div>

@@ -35,6 +35,10 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
         .when('/project/:project_uuid/submission/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController'
+        })
+        .when('/settings', {
+          templateUrl: "partials/settings.html",
+          controller: 'settingsController'
         }); 
     $httpProvider.defaults.timeout = 1000;
 }]);

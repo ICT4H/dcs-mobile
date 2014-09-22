@@ -1,14 +1,16 @@
-dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
-    function(app, $scope, $routeParams, $location, dcsService, localStore, msg){
+dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
+    function($rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading submissions');
     $scope.displayHeaders = {}; 
     $scope.orderHeaders = []; 
     $scope.searchFields = {all: 'All'}; 
-    $scope.showActions = false;  
-    $scope.pageSizes = [5, 10, 15, 20];
-    $scope.total =1;
+    $scope.showActions = false;
+    $scope.Math = window.Math;  
+    $scope.pageSizes = $rootScope.pageSizes;
+    $scope.pageSize = $rootScope.pageSize.value;
+    $scope.total = 0;
     $scope.project_uuid = $routeParams.project_uuid;
     var selected = [];
 
@@ -39,12 +41,11 @@ dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams'
                 $scope.total = result.total;
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
-        dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize.value, $scope.pageSize.value)
+        dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
         .then(assignSubmissions, ErrorLoadingSubmissions);
     };
 
     $scope.onLoad = function() {
-        $scope.pageSize = {'value':$scope.pageSizes[0]};
         localStore.getProjectById($scope.project_uuid)
             .then(function(project) {
                 $scope.project_name = project.name;
@@ -58,7 +59,7 @@ dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams'
     $scope.onLoad();
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize.value < $scope.total)
+        if(pageNumber * $scope.pageSize < $scope.total)
             loadSubmissions(pageNumber);
     };
 
@@ -67,9 +68,21 @@ dcsApp.controller('serverSubmissionController', ['app', '$scope', '$routeParams'
             loadSubmissions(pageNumber);
     };
 
-    $scope.onPageSizeChange = function() {
-        loadSubmissions(0);
+    $scope.isLastPage = function() {
+        if($scope.total % $scope.pageSize == 0)
+            return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber + 1 ;
+        return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber;
     };
+
+    $scope.isFirstPage = function() {
+        return $scope.pageNumber == 0;
+    };
+
+    $scope.isAtLast = function(index) {
+        if($scope.isLastPage())
+            return index ==  $scope.total % $scope.pageSize - 1 ;
+        return index == $scope.pageSize-1;
+    }
 
     $scope.isSubmissionDisplayable = function(submissionData) {
         return app.isSubmissionDisplayable(submissionData, $scope.searchStr, $scope.selectedField);

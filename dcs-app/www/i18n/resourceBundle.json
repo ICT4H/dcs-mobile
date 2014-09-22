@@ -9,5 +9,7 @@
     "manage_columns_info" : "Tap to add/remove column of submission table",
     "manage_columns_page_title" : "Server",
     "installed": "Downloaded",
-    "server": "Server"
+    "server": "Server",
+    "no_projects": "No project downloaded. Go to Server tab and download.",
+    "end_of_list": "You are on last Page"
 }

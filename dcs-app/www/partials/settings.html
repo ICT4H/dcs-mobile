@@ -1,0 +1,13 @@
+<div ng-include="'partials/menu-bar.html'"></div>
+
+<div class="scrollable-content section">
+    
+    <div bs-panel>
+        <div class ="form-group">
+            <label>Items Per Page</label>
+            <span >
+		    	<select class="select-in-bar form-control" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()"></select>
+			</span>
+		</div>
+    </div>
+</div>

@@ -48,7 +48,9 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
     };
 
     $rootScope.startMessageGC();
-
+    $rootScope.pageSizes = [5, 10, 15, 20];
+    $rootScope.pageSize = {'value':$rootScope.pageSizes[0]};
+    
     $rootScope.logout = function() {
         console.log('logout');
         app.isAuthenticated = false;

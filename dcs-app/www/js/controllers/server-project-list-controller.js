@@ -1,8 +1,10 @@
 dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
 
     $scope.pageTitle = $rootScope.title + ' - Projects';
-    $scope.pageSize = 5;
-    $scope.pageSizes = [5, 10, 15, 20];
+    $scope.pageSize = $rootScope.pageSize.value;
+    $scope.pageSizes = $rootScope.pageSizes;
+    $scope.total = 0;
+    $scope.Math = window.Math;
 
     var assignProjects = function(projects) {
         $scope.total = projects.total;
@@ -17,17 +19,16 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
     var fetchProjects  = function(pageNumber) {
         $scope.pageNumber = pageNumber;
         msg.showLoadingWithInfo(resourceBundle.fetching_projects);
-        dcsService.getProjects(pageNumber * $scope.pageSize.value, $scope.pageSize.value)
+        dcsService.getProjects(pageNumber * $scope.pageSize, $scope.pageSize)
         .then(assignProjects, ErrorLoadingProjects);
     };
 
     var onLoad = function() {
-        $scope.pageSize = {'value':$scope.pageSizes[0]};
         fetchProjects(0);
     };
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize.value < $scope.total)
+        if(pageNumber * $scope.pageSize < $scope.total)
             fetchProjects(pageNumber);
     };
 
@@ -36,9 +37,21 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
             fetchProjects(pageNumber);
     };
 
-    $scope.onPageSizeChange = function() {
-        fetchProjects(0);
+    $scope.isLastPage = function() {
+        if($scope.total % $scope.pageSize == 0)
+            return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber + 1 ;
+        return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber;
     };
+
+    $scope.isFirstPage = function() {
+        return $scope.pageNumber == 0;
+    };
+
+    $scope.isAtLast = function() {
+        if($scope.isLastPage())
+            return $scope.listIndex ==  $scope.total % $scope.pageSize - 1 ;
+        return $scope.listIndex == $scope.pageSize-1;
+    }
 
     onLoad();
 

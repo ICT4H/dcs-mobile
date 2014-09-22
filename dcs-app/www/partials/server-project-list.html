@@ -11,20 +11,17 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
-                        <div ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar line-bottom">
+                         <div ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar" style="padding:5px 0 0 0;">
                     </div>
                 </div>
             </div>
         </div>
         <div class="list-group">
-            <!-- <div class="input-group">
-                <input type="search" class="form-control app-search" placeholder="Search.." ng-model="searchText" />
-                <span class="input-group-addon" ng-click="searchText = ''"><a><i class="fa fa-search-minus"></i></a></span>
-            </div> -->
             <div ng-repeat="project in projects  | filter:searchText" href="#server-project-list" class="list-group-item" ng-class="project.status" >
                 <i class="fa fa-download fa-lg pull-right" ng-click="downloadProject(project)"></i>
                 <span>{{ project.name }}</span>
             </div>
-        </div>
+            <div ng-show="total>=5" ng-include="'partials/pagination_tag.html'"     class="bg-white black-font table-bar list-group-item ">
+            </div>
     </div>
 </div>
