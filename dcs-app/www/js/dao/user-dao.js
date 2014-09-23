@@ -22,4 +22,8 @@ dcsApp.service('userDao', ['store', function(store){
 		return store.executeUserQueries('SELECT * FROM users WHERE name = ?', [userName]);
     }; 
 
+    this.validateUser = function(user) {
+    	return store.init(user);
+    }
+
 }]);	

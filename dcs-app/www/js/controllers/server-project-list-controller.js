@@ -12,8 +12,8 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         msg.hideAll();
     };
 
-    var ErrorLoadingProjects = function(data,error) {
-        msg.hideLoadingWithErr(error+' Failed to fetch projects');
+    var ErrorLoadingProjects = function(data, error) {
+        msg.hideLoadingWithErr('Failed to fetch projects');
     };
 
     var fetchProjects  = function(pageNumber) {

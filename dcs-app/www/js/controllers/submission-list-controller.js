@@ -34,7 +34,7 @@ dcsApp.controller('submissionListController',
     };
 
     var ErrorLoadingSubmissions = function(data, error) {
-        msg.hideLoadingWithErr(error+' Failed to load Submissions');
+        msg.hideLoadingWithErr('Failed to load Submissions');
     };
 
     var loadSubmissions = function(pageNumber) {

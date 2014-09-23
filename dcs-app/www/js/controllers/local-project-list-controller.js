@@ -11,7 +11,7 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     };
 
     var ErrorLoadingProjects = function(data,error) {
-        msg.hideLoadingWithErr(error+' Failed to load projects');
+        msg.hideLoadingWithErr('Failed to load projects');
     };
 
     var loadProjects  = function(pageNumber) {

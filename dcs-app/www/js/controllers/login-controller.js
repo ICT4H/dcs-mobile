@@ -23,7 +23,11 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
         msg.showLoading();
         app.user = $scope.user;
         if(!isNewUser)
-            userDao.updateUrl($scope.user).then(onSuccess, onError);
+            userDao.validateUser(app.user)
+            .then(userDao.updateUrl)
+            .then(onSuccess, function() { 
+                onError("Invalid username and password.");
+            });
         else 
             dcsService.verifyUser($scope.user).then(function() {
                             userDao.addUser($scope.user).then(onSuccess, onError);

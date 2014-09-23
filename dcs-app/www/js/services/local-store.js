@@ -22,6 +22,24 @@ dcsApp.service('store',['$q', function($q){
 		return runOn(userStore, query, values, isSingleRecord);
 	};
 
+	this.init =  function(user) {
+		var dbName = convertToSlug(user.name);
+		var deferred = $q.defer();
+
+		if (isEmulator) {
+			db = window.openDatabase(dbName, version, dbName, 1);
+			deferred.resolve(user);
+			return deferred.promise;
+		}
+
+		db = window.sqlitePlugin.openDatabase({name: dbName, bgType: 1, key: user.password}, function() {
+			console.log('_getDB success');
+			deferred.resolve(user);
+		},deferred.reject);
+
+		return deferred.promise;
+	};
+
 	this.executeUserQueries = function(query, values, isSingleRecord) {
 		return runOn(usersStore, query, values, isSingleRecord);
 	};
