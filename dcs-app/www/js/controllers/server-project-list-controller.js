@@ -28,19 +28,15 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
     };
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize < $scope.total)
-            fetchProjects(pageNumber);
+        loadProjects(pageNumber);
     };
 
-   $scope.onPrevious = function(pageNumber) {
-        if (pageNumber >= 0) 
-            fetchProjects(pageNumber);
+    $scope.onPrevious = function(pageNumber) {
+        loadProjects(pageNumber);
     };
 
     $scope.isLastPage = function() {
-        if($scope.total % $scope.pageSize == 0)
-            return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber + 1 ;
-        return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber;
+        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
     };
 
     $scope.isFirstPage = function() {

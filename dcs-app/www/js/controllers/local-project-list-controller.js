@@ -5,6 +5,7 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     $scope.pageSizes = $rootScope.pageSizes;
     $scope.pageSize = $rootScope.pageSize.value;
     $scope.total = 0;
+    $scope.pageNumber = 0;
     $scope.Math = window.Math;
     var assignProjects = function(projects) {
         $scope.projects = projects;
@@ -24,29 +25,22 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
 
     var onLoad = function() {
         projectDao.getCountOfProjects().then(function(result){
-            if(result.total!=0)
-                $scope.total = result.total;
+            if(result.total == 0) return;
+            $scope.total = result.total;
+            loadProjects(0);
         });
-       
-        loadProjects(0);
     };
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize < $scope.total)
-            loadProjects(pageNumber);
-
+        loadProjects(pageNumber);
     };
 
     $scope.onPrevious = function(pageNumber) {
-        if (pageNumber >= 0) 
-            loadProjects(pageNumber);
-
+        loadProjects(pageNumber);
     };
 
     $scope.isLastPage = function() {
-        if($scope.total % $scope.pageSize == 0)
-            return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber + 1 ;
-        return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber;
+        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
     };
 
     $scope.isFirstPage = function() {

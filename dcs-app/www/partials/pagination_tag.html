@@ -1,7 +1,7 @@
 <div style="text-align:center;">
 	<span ng-show="!isFirstPage()" ng-click="onPrevious(pageNumber-1)" class="fa fa-lg fa-chevron-left" style="float: left;margin-top: 6px;"></span>
     <span style="text-align:center;">
-    	{{(pageNumber * pageSize) + 1}}  - {{(pageNumber * pageSize) + Math.min((total - (pageSize * pageNumber)), pageSize)}} of {{total}}
+    	{{(pageNumber * pageSize) + Math.max(0,Math.min(1, total*pageSize))}}  - {{(pageNumber * pageSize) + Math.min((total - (pageSize * pageNumber)), pageSize)}} of {{total}}
     </span>
     <span ng-show="!isLastPage()" ng-click="onNext(pageNumber+1)" class="fa fa-lg fa-chevron-right pull-right"></span>
  </div>

@@ -59,19 +59,15 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', 
     $scope.onLoad();
 
     $scope.onNext = function(pageNumber) {
-        if(pageNumber * $scope.pageSize < $scope.total)
-            loadSubmissions(pageNumber);
+        loadProjects(pageNumber);
     };
 
-   $scope.onPrevious = function(pageNumber) {
-        if (pageNumber >= 0) 
-            loadSubmissions(pageNumber);
+    $scope.onPrevious = function(pageNumber) {
+        loadProjects(pageNumber);
     };
 
     $scope.isLastPage = function() {
-        if($scope.total % $scope.pageSize == 0)
-            return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber + 1 ;
-        return Math.floor($scope.total/$scope.pageSize) == $scope.pageNumber;
+        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
     };
 
     $scope.isFirstPage = function() {
