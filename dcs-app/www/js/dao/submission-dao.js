@@ -1,21 +1,22 @@
 dcsApp.service('submissionDao',['store', function(store){
 
 	this.createSubmission = function(submission) {
-		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml)'+
-		'VALUES (?,?,?,?,?,?,?,?)';
+		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
+		'VALUES (?,?,?,?,?,?,?,?,?,?)';
 		return store.execute(query, getSubmissionAsValues(submission));
 	};
 	
-	this.updateSubmission = function(submission_id, submission) {
+	this.updateSubmission = function(submission) {
+		console.log('submission_id: ' + submission.submission_id + ' submission: ' + JSON.stringify(submission));
 		var values = getSubmissionAsValues(submission);
-		values.push(submission_id);
-		return store.execute('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, project_uuid=?, created=?, data=?, xml=? where submission_id = ?', 
+		values.push(submission.submission_id);
+		return store.execute('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, project_uuid=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_id = ?', 
 			values);
 	};
 
 	var getSubmissionAsValues = function(submission){
 		var values = [submission.submission_uuid, submission.version, "changed", 1, submission.project_uuid,
-			submission.created, submission.data, submission.xml];
+			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
 

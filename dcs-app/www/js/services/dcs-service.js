@@ -49,30 +49,85 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpRequest("/client/project/" + project_uuid + "/submission/" + submission_uuid);
     };
 
-    this.postSubmission = function(submission) {
-        console.log('submit submission: ' + JSON.stringify(submission));
+    this.postSubmissionAndPurgeObsoluteMedia = function(submission) {
+
+        var createOrUpdateUrl = getCreateOrUpdateUrl(submission.submission_uuid);
         var deferred = $q.defer();
-        var createOrUpdateUrl;
-        var isUpdate = angular.isUndefined(submission.submission_uuid) || submission.submission_uuid == "undefined";
 
-        if (isUpdate) {
-            createOrUpdateUrl = "/client/project/dummy/submission/";
-        } else {
-            createOrUpdateUrl = "/client/project/dummy/submission/" + submission.submission_uuid;
-        }
+        app.httpPostRequest(createOrUpdateUrl,
+            'form_data=' + submission.xml +'&retain_files=' + submission.un_changed_files)
 
-        app.httpPostRequest(createOrUpdateUrl, 'form_data=' + submission.xml)
-            .then(function(updatedSubmission) {
+            .then(function(response) {
                 submission.status = BOTH;
-                submission.submission_uuid = updatedSubmission.submission_uuid;
-                submission.version = updatedSubmission.version;
+                submission.submission_uuid = response.submission_uuid;
+                submission.version = response.version;
+                submission.is_modified = false;
 
+                console.log('httpPostRequest resolved; updated submission' + JSON.stringify(submission));
                 deferred.resolve(submission);
-
-            },deferred.reject);
+            }, deferred.reject);
 
         return deferred.promise;
     };
+
+    function getCreateOrUpdateUrl(submission_uuid) {
+        var baseUrl = "/client/project/dummy/submission/";
+        var isNewSubmission = angular.isUndefined(submission_uuid) || submission_uuid == "undefined";
+        return isNewSubmission ? baseUrl : (baseUrl + submission_uuid);
+    }
+
+    this.postSubmissionNewMedia = function(submission) {
+        console.log('update submission response: ' + JSON.stringify(submission));
+
+        var deferred = $q.defer();
+        var fileNamesString = submission.new_files_added;
+        console.log('fileNamesString: ' + fileNamesString);
+        if ( !fileNamesString || !fileNamesString.length > 0) {
+            console.log('no meida to upload');
+            deferred.resolve(submission);
+            return deferred.promise;
+        }
+
+        return getFilesMeta(fileNamesString)
+            .then(function(filesMetaData) {
+                console.log('all getFilesMeta promises done, result length: ' + filesMetaData.length);
+
+                var transferPromises = [];
+                angular.forEach(filesMetaData, function(fileMeta) {
+                    transferPromises.push(app.httpPostFile(fileMeta, submission.submission_uuid));
+                });
+
+                $q.all(transferPromises).then(function() {
+                    deferred.resolve(submission);
+                });
+
+                return deferred.promise;
+            });
+    }
+
+    function getFilesMeta(fileNamesString) {
+        console.log('in getFilesMeta, fileNamesString: ' + fileNamesString);
+
+        var deferred = $q.defer();
+        var fileNames = fileNamesString.split(',');
+        var promises = [];
+        angular.forEach(fileNames, function(fileName) {
+            promises.push(getFileMeta(fileName));
+        });
+
+        return $q.all(promises);
+    }
+
+    function getFileMeta(fileName) {
+        console.log('in getFileMeta, filename: ' + fileName);
+        var deferred = $q.defer();
+
+        cordovaMediaManager.fileNameToFileInfo(fileName, function(filePath, type) {
+            console.log('cordovaMediaManager loaded filename: ' + fileName + ' path: '+ filePath + '; type: ' + type);
+            deferred.resolve({name: fileName, path:filePath, type:type});
+        });
+        return deferred.promise;
+    }
 
     this.checkSubmissionVersions = function(id_versions) {
         return app.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions));

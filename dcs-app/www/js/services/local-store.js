@@ -14,7 +14,8 @@ dcsApp.service('store',['$q', function($q){
 		.then(runOn(userStore, 'CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,'+
 						'version text, status text, name text, xform text, headers text, local_headers text)', [], false))
 		.then(runOn(userStore, 'CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
-						 'version text, status text, is_modified integer, project_uuid integer, created text, data text, xml text)', [], false))
+						 'version text, status text, is_modified integer, project_uuid integer, created text, data text, xml text,'+
+						 'new_files_added text, un_changed_files text)', [], false))
 		.then(runOn(userStore, 'CREATE INDEX IF NOT EXISTS project_uuid_index ON submissions (project_uuid)', [], false));
 	};
 
@@ -86,12 +87,16 @@ dcsApp.service('store',['$q', function($q){
 
 	var transformRows = function(resultSet, isSingleRecord) {
 		var rows = [];
-		if(isSingleRecord && resultSet.length > 0)
+		console.log('in transformRows');
+		if(isSingleRecord && resultSet.length > 0) {
+			console.log('resultString: ' + JSON.stringify(resultSet.item(0)) );
 			return angular.copy(resultSet.item(0));
-
-		for (var i=0; i < resultSet.length; i++) 
-			 rows.push(resultSet.item(i));
+		}
 		
+		for (var i=0; i < resultSet.length; i++) {
+			console.log('resultString: ' + JSON.stringify(resultSet.item(i)) );
+			 rows.push(resultSet.item(i));
+		}
 		return angular.copy(rows);
 	};
 

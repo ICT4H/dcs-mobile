@@ -208,9 +208,9 @@ dcsApp.controller('submissionListController',
         selected.forEach(function(submissionId) {
             multiplePromises.push(
                 localStore.getSubmissionById(submissionId)
-                .then(dcsService.postSubmission)
-                .then(localStore.updateSubmissionMeta));
-
+                    .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
+                    .then(dcsService.postSubmissionNewMedia)
+                    .then(localStore.updateSubmission));
         });
         return multiplePromises;
     };

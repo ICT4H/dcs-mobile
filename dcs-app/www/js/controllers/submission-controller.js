@@ -24,7 +24,7 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
     };
 
     var onEdit = function(submission) {
-        localStore.updateSubmission(submission_id, submission)
+        localStore.updateSubmission(submission)
         .then(function() {
             msg.displaySuccess('Updated');
             $location.path("/submission-list/" + $routeParams.project_uuid);

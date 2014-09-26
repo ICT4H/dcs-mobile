@@ -104,10 +104,6 @@ label, legend, .trigger, .note {
   color: black;
   padding: 5px 5px 12px 5px;
 }
-.or label > span.or-hint.active {
-  color: black;
-  display: block;
-}
 .or .required {
   float: right;
 }
@@ -127,10 +123,18 @@ label, legend, .trigger, .note {
 .or input[type="file"] {
   display: none !important;
 }
-.or .or-hint.active {
+.or .or-hint.active, .or .or-hint.or-form-print.active {
+  color: black;
+  display: block;
   padding-top: 5px;
   margin-top: 0;
   line-height: 1em;
+}
+.or .or-hint.or-form-print.active {
+  border: 1px dotted black;
+  padding: 1px;
+  margin-top: 5px;
+  font-size: 10px;
 }
 
 .invalid-constraint, .invalid-required {

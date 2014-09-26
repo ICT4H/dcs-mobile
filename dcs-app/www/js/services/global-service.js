@@ -25,12 +25,55 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
         console.log('calls user name: ' + user.name + '; url: ' + user.url + uri);
         $http.defaults.headers.post["Content-Type"] = "text/plain";
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
-        
-        $http.post(user.url + uri, data).success(deferred.resolve).error(function(data, status, headers, config) {
-            deferred.reject(status);
-        });
+
+        $http.post(user.url + uri, data)
+            .success(deferred.resolve)
+            .error(function(data, status, headers, config) {
+                deferred.reject(status);
+            });
+
         return deferred.promise;
     };
+
+    this.httpPostFile = function(fileMeta, submission_uuid) {
+        user = this.user;
+        var url = user.url + '/client/attachment/' + submission_uuid;
+        //TODO extract a method to get the auth after the usage of global var user is identified.
+        var headersMap = {"Authorization": 'Basic ' + btoa(this.user.name + ':' + this.user.password)};
+
+        console.log('calling httpPostFile with user name: ' + user.name + '; url: ' + url);
+        
+        return transfer(url, headersMap, fileMeta);
+    }
+
+    function transfer(serverUrl, headersMap, filesInfo) {
+        var deferred = $q.defer();
+        
+        var win = function (r) {
+            console.log("Code = " + r.responseCode);
+            console.log("Response = " + r.response);
+            console.log("Sent = " + r.bytesSent);
+            deferred.resolve(r.response);
+        }
+
+        var fail = function (error) {
+            alert("An error has occurred: Code = " + error.code);
+            console.log("upload error source " + error.source);
+            console.log("upload error target " + error.target);
+            deferred.reject();
+        }
+
+        var options = new FileUploadOptions();
+        options.fileName = filesInfo.name;
+        options.fileKey = options.fileName;
+        options.mimeType = filesInfo.type;
+        options.headers = headersMap;
+
+        var ft = new FileTransfer();
+        ft.upload(filesInfo.path, encodeURI(serverUrl), win, fail, options);
+
+        return deferred.promise;
+    }
 
     var searchInRepeat =  function(submission, searchStr, searchField) {
         var level = searchField.split("-");

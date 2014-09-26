@@ -6,9 +6,11 @@
 // the identifier, the filesystem location
 // or the URL
 var pluginlist = [
-    "https://git-wip-us.apache.org/repos/asf/cordova-plugin-dialogs.git",
-    "https://github.com/ICT4H/Cordova-SQLitePlugin.git",
-    "https://git-wip-us.apache.org/repos/asf/cordova-plugin-file.git"
+    "org.apache.cordova.file",
+    "org.apache.cordova.dialogs",
+    "org.apache.cordova.camera",
+    "org.apache.cordova.file-transfer",
+    "https://github.com/ICT4H/Cordova-SQLitePlugin.git"
 ];
  
 // no need to configure below

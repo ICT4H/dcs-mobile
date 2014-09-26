@@ -573,11 +573,11 @@ a.text-info:hover {
   color: #245269;
 }
 
-.text-warning {
+.text-warning, .file-picker .file-feedback.warning {
   color: #8a6d3b;
 }
 
-a.text-warning:hover {
+a.text-warning:hover, .file-picker a.file-feedback.warning:hover {
   color: #66512c;
 }
 
@@ -1043,7 +1043,7 @@ input[type="checkbox"] {
   line-height: normal;
 }
 
-input[type="file"] {
+input[type="file"], .file-picker .fake-file-input {
   display: block;
 }
 
@@ -1057,7 +1057,7 @@ select[size] {
   height: auto;
 }
 
-input[type="file"]:focus,
+input[type="file"]:focus, .file-picker .fake-file-input:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
   outline: thin dotted;
@@ -1073,7 +1073,7 @@ output {
   color: #555555;
 }
 
-.form-control, input:not([type=radio]):not([type=checkbox]), select, textarea {
+.form-control, .file-picker .fake-file-input, input:not([type=radio]):not([type=checkbox]), select, textarea {
   display: block;
   width: 100%;
   height: 32px;
@@ -1090,29 +1090,29 @@ output {
   -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
-.form-control:focus, input:focus:not([type=radio]):not([type=checkbox]), select:focus, textarea:focus {
+.form-control:focus, .file-picker .fake-file-input:focus, input:focus:not([type=radio]):not([type=checkbox]), select:focus, textarea:focus {
   border-color: #66afe9;
   outline: 0;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
-.form-control::-moz-placeholder, input:not([type=checkbox]):not([type=radio])::-moz-placeholder, select::-moz-placeholder, textarea::-moz-placeholder {
+.form-control::-moz-placeholder, .file-picker .fake-file-input::-moz-placeholder, input:not([type=checkbox]):not([type=radio])::-moz-placeholder, select::-moz-placeholder, textarea::-moz-placeholder {
   color: #999999;
   opacity: 1;
 }
-.form-control:-ms-input-placeholder, input:-ms-input-placeholder:not([type=radio]):not([type=checkbox]), select:-ms-input-placeholder, textarea:-ms-input-placeholder {
+.form-control:-ms-input-placeholder, .file-picker .fake-file-input:-ms-input-placeholder, input:-ms-input-placeholder:not([type=radio]):not([type=checkbox]), select:-ms-input-placeholder, textarea:-ms-input-placeholder {
   color: #999999;
 }
-.form-control::-webkit-input-placeholder, input:not([type=checkbox]):not([type=radio])::-webkit-input-placeholder, select::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+.form-control::-webkit-input-placeholder, .file-picker .fake-file-input::-webkit-input-placeholder, input:not([type=checkbox]):not([type=radio])::-webkit-input-placeholder, select::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   color: #999999;
 }
-.form-control[disabled], input[disabled]:not([type=radio]):not([type=checkbox]), select[disabled], textarea[disabled], .form-control[readonly], input[readonly]:not([type=radio]):not([type=checkbox]), select[readonly], textarea[readonly], fieldset[disabled] .form-control, fieldset[disabled] input:not([type=radio]):not([type=checkbox]), fieldset[disabled] select, fieldset[disabled] textarea {
+.form-control[disabled], .file-picker [disabled].fake-file-input, input[disabled]:not([type=radio]):not([type=checkbox]), select[disabled], textarea[disabled], .form-control[readonly], .file-picker [readonly].fake-file-input, input[readonly]:not([type=radio]):not([type=checkbox]), select[readonly], textarea[readonly], fieldset[disabled] .form-control, fieldset[disabled] .file-picker .fake-file-input, .file-picker fieldset[disabled] .fake-file-input, fieldset[disabled] input:not([type=radio]):not([type=checkbox]), fieldset[disabled] select, fieldset[disabled] textarea {
   cursor: not-allowed;
   background-color: #eeeeee;
   opacity: 1;
 }
 
-textarea.form-control, textarea {
+textarea.form-control, .file-picker textarea.fake-file-input, textarea {
   height: auto;
 }
 
@@ -1186,7 +1186,7 @@ input[type="checkbox"],
   cursor: not-allowed;
 }
 
-.input-sm, .input-group-sm > .form-control, .input-group-sm > input:not([type=radio]):not([type=checkbox]), .input-group-sm > select, .input-group-sm > textarea,
+.input-sm, .input-group-sm > .form-control, .file-picker .input-group-sm > .fake-file-input, .input-group-sm > input:not([type=radio]):not([type=checkbox]), .input-group-sm > select, .input-group-sm > textarea,
 .input-group-sm > .input-group-addon,
 .input-group-sm > .input-group-btn > .btn {
   height: 31px;
@@ -1196,14 +1196,14 @@ input[type="checkbox"],
   border-radius: 3px;
 }
 
-select.input-sm, .input-group-sm > select,
+select.input-sm, .file-picker .input-group-sm > select.fake-file-input, .input-group-sm > select,
 .input-group-sm > select.input-group-addon,
 .input-group-sm > .input-group-btn > select.btn {
   height: 31px;
   line-height: 31px;
 }
 
-textarea.input-sm, .input-group-sm > textarea,
+textarea.input-sm, .file-picker .input-group-sm > textarea.fake-file-input, .input-group-sm > textarea,
 .input-group-sm > textarea.input-group-addon,
 .input-group-sm > .input-group-btn > textarea.btn,
 select[multiple].input-sm,
@@ -1212,7 +1212,7 @@ select[multiple].input-sm,
   height: auto;
 }
 
-.input-lg, .input-group-lg > .form-control, .input-group-lg > input:not([type=radio]):not([type=checkbox]), .input-group-lg > select, .input-group-lg > textarea,
+.input-lg, .input-group-lg > .form-control, .file-picker .input-group-lg > .fake-file-input, .input-group-lg > input:not([type=radio]):not([type=checkbox]), .input-group-lg > select, .input-group-lg > textarea,
 .input-group-lg > .input-group-addon,
 .input-group-lg > .input-group-btn > .btn {
   height: 48px;
@@ -1222,14 +1222,14 @@ select[multiple].input-sm,
   border-radius: 6px;
 }
 
-select.input-lg, .input-group-lg > select,
+select.input-lg, .file-picker .input-group-lg > select.fake-file-input, .input-group-lg > select,
 .input-group-lg > select.input-group-addon,
 .input-group-lg > .input-group-btn > select.btn {
   height: 48px;
   line-height: 48px;
 }
 
-textarea.input-lg, .input-group-lg > textarea,
+textarea.input-lg, .file-picker .input-group-lg > textarea.fake-file-input, .input-group-lg > textarea,
 .input-group-lg > textarea.input-group-addon,
 .input-group-lg > .input-group-btn > textarea.btn,
 select[multiple].input-lg,
@@ -1241,7 +1241,7 @@ select[multiple].input-lg,
 .has-feedback {
   position: relative;
 }
-.has-feedback .form-control, .has-feedback input:not([type=radio]):not([type=checkbox]), .has-feedback select, .has-feedback textarea {
+.has-feedback .form-control, .has-feedback .file-picker .fake-file-input, .file-picker .has-feedback .fake-file-input, .has-feedback input:not([type=radio]):not([type=checkbox]), .has-feedback select, .has-feedback textarea {
   padding-right: 40px;
 }
 .has-feedback .form-control-feedback {
@@ -1263,12 +1263,12 @@ select[multiple].input-lg,
 .has-success .checkbox-inline {
   color: #3c763d;
 }
-.has-success .form-control, .has-success input:not([type=radio]):not([type=checkbox]), .has-success select, .has-success textarea {
+.has-success .form-control, .has-success .file-picker .fake-file-input, .file-picker .has-success .fake-file-input, .has-success input:not([type=radio]):not([type=checkbox]), .has-success select, .has-success textarea {
   border-color: #3c763d;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
-.has-success .form-control:focus, .has-success input:focus:not([type=radio]):not([type=checkbox]), .has-success select:focus, .has-success textarea:focus {
+.has-success .form-control:focus, .has-success .file-picker .fake-file-input:focus, .file-picker .has-success .fake-file-input:focus, .has-success input:focus:not([type=radio]):not([type=checkbox]), .has-success select:focus, .has-success textarea:focus {
   border-color: #2b542c;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #67b168;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #67b168;
@@ -1290,12 +1290,12 @@ select[multiple].input-lg,
 .has-warning .checkbox-inline {
   color: #8a6d3b;
 }
-.has-warning .form-control, .has-warning input:not([type=radio]):not([type=checkbox]), .has-warning select, .has-warning textarea {
+.has-warning .form-control, .has-warning .file-picker .fake-file-input, .file-picker .has-warning .fake-file-input, .has-warning input:not([type=radio]):not([type=checkbox]), .has-warning select, .has-warning textarea {
   border-color: #8a6d3b;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
-.has-warning .form-control:focus, .has-warning input:focus:not([type=radio]):not([type=checkbox]), .has-warning select:focus, .has-warning textarea:focus {
+.has-warning .form-control:focus, .has-warning .file-picker .fake-file-input:focus, .file-picker .has-warning .fake-file-input:focus, .has-warning input:focus:not([type=radio]):not([type=checkbox]), .has-warning select:focus, .has-warning textarea:focus {
   border-color: #66512c;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #c0a16b;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #c0a16b;
@@ -1317,12 +1317,12 @@ select[multiple].input-lg,
 .has-error .checkbox-inline {
   color: #a94442;
 }
-.has-error .form-control, .has-error input:not([type=radio]):not([type=checkbox]), .has-error select, .has-error textarea {
+.has-error .form-control, .has-error .file-picker .fake-file-input, .file-picker .has-error .fake-file-input, .has-error input:not([type=radio]):not([type=checkbox]), .has-error select, .has-error textarea {
   border-color: #a94442;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
-.has-error .form-control:focus, .has-error input:focus:not([type=radio]):not([type=checkbox]), .has-error select:focus, .has-error textarea:focus {
+.has-error .form-control:focus, .has-error .file-picker .fake-file-input:focus, .file-picker .has-error .fake-file-input:focus, .has-error input:focus:not([type=radio]):not([type=checkbox]), .has-error select:focus, .has-error textarea:focus {
   border-color: #843534;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
@@ -1353,12 +1353,12 @@ select[multiple].input-lg,
     margin-bottom: 0;
     vertical-align: middle;
   }
-  .form-inline .form-control, .navbar-form .form-control, .form-inline input:not([type=radio]):not([type=checkbox]), .navbar-form input:not([type=radio]):not([type=checkbox]), .form-inline select, .navbar-form select, .form-inline textarea, .navbar-form textarea {
+  .form-inline .form-control, .navbar-form .form-control, .form-inline .file-picker .fake-file-input, .file-picker .form-inline .fake-file-input, .navbar-form .file-picker .fake-file-input, .file-picker .navbar-form .fake-file-input, .form-inline input:not([type=radio]):not([type=checkbox]), .navbar-form input:not([type=radio]):not([type=checkbox]), .form-inline select, .navbar-form select, .form-inline textarea, .navbar-form textarea {
     display: inline-block;
     width: auto;
     vertical-align: middle;
   }
-  .form-inline .input-group > .form-control, .navbar-form .input-group > .form-control, .form-inline .input-group > input:not([type=radio]):not([type=checkbox]), .navbar-form .input-group > input:not([type=radio]):not([type=checkbox]), .form-inline .input-group > select, .navbar-form .input-group > select, .form-inline .input-group > textarea, .navbar-form .input-group > textarea {
+  .form-inline .input-group > .form-control, .navbar-form .input-group > .form-control, .form-inline .file-picker .input-group > .fake-file-input, .file-picker .form-inline .input-group > .fake-file-input, .navbar-form .file-picker .input-group > .fake-file-input, .file-picker .navbar-form .input-group > .fake-file-input, .form-inline .input-group > input:not([type=radio]):not([type=checkbox]), .navbar-form .input-group > input:not([type=radio]):not([type=checkbox]), .form-inline .input-group > select, .navbar-form .input-group > select, .form-inline .input-group > textarea, .navbar-form .input-group > textarea {
     width: 100%;
   }
   .form-inline .control-label, .navbar-form .control-label {
@@ -2904,7 +2904,7 @@ input[type="button"].btn-block {
   padding-left: 0;
   padding-right: 0;
 }
-.input-group .form-control, .input-group input:not([type=radio]):not([type=checkbox]), .input-group select, .input-group textarea {
+.input-group .form-control, .input-group .file-picker .fake-file-input, .file-picker .input-group .fake-file-input, .input-group input:not([type=radio]):not([type=checkbox]), .input-group select, .input-group textarea {
   position: relative;
   z-index: 2;
   float: left;
@@ -2915,6 +2915,8 @@ input[type="button"].btn-block {
 .input-group-addon,
 .input-group-btn,
 .input-group .form-control,
+.input-group .file-picker .fake-file-input,
+.file-picker .input-group .fake-file-input,
 .input-group input:not([type=radio]):not([type=checkbox]),
 .input-group select,
 .input-group textarea {
@@ -2923,6 +2925,8 @@ input[type="button"].btn-block {
 .input-group-addon:not(:first-child):not(:last-child),
 .input-group-btn:not(:first-child):not(:last-child),
 .input-group .form-control:not(:first-child):not(:last-child),
+.input-group .file-picker .fake-file-input:not(:first-child):not(:last-child),
+.file-picker .input-group .fake-file-input:not(:first-child):not(:last-child),
 .input-group input:not(:first-child):not(:last-child):not([type=radio]):not([type=checkbox]),
 .input-group select:not(:first-child):not(:last-child),
 .input-group textarea:not(:first-child):not(:last-child) {
@@ -2966,7 +2970,7 @@ input[type="button"].btn-block {
   margin-top: 0;
 }
 
-.input-group .form-control:first-child, .input-group input:first-child:not([type=radio]):not([type=checkbox]), .input-group select:first-child, .input-group textarea:first-child,
+.input-group .form-control:first-child, .input-group .file-picker .fake-file-input:first-child, .file-picker .input-group .fake-file-input:first-child, .input-group input:first-child:not([type=radio]):not([type=checkbox]), .input-group select:first-child, .input-group textarea:first-child,
 .input-group-addon:first-child,
 .input-group-btn:first-child > .btn,
 .input-group-btn:first-child > .btn-group > .btn,
@@ -2981,7 +2985,7 @@ input[type="button"].btn-block {
   border-right: 0;
 }
 
-.input-group .form-control:last-child, .input-group input:last-child:not([type=radio]):not([type=checkbox]), .input-group select:last-child, .input-group textarea:last-child,
+.input-group .form-control:last-child, .input-group .file-picker .fake-file-input:last-child, .file-picker .input-group .fake-file-input:last-child, .input-group input:last-child:not([type=radio]):not([type=checkbox]), .input-group select:last-child, .input-group textarea:last-child,
 .input-group-addon:last-child,
 .input-group-btn:last-child > .btn,
 .input-group-btn:last-child > .btn-group > .btn,
@@ -4762,7 +4766,7 @@ input, select, textarea {
 
 /** hide stuff **/
 .or [lang]:not(.active), .or-option-translations, .or-appearance-page-break, .or-constraint-msg, .or-required-msg,
-.option-wrapper .itemset-template, .itemset-labels {
+.option-wrapper .itemset-template, .itemset-labels, .or-hint.or-form-print, .or-hint.or-form-print.active {
   display: none;
 }
 
@@ -5042,7 +5046,7 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   height: 34px;
 }
 
-.question input[type="text"], .question input[type="password"], .question input[type="url"], .question input[type="email"], .question input[type="file"], .note input[type="text"], .note input[type="password"], .note input[type="url"], .note input[type="email"], .note input[type="file"] {
+.question input[type="text"], .question input[type="password"], .question input[type="url"], .question input[type="email"], .question input[type="file"], .question .file-picker .fake-file-input, .file-picker .question .fake-file-input, .note input[type="text"], .note input[type="password"], .note input[type="url"], .note input[type="email"], .note input[type="file"], .note .file-picker .fake-file-input, .file-picker .note .fake-file-input {
   width: 80%;
 }
 .question input[type="date"], .question input[type="number"], .question input[type="time"], .question input[type="datetime"], .note input[type="date"], .note input[type="number"], .note input[type="time"], .note input[type="datetime"] {
@@ -5203,6 +5207,29 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.enketo-area-popup .leaflet-popup-content-wrapper {
+  border-radius: 2px;
+  color: black;
+  background: none;
+  box-shadow: none;
+}
+.enketo-area-popup .leaflet-popup-content {
+  margin: 3px 20px;
+}
+.enketo-area-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+.leaflet-container .enketo-area-popup:hover a.leaflet-popup-close-button {
+  display: block;
+}
+.leaflet-container .enketo-area-popup a.leaflet-popup-close-button {
+  z-index: 1;
+  display: none;
+  font-weight: normal;
+  color: black;
+}
+
 .enketo-geopoint-circle-marker, .geopicker .point {
   width: 16px;
   height: 16px;
@@ -5238,6 +5265,9 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   .geopicker .geo-inputs {
     width: 100%;
   }
+}
+.geopicker .map-canvas-wrapper {
+  position: relative;
 }
 .geopicker .map-canvas-wrapper, .geopicker .search-bar {
   width: 65%;
@@ -5278,6 +5308,24 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   font-weight: normal;
   font-style: normal;
   float: right;
+}
+.geopicker .toggle-input-btn {
+  position: absolute;
+  top: calc(50% - 15px);
+  left: -16px;
+  background: none;
+  border-left: 3px solid #aaaaaa;
+  border-bottom: 2px solid #aaaaaa;
+  border-top: 2px solid #aaaaaa;
+  border-right: none;
+  height: 30px;
+  width: 7px;
+  padding: 0;
+}
+.geopicker .toggle-input-btn.open {
+  left: -20px;
+  border-left: none;
+  border-right: 3px solid #aaaaaa;
 }
 .geopicker .points {
   width: 100%;
@@ -5431,12 +5479,22 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   padding-top: 25px;
 }
 .geopicker.full-screen .geo-inputs {
+  width: 160px;
+  margin-left: 10px;
+  margin-bottom: 15px;
+}
+.geopicker.full-screen .geo-inputs .geo {
   display: none;
+}
+.geopicker.full-screen .geo-inputs .close-chain-btn {
+  float: none;
+  margin-left: 20px;
+  margin-top: 0;
 }
 .geopicker.full-screen .map-canvas-wrapper {
   float: none;
   width: 100%;
-  padding: 0 25px 25px 25px;
+  padding: 0 25px 15px 25px;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -5464,7 +5522,7 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
 }
 .geopicker.full-screen .search-bar {
   width: 100%;
-  padding: 0 25px 25px 25px;
+  padding: 0 25px 15px 25px;
 }
 .geopicker.full-screen .search-bar.hide-search {
   display: block;
@@ -5481,6 +5539,43 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
 }
 .geopicker.full-screen .points {
   display: none;
+}
+.geopicker .leaflet-control-layers-toggle,
+.geopicker .leaflet-retina .leaflet-control-layers-toggle {
+  background: none;
+  padding: 5px;
+  color: #888;
+  text-align: center;
+  font-size: 20px;
+}
+.geopicker:not(.full-screen).hide-input.wide .map-canvas {
+  height: 375px;
+}
+.geopicker:not(.full-screen).hide-input .geo-inputs .geo {
+  display: none;
+}
+.geopicker:not(.full-screen).hide-input .close-chain-btn {
+  float: none;
+  margin: 5px 0 5px 20px;
+}
+.geopicker:not(.full-screen).hide-input .btn-remove {
+  margin: 10px 0 5px 0;
+}
+.geopicker:not(.full-screen).hide-input .map-canvas-wrapper, .geopicker:not(.full-screen).hide-input .search-bar {
+  width: 100%;
+  float: none;
+  border-left: none;
+  padding-left: 0;
+}
+
+.question:not(.or-appearance-label):not(.or-appearance-compact):not(.or-appearance-quickcompact) .geopicker label {
+  line-height: 16px;
+  font-weight: normal;
+}
+.question:not(.or-appearance-label):not(.or-appearance-compact):not(.or-appearance-quickcompact) .geopicker label input[type=radio] ~ .option-label::before {
+  font-size: 16px;
+  height: 16px;
+  margin-right: 2px;
 }
 
 /* required styles for Leaflet (unchanged) */
@@ -6836,10 +6931,35 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
   border-color: #ce4f07;
 }
 
-.file-feedback, .file-preview {
+.file-picker .fake-file-input {
   font-family: 'OpenSans', Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
+  font-size: 15px;
+  height: 34px;
+  width: 144px;
+  padding: 5px 10px;
+}
+.file-picker .file-feedback, .file-picker .file-preview {
+  font-family: 'OpenSans', Arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+}
+.file-picker .file-feedback.error {
+  display: block;
+  padding-top: 5px;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: #B94A48;
+}
+.file-picker .file-preview {
+  margin-top: 10px;
+}
+
+input[type="file"].transparent, .file-picker .transparent.fake-file-input {
+  position: absolute;
+  visibility: hidden;
+  z-index: 5;
 }
 
 .or-appearance-likert .option-wrapper {
@@ -7200,7 +7320,7 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
     line-height: 1.3625;
   }
 
-  input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="number"], input[type="time"], input[type="datetime"], input[type="file"] {
+  input[type="text"], input[type="password"], input[type="url"], input[type="email"], input[type="date"], input[type="number"], input[type="time"], input[type="datetime"], input[type="file"], .file-picker .fake-file-input {
     width: 100%;
   }
 
@@ -7361,6 +7481,11 @@ input:not([type="radio"]):not([type="checkbox"]), textarea {
 }
 
 /** apply bootstrap .form-control class by default **/
+input:not([type=radio]):not([type=checkbox]), select, textarea {
+  font-size: 15px;
+  padding: 6px 12px;
+}
+
 .or-group {
   border-top: none;
 }
