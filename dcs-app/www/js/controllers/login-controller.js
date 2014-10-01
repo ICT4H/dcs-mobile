@@ -19,19 +19,27 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
         $location.path('/');
     }
 
+    $scope.forgetPassword = function() {
+        $location.path('/change-password');
+    };
+
     $scope.login = function(){  
         msg.showLoading();
         app.user = $scope.user;
         if(!isNewUser)
-            userDao.validateUser(app.user)
-            .then(userDao.updateUrl)
+            userDao.openUserStore(app.user)
+            .then(function() {
+                console.log("coming");
+                return userDao.updateUrl(user);
+            })
             .then(onSuccess, function() { 
                 onError("Invalid username and password.");
             });
         else 
-            dcsService.verifyUser($scope.user).then(function() {
-                            userDao.addUser($scope.user).then(onSuccess, onError);
-            }, onError);    
+            dcsService.verifyUser($scope.user)
+            .then(function(respone) {
+                userDao.addUser(respone, $scope.user).then(onSuccess, onError);
+            }, onError);            
     };
 
     var onLoad = function(){

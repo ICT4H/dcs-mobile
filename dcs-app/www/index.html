@@ -42,9 +42,7 @@
     
     <!-- remote debugging -->
     
-    <!-- <script src="http://10.4.32.185:8080/target/target-script.js#anonymous"></script> -->
-     
-
+   <!-- <script src="http://10.4.32.185:8080/target/target-script.js#anonymous"></script> -->
 
 </head>
 <body >
@@ -69,8 +67,8 @@
           <div class="bg-success panel-title" ng-show=showMessage>
             <div class="panel-heading {{css}}" style = "position:absolute;z-index:10;width:100%" >
               <h2 class="panel-title">
-                {{message_to_display}}
-                <button type="button" class="close" ng-click="showMessage=false">&times;</button>
+                <span ng-bind-html="message_to_display"></span>
+                    <button type="button" class="close" ng-click="showMessage=false">&times;</button>
               </h2>
             </div>
           </div>
@@ -122,6 +120,8 @@
     <script type="text/javascript" src="js/controllers/submission-conflict-controller.js"></script>
     <script type="text/javascript" src="js/controllers/login-controller.js"></script>
     <script type="text/javascript" src="js/controllers/settings-controller.js"></script>
+    <script type="text/javascript" src="js/controllers/change-password-controller.js"></script>
+
 
     <!-- decide the uglify statergy -->
     <script src="js/lib/jquery.min.js"></script>

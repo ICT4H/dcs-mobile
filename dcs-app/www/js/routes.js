@@ -39,6 +39,10 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
         .when('/settings', {
           templateUrl: "partials/settings.html",
           controller: 'settingsController'
+        })
+        .when('/change-password', {
+          templateUrl: "partials/change-password.html",
+          controller:'changePasswordController'
         }); 
     $httpProvider.defaults.timeout = 1000;
 }]);

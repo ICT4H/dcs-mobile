@@ -32,7 +32,7 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
 
         console.log('going to ' + $location.path());
-        if ($location.path() != '/' && !app.isAuthenticated) {
+        if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
             $location.path('/');
         }
     }); 
