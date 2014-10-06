@@ -29,8 +29,7 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
         if(!isNewUser)
             userDao.openUserStore(app.user)
             .then(function() {
-                console.log("coming");
-                return userDao.updateUrl(user);
+                return userDao.updateUrl(app.user);
             })
             .then(onSuccess, function() { 
                 onError("Invalid username and password.");

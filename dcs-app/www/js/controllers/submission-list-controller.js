@@ -40,8 +40,7 @@ dcsApp.controller('submissionListController',
     var loadSubmissions = function(pageNumber) {
         $scope.pageNumber = pageNumber;
         localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-            if(result.total!=0)
-                $scope.total = result.total;
+            $scope.total = result.total;
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         localStore.getSubmissionsByProjectId($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)

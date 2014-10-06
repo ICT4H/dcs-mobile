@@ -16,6 +16,7 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', 
 
     var assignSubmissions = function(submissions){
         msg.hideAll();
+        $scope.total = submissions.total;
         if(submissions.length == 0)
             msg.hideLoadingWithInfo('No server submissions !');
         $scope.submissions = submissions.data;
@@ -36,10 +37,6 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', 
 
     var loadSubmissions = function(pageNumber) {
         $scope.pageNumber = pageNumber;
-        localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-            if(result.total!=0)
-                $scope.total = result.total;
-        });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
         .then(assignSubmissions, ErrorLoadingSubmissions);
