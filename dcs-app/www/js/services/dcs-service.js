@@ -26,14 +26,40 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
 
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
-            app.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid).then(function(serverSubmission) {
+        app.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid)
+            .then(function(serverSubmission) {
                 serverSubmission.project_uuid = submission.project_uuid;
                 serverSubmission.status = submission.status;
+                serverSubmission.un_changed_files = submission.media_file_names_string;
+                console.log('resolving dcsService.getSubmission');
                 deferred.resolve(serverSubmission);
 
             },deferred.reject);
+        console.log('dcsService.getSubmission return promise');
         return deferred.promise;
     };
+
+    this.getSubmissionMedia = function(submission) {
+        console.log('in getSubmissionMedia; submission: ' + JSON.stringify(submission));
+        var media_file_names = submission.media_file_names_string;
+        var deferred = $q.defer();
+        if (!media_file_names || media_file_names.length < 1) {
+            console.log('no media to download; media_file_names: ' + media_file_names);
+            deferred.resolve(submission);
+            return deferred.promise;
+        }
+        var promises = [];
+        angular.forEach(media_file_names.split(','), function(fileName) {
+            promises.push(app.httpGetMediaFile(submission.submission_uuid, fileName));
+        });
+
+        $q.all(promises)
+            .then(function() {
+                deferred.resolve(submission);
+            }, deferred.reject);
+
+        return deferred.promise;
+    }
 
     this.getSubmissionHeaders = function(project_uuid) {
         var deferred = $q.defer();
@@ -121,7 +147,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         console.log('in getFileMeta, filename: ' + fileName);
         var deferred = $q.defer();
 
-        cordovaMediaManager.fileNameToFileInfo(fileName, function(filePath, type) {
+        fileSystem.fileNameToFileInfo(fileName, function(filePath, type) {
             console.log('cordovaMediaManager loaded filename: ' + fileName + ' path: '+ filePath + '; type: ' + type);
             deferred.resolve({name: fileName, path:filePath, type:type});
         });

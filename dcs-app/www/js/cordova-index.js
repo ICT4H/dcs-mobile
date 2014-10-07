@@ -39,7 +39,7 @@ var app = {
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
         angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
-        cordovaMediaManager.init();
+        fileSystem.init();
         console.log('app loaded');
     }
 };

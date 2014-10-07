@@ -41,7 +41,7 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('SELECT * FROM submissions where submission_id = ?', [submission_id], true);
 	};
 
-	this.submissionNotExists = function(submission_uuid) {
+	this.getsubmissionUuidByUuid = function(submission_uuid) {
 		return store.execute('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid]);
 	};
 

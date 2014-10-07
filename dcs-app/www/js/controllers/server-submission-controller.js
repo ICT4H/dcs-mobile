@@ -1,5 +1,5 @@
-dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
-    function($rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg){
+dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
+    function($q, $rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading submissions');
@@ -94,37 +94,63 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', 
 
     $scope.download = function() {
         msg.showLoading();
-        var downloadSubmissionPromise = [];
-        selected.forEach(function(submissionId) {
-            localStore.submissionNotExists(submissionId).then(function(result) {
-                if(result.length == 0)
-                    downloadSubmissionPromise.push(downloadSubmission({submission_uuid: submissionId, project_uuid:$scope.project_uuid}));
-            });
+        var localSubmissionPromises = [];
+
+        selected.forEach(function(submission_uuid) {
+            // adding to array needs to be sync.
+            localSubmissionPromises.push(loadLocalSubmissionUuid(submission_uuid));
         });
 
-        app.promises(downloadSubmissionPromise, function(resp) {
-                msg.hideLoadingWithInfo("Submission downloaded.");
-            }, function(error) {
-                msg.hideLoadingWithErr('Unable to download submission.');
+        console.log('localSubmissionPromises.length: ' + localSubmissionPromises.length);
+
+        downloadNonLocalSubmissions(localSubmissionPromises)
+            .then(function(submissionDownloaders) {
+
+                $q.all(submissionDownloaders)
+                    .then(function(results) {
+                        msg.hideLoadingWithInfo("Submission downloaded.");
+                    }, function(e) {
+                        msg.hideLoadingWithErr('Unable to download submission.');
+                    });
             });
     };
 
-    // $scope.download = function() {
-    //     console.log('download clicked');
-    //     var selected_rows = document.getElementById('server-submissions').getElementsByClassName('success');
-    //     var uuid;
-    //     for (var i=0; i<selected_rows.length; i++) {
-    //         uuid = selected_rows[i].cells[0].innerText;
-    //         localStore.submissionNotExists(uuid)
-    //             .then(function(result) {
-    //                 if(result) {
-    //                     downloadSubmission({submission_uuid: uuid,
-    //                                         project_uuid:$scope.project_uuid});
-    //                 }
-    //                 // TODO what to be done for existing submissions.
-    //             });
-    //     }
-    // }
+    function loadLocalSubmissionUuid(submission_uuid) {
+        var deferred = $q.defer();
+
+        localStore.getsubmissionUuidByUuid(submission_uuid)
+            .then(function(result) {
+                console.log('getsubmissionUuidByUuid uuid: ' + submission_uuid + '; submission found: ' + result.length);
+                if (result.length == 0)
+                    deferred.resolve(submission_uuid);
+                else
+                    deferred.resolve();
+            }, deferred.reject);
+
+        return deferred.promise;
+    }
+
+    function downloadNonLocalSubmissions(localSubmissionPromises) {
+        var deferred = $q.defer();
+        var submissionDownloaders = [];
+
+        $q.all(localSubmissionPromises)
+            .then(function(results) {
+                results.forEach(function(nonLocalSubmissionUuid) {
+                    console.log('nonLocalSubmissionUuid: ' + nonLocalSubmissionUuid);
+                    if (nonLocalSubmissionUuid) {
+                        submissionDownloaders.push(
+                            downloadSubmission({submission_uuid: nonLocalSubmissionUuid,
+                                                project_uuid:$scope.project_uuid}));
+                    }
+                });
+                deferred.resolve(submissionDownloaders);
+
+            }, function(e) {
+                console.log('Error during submission download: ' + e);
+            });
+        return deferred.promise;
+    }
 
     $scope.update_selected_submissions = function(submissionRow) {
         submissionRow.selected = !submissionRow.selected;
@@ -134,7 +160,8 @@ dcsApp.controller('serverSubmissionController', ['$rootScope', 'app', '$scope', 
 
     var downloadSubmission = function(submission) {
         submission.status = BOTH;
-        dcsService.getSubmission(submission)
+        return dcsService.getSubmission(submission)
+            .then(dcsService.getSubmissionMedia)
             .then(localStore.createSubmission);
             
     }

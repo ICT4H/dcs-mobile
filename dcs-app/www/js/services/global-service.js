@@ -75,6 +75,43 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
         return deferred.promise;
     }
 
+    this.httpGetMediaFile = function(submission_uuid, fileName) {
+        user = this.user;
+        var url = user.url + '/client/attachment/' + submission_uuid + '/' + fileName;
+        var headersMap = {"Authorization": 'Basic ' + btoa(this.user.name + ':' + this.user.password)};
+        // TODO use file system to find the base url.
+        var saveToFileUrl = 'file:///sdcard/dcs/' + fileName;
+
+        console.log('downloading file: ' + fileName);
+
+        return downloadMedia(headersMap, url, saveToFileUrl);
+    }
+
+    function downloadMedia(headerMap, url, saveToFileUrl) {
+        var deferred = $q.defer();
+        var fileTransfer = new FileTransfer();
+
+        fileTransfer.download(
+            encodeURI(url),
+            saveToFileUrl,
+            function(entry) {
+                console.log("download complete: " + entry.toURL());
+                deferred.resolve();
+            },
+            function(error) {
+                console.log("download error source " + error.source);
+                console.log("download error target " + error.target);
+                console.log("download error code" + error.code);
+                deferred.reject();
+            },
+            false,
+            {
+                headers: headerMap
+            }
+        );
+        return deferred.promise;
+    }
+
     var searchInRepeat =  function(submission, searchStr, searchField) {
         var level = searchField.split("-");
         var flag = false;
