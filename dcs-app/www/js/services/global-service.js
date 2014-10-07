@@ -53,7 +53,7 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
             console.log("Code = " + r.responseCode);
             console.log("Response = " + r.response);
             console.log("Sent = " + r.bytesSent);
-            deferred.resolve(r.response);
+            deferred.resolve(filesInfo.name);
         }
 
         var fail = function (error) {

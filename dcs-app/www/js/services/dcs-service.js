@@ -126,12 +126,54 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
                     transferPromises.push(app.httpPostFile(fileMeta, submission.submission_uuid));
                 });
 
-                $q.all(transferPromises).then(function() {
+                $q.all(transferPromises).then(function(submittedFiles) {
+                    updateMediaFileInfo(submission, submittedFiles);
                     deferred.resolve(submission);
-                });
+                }, deferred.reject);
 
                 return deferred.promise;
             });
+    }
+
+    function updateMediaFileInfo(submission, submittedFiles) {
+        console.log('media files submited are: ' + submittedFiles);
+        var new_files_added = removeSubmittedFromNewFilesInfo(submission.new_files_added, submittedFiles);
+        var un_changed_files = updateSubmittedFileToRetain(submission.un_changed_files,submittedFiles);
+
+        submission.new_files_added = new_files_added.join(',');
+        submission.un_changed_files = un_changed_files.join(',');
+    }
+
+    function removeSubmittedFromNewFilesInfo(new_files_added, submittedFiles) {
+        console.log('new_files_added: ' + new_files_added);
+
+        var new_files = new_files_added.split(',');
+        if (new_files.length > 0) {
+            $.each(submittedFiles, function(i, submittedFile) {
+                var index = $.inArray(submittedFile, new_files);
+                if (index > -1) {
+                    new_files.splice(index, 1);
+                }
+            });
+        }
+        console.log('new_files: ' + new_files);
+        // this will always be empty, but incase of some unpredicated failure this will keep data consistent
+        return new_files;
+    }
+
+    function updateSubmittedFileToRetain(un_changed_files, submittedFiles) {
+        console.log('un_changed_files: ' + un_changed_files);
+        
+        var un_changed = un_changed_files.split(',');
+        un_changed = $.merge(submittedFiles, un_changed);
+        un_changed = un_changed.filter(onlyUnique);
+        console.log('un_changed: ' + un_changed);
+
+        return un_changed;
+    }
+
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
     }
 
     function getFilesMeta(fileNamesString) {
