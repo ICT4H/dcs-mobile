@@ -1,38 +1,33 @@
 
-// var mediaInterface = {
-//     capturePhoto: function() {},
-//     openGallery: function() {},
-//     captureVideo: function() {}
-// };
+var DeviceHandler = {
+    capturePhoto: function(callbacks) {},
+    captureVideo: function(callbacks) {},
+    captureAudio: function(callbacks) {},
+    photoGallery: function(callbacks) {},
+    videoGallery: function(callbacks) {}
+};
 
-// function CordovaMedia(fileSystem, message) {
+(function() {
+    var navigator;
 
-// }
+    CordovaDeviceHandler = function(navigatorObj) {
+        console.log('in cordovaDeviceHandler');
+        navigator = navigatorObj; //this can be static since there will be one way to interact with device apis
+    }
 
+    CordovaDeviceHandler.prototype = Object.create(DeviceHandler);
 
+    CordovaDeviceHandler.prototype.constructor = DeviceHandler;
 
-// (function() {
-//     CordovaDeviceHandler = function(navigator) {
-
-//     }
-// }());
-
-var cordovaDeviceHandler = (function($, fs) {
-    "use strict";
-    console.log('in cordovaDeviceHandler');
-    var capturePhoto, photoGallery, captureVideo, captureAudio, videoGallery;
-
-    //TODO handle errors in all functions.
-
-    capturePhoto = function(callbacks) {
+    CordovaDeviceHandler.prototype.capturePhoto = function(callbacks) {
         deviceHandleMapper('photo', callbacks);
     }
 
-    captureVideo = function(callbacks) {
+    CordovaDeviceHandler.prototype.captureVideo = function(callbacks) {
         deviceHandleMapper('video', callbacks);
     }
 
-    captureAudio = function(callbacks) {
+    CordovaDeviceHandler.prototype.captureAudio = function(callbacks) {
         deviceHandleMapper('audio', callbacks);
     }
 
@@ -55,11 +50,11 @@ var cordovaDeviceHandler = (function($, fs) {
         );
     }
 
-    photoGallery = function(callbacks) {
+    CordovaDeviceHandler.prototype.photoGallery = function(callbacks) {
         galleryHandler(callbacks, Camera.MediaType.PHOTO);
     }
 
-    videoGallery = function(callbacks) {
+    CordovaDeviceHandler.prototype.videoGallery = function(callbacks) {
         galleryHandler(callbacks,Camera.MediaType.VIDEO);
     }
 
@@ -79,12 +74,6 @@ var cordovaDeviceHandler = (function($, fs) {
         );
     }
 
-    return {
-        capturePhoto: capturePhoto,
-        photoGallery: photoGallery,
-        captureVideo: captureVideo,
-        videoGallery: videoGallery,
-        captureAudio: captureAudio,
-    };
+}());
 
-} )(jQuery, fileSystem);
+var cordovaDeviceHandler = new CordovaDeviceHandler(navigator);
