@@ -18,7 +18,7 @@
             'image/*': [{
                 label: 'Camera',
                 clickHandler: this.deviceHandler.capturePhoto,
-                fsCallbacks: this.fileSystem.moveFile,
+                fsCallbacks: this.fileSystem.copyFile,
                 callbacks: applyCallbacks
             }, {
                 label: 'Gallery',
@@ -29,7 +29,7 @@
             'video/*': [{
                 label: 'Video',
                 clickHandler: this.deviceHandler.captureVideo,
-                fsCallbacks: this.fileSystem.moveFile,
+                fsCallbacks: this.fileSystem.copyFile,
                 callbacks: applyCallbacks
             }, {
                 label: 'Gallery-v',
@@ -40,7 +40,7 @@
             'audio/*': [{
                 label: 'Audio',
                 clickHandler: this.deviceHandler.captureAudio,
-                fsCallbacks: this.fileSystem.moveFile,
+                fsCallbacks: this.fileSystem.copyFile,
                 callbacks: applyCallbacks
             }]};
 
