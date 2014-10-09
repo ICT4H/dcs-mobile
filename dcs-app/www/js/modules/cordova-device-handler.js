@@ -1,12 +1,3 @@
-
-var DeviceHandler = {
-    capturePhoto: function(callbacks) {},
-    captureVideo: function(callbacks) {},
-    captureAudio: function(callbacks) {},
-    photoGallery: function(callbacks) {},
-    videoGallery: function(callbacks) {}
-};
-
 (function() {
     var navigator;
 
@@ -19,15 +10,15 @@ var DeviceHandler = {
 
     CordovaDeviceHandler.prototype.constructor = DeviceHandler;
 
-    CordovaDeviceHandler.prototype.capturePhoto = function(callbacks) {
+    CordovaDeviceHandler.prototype.openCamera = function(callbacks) {
         deviceHandleMapper('photo', callbacks);
     }
 
-    CordovaDeviceHandler.prototype.captureVideo = function(callbacks) {
+    CordovaDeviceHandler.prototype.openVideoCamera = function(callbacks) {
         deviceHandleMapper('video', callbacks);
     }
 
-    CordovaDeviceHandler.prototype.captureAudio = function(callbacks) {
+    CordovaDeviceHandler.prototype.openAudioRecorder = function(callbacks) {
         deviceHandleMapper('audio', callbacks);
     }
 
@@ -50,11 +41,11 @@ var DeviceHandler = {
         );
     }
 
-    CordovaDeviceHandler.prototype.photoGallery = function(callbacks) {
+    CordovaDeviceHandler.prototype.openPhotoGallery = function(callbacks) {
         galleryHandler(callbacks, Camera.MediaType.PHOTO);
     }
 
-    CordovaDeviceHandler.prototype.videoGallery = function(callbacks) {
+    CordovaDeviceHandler.prototype.openVideoGallery = function(callbacks) {
         galleryHandler(callbacks,Camera.MediaType.VIDEO);
     }
 
