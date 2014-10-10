@@ -1,0 +1,11 @@
+<h2 class="app-name">{{resourceBundle.right_menu_header}}</h2>
+<div class="scrollable">
+ <div class="scrollable-content">
+ 	<div ng-repeat="(text, message) in messages"  toggle="off" bubble target="notification" >
+	<div class="list-group-item  panel-heading ">
+		<a class="{{message.css}}" href="{{message.backUrl}}">{{text}}</a>
+		<button type="button" class="close" ng-click="removeMessage(text)">&times;</button>
+	</div>
+</div>
+ </div>
+</div>

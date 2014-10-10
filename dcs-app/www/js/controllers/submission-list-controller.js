@@ -1,6 +1,6 @@
 dcsApp.controller('submissionListController', 
-    ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', '$sce',
-    function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, $sce){
+    ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
+    function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
 
     $scope.pageTitle = "Submissions";
     $scope.pageSizes = $rootScope.pageSizes;
@@ -15,12 +15,11 @@ dcsApp.controller('submissionListController',
         
     var MODIFIED = 1;
     var UNMODIFIED = 0;
-    var project_uuid = $routeParams.project_uuid;
     var selectedCount = 0;
     var serverSubmissions = [];
     var selected = [];
 
-    $scope.project_uuid = project_uuid;
+    $scope.project_uuid = $routeParams.project_uuid;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
 
@@ -49,7 +48,7 @@ dcsApp.controller('submissionListController',
     };
 
     $scope.onLoad = function() {
-        localStore.getProjectById(project_uuid)
+        localStore.getProjectById($scope.project_uuid)
             .then(function(project) {
                 $scope.project_name = project.name;
                 $scope.project_uuid = project.project_uuid;
@@ -63,11 +62,11 @@ dcsApp.controller('submissionListController',
     $scope.onLoad();
 
     $scope.onNext = function(pageNumber) {
-        loadProjects(pageNumber);
+        loadSubmissions(pageNumber);
     };
 
     $scope.onPrevious = function(pageNumber) {
-        loadProjects(pageNumber);
+        loadSubmissions(pageNumber);
     };
 
     $scope.isLastPage = function() {
@@ -98,6 +97,58 @@ dcsApp.controller('submissionListController',
                 ret += "<td>" + submission.data[header] + "</td>";
         });
         return ret;
+    };
+
+    $scope.getChanges = function() {
+        $scope.newSubmissions = [];
+        $scope.updatedSubmissions = [];
+        $scope.conflitSubmission = [];
+        var promises;
+        localStore.getLastFetch($scope.project_uuid).then(function(result) {
+            dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
+                promises = result.submissions.map(function(submission) { 
+                                    return localStore.getSubmissionByuuid(submission.submission_uuid).then(function(result) {
+                                        getTypeOf(submission, result);
+                                    });
+                                });
+                app.promises(promises, function(results) {
+                    var newSubmissions = []; 
+                    var updatedSubmissions = []; 
+                    
+                    localStore.updatelastFetch($scope.project_uuid, result.last_fetch);           
+
+                    $scope.newSubmissions.forEach(function(submission) {
+                        newSubmissions.push(localStore.createSubmission(submission));
+                    });
+
+                    $scope.updatedSubmissions.forEach(function(submission) {
+                        updatedSubmissions.push(localStore.updateSubmission(submission));
+                    });
+
+                    app.promises(newSubmissions, function() {
+                        if($scope.newSubmissions != 0)
+                            msg.addInfo($scope.newSubmissions.length + " submission added.");
+                    });
+
+                    app.promises(updatedSubmissions, function() {
+                        if($scope.updatedSubmissions != 0)
+                            msg.addInfo($scope.updatedSubmissions.length + " submission updated.");
+                    });
+                });
+            });
+        }); 
+    };
+
+    var getTypeOf = function(submission, result) {
+        if(result.length==0) 
+            $scope.newSubmissions.push(submission);
+        else
+        {
+            if(result[0].is_modified)   
+                    $scope.conflitSubmission.push(submission);
+            else
+                $scope.updatedSubmissions.push(submission);
+        }
     };
 
     // var setObseleteProjectWarning = function(project) {
@@ -158,12 +209,12 @@ dcsApp.controller('submissionListController',
     // }
 
     $scope.createSurveyResponse = function() {
-        $location.path('/project/' + project_uuid + '/submission/' + null);
+        $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
     };
 
     $scope.editSurveyResponse = function() {
         if(selectedCount==1) {
-            $location.path('/project/' + project_uuid + '/submission/' + selected[0]);
+            $location.path('/project/' + $scope.project_uuid + '/submission/' + selected[0]);
             return;
         }
         msg.displayInfo('you can edit only one submission at a time !');

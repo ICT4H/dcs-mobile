@@ -16,7 +16,6 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     this.addError = function(error){
         $rootScope.messages[error] = new message("", "alert-danger");
         $rootScope.notificationLength = Object.keys($rootScope.messages).length;
-        console.log($rootScope.notificationLength);
         apply();
     };
 

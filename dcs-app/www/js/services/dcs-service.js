@@ -20,8 +20,12 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpRequest("/client/project/" + project_uuid + "/submission/");
     };
     
-    this.getSubmissions = function(project_uuid,start,length){
+    this.getSubmissions = function(project_uuid, start, length){
         return app.httpRequest('/client/submissions/?uuid='+project_uuid+'&start='+start+'&length='+length);
+    };
+
+    this.getSubmissionsFrom = function(project_uuid, last_fetch){
+        return app.httpRequest('/client/delta/submissions/?uuid='+project_uuid+'&last_fetch='+last_fetch);
     };
 
     this.getSubmission = function(submission) {
