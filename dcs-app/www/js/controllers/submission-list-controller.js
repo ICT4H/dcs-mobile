@@ -18,6 +18,7 @@ dcsApp.controller('submissionListController',
     var selectedCount = 0;
     var serverSubmissions = [];
     var selected = [];
+    $scope.conflictSubmissionCount = 0;
 
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.outdateProject = false;
@@ -27,8 +28,12 @@ dcsApp.controller('submissionListController',
         if(submissions.length == 0)
             msg.hideLoadingWithInfo('No local submissions !');
         submissions.forEach(function(submission){
+            if(submission.status == "conflict")
+                $scope.conflictSubmissionCount = $scope.conflictSubmissionCount + 1;
             submission.data = JSON.parse(submission.data);
         });
+        if($scope.conflictSubmissionCount > 0) 
+            msg.addInfo($scope.conflictSubmissionCount + " submission are in conflict.", "#conflict-submission-list/" + $scope.project_uuid);
         $scope.submissions = submissions;
     };
 
@@ -102,7 +107,7 @@ dcsApp.controller('submissionListController',
     $scope.getChanges = function() {
         $scope.newSubmissions = [];
         $scope.updatedSubmissions = [];
-        $scope.conflitSubmission = [];
+        $scope.conflictSubmissions = [];
         var promises;
         localStore.getLastFetch($scope.project_uuid).then(function(result) {
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
@@ -112,27 +117,37 @@ dcsApp.controller('submissionListController',
                                     });
                                 });
                 app.promises(promises, function(results) {
-                    var newSubmissions = []; 
-                    var updatedSubmissions = []; 
-                    
+                    var newSubmissionsPro = []; 
+                    var updatedSubmissionsPro = []; 
+                    var conflictSubmissionsPro = [];
                     localStore.updatelastFetch($scope.project_uuid, result.last_fetch);           
 
                     $scope.newSubmissions.forEach(function(submission) {
-                        newSubmissions.push(localStore.createSubmission(submission));
+                        newSubmissionsPro.push(localStore.createSubmission(submission));
                     });
 
                     $scope.updatedSubmissions.forEach(function(submission) {
-                        updatedSubmissions.push(localStore.updateSubmission(submission));
+                        submission.is_modified = true;
+                        updatedSubmissionsPro.push(localStore.updateSubmission(submission));
                     });
 
-                    app.promises(newSubmissions, function() {
+                    $scope.conflictSubmissions.forEach(function(submission) {
+                        conflictSubmissionsPro.push(localStore.updateSubmissionStatus(submission.submission_uuid, "conflict"));
+                    });
+
+                    app.promises(newSubmissionsPro, function() {
                         if($scope.newSubmissions != 0)
                             msg.addInfo($scope.newSubmissions.length + " submission added.");
                     });
 
-                    app.promises(updatedSubmissions, function() {
+                    app.promises(updatedSubmissionsPro, function() {
                         if($scope.updatedSubmissions != 0)
                             msg.addInfo($scope.updatedSubmissions.length + " submission updated.");
+                    });
+
+                    app.promises(conflictSubmissionsPro, function() {
+                        if($scope.conflictSubmissions != 0)
+                            msg.addInfo($scope.conflictSubmissions.length + " submission are in conflict.", "#conflict-submission-list/" + $scope.project_uuid);
                     });
                 });
             });
@@ -145,7 +160,7 @@ dcsApp.controller('submissionListController',
         else
         {
             if(result[0].is_modified)   
-                    $scope.conflitSubmission.push(submission);
+                    $scope.conflictSubmissions.push(submission);
             else
                 $scope.updatedSubmissions.push(submission);
         }

@@ -24,6 +24,7 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
     };
 
     var onEdit = function(submission) {
+        submission.is_modified = true;
         localStore.updateSubmission(submission)
         .then(function() {
             msg.displaySuccess('Updated');

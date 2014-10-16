@@ -1,96 +1,86 @@
-dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'localStore', 'messageService',
-    function($rootScope, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
+var submissionConflictController = function($rootScope, $scope, $routeParams, $location, submissionDao, msg, app) {
 
-    msg.showLoadingWithInfo('Loading submissions');
+    $scope.pageTitle = "Submissions";
+    $scope.pageSizes = $rootScope.pageSizes;
+    $scope.pageSize = $rootScope.pageSize.value;
+    $scope.searchFields = {all: 'All'};  
+    $scope.displayHeaders = {}; 
+    $scope.orderHeaders = []; 
+    $scope.showActions = false;
+    $scope.Math = window.Math;
+    $scope.total = 0;
 
-    $scope.selectLocal = false;
+    $scope.project_uuid = $routeParams.project_uuid;
 
-    $scope.takeLocal = function(row) {
-        console.log('take local value');
-        $scope.selectLocal = true;
+    var assignSubmissions = function(submissions){
+        $scope.total = submissions.length;
+
+        if(submissions.length == 0)
+            msg.hideLoadingWithInfo('No local submissions !');
+        submissions.forEach(function(submission){
+            submission.data = JSON.parse(submission.data);
+        });
+        $scope.submissions = submissions;
+    };
+
+    var ErrorLoadingSubmissions = function(data, error) {
+        msg.hideLoadingWithErr('Failed to load Submissions');
+    };
+
+    $scope.onNext = function(pageNumber) {
+        loadSubmissions(pageNumber);
+    };
+
+    $scope.onPrevious = function(pageNumber) {
+        loadSubmissions(pageNumber);
+    };
+
+    $scope.isLastPage = function() {
+        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
+    };
+
+    $scope.isFirstPage = function() {
+        return $scope.pageNumber == 0;
+    };
+
+    $scope.isAtLast = function(index) {
+        if($scope.isLastPage())
+            return index ==  $scope.total % $scope.pageSize - 1 ;
+        return index == $scope.pageSize-1;
     }
 
-    $scope.takeServer = function(row) {
-        console.log('take server value');
-        $scope.selectLocal = false;
-    }
+    $scope.formatSubmission = function(index, submission) {
+        var ret = '';
+        $scope.listIndex = index;
+        angular.forEach($scope.orderHeaders, function(header) {
+              if(header == "more") 
+                ret += "<td><a href='#conflict-resolver/" + submission.project_uuid + "/" + submission.submission_uuid + "'>Resolve</a></td>";
+            else
+                ret += "<td>" + submission.data[header] + "</td>";
+        });
+        return ret;
+    };
 
-    $scope.isArray = function(value) {
-        return (value instanceof Array);
-    }
+    $scope.onLoad = function() {
+        submissionDao.getProjectById($scope.project_uuid)
+            .then(function(project) {
+                $scope.project_name = project.name;
+                $scope.project_uuid = project.project_uuid;
+                $scope.headers = JSON.parse(project.headers);
+                $scope.orderHeaders = app.extractHeaders($scope.headers);
+                angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
+                loadSubmissions(0);
+        });
+    };
+    $scope.onLoad();
 
-    $scope.save = function() {
-        if ($scope.selectLocal) {
-            localStore.updateSubmissionVersionAndStatus($scope.localSubmission.submission_id, $scope.serverSubmission.version, BOTH);
-            localStore.updateSubmissionCreatedDate($scope.localSubmission.submission_id, $scope.serverSubmission.created);
-            msg.displaySuccess('Local changes taken');
-        } else {
-            localStore.updateSubmission($scope.localSubmission.submission_id, $scope.serverSubmission);
+    var loadSubmissions = function(pageNumber) {
+        $scope.pageNumber = pageNumber;
+        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        submissionDao.getSubmissionsByStatusPagination($scope.project_uuid, "conflict", pageNumber * $scope.pageSize, $scope.pageSize)
+        .then(assignSubmissions, ErrorLoadingSubmissions);
+        msg.hideAll();
+    };
 
-            msg.displaySuccess('Server changes taken');
-        }
-    }
-
-    localStore.getProjectById($routeParams.project_uuid)
-        .then(function(project) {
-            $scope.project_name = project.name;
-            $scope.headers = JSON.parse(project.headers);
-            delete $scope.headers.ds_name;
-            delete $scope.headers.date;
-
-          localStore.getSubmissionById($routeParams.submission_id)
-             .then(function(localSubmission) {
-
-                $scope.localSubmission = localSubmission;
-                delete $scope.localSubmission.data["meta"];
-                dcsService.getSubmissionById(project.project_uuid, localSubmission.submission_uuid)
-                   .then(function(serverSubmission) {
-                        $scope.serverSubmission   = serverSubmission;
-                        $scope.serverSubmissionData = JSON.parse(serverSubmission.data);
-                        delete $scope.serverSubmissionData["meta"];
-
-                        fillPaddingData($scope.localSubmission.data, $scope.serverSubmissionData);
-                        msg.hideAll();
-                   });
-             });
-    });
-
-    var fillRepeat = function(repeatObjects, n) {
-        var keys = Object.keys(repeatObjects[0]);
-        for (var i=0; i<n; i++) {
-            var d = {};
-            for (var j=0; j<keys.length; j++) {
-                d[keys[j]] = '-';
-            }
-            repeatObjects.push(d);
-        }
-    }
-
-    var fillPaddingData = function(local, server) {
-
-        for (key in server) {
-            //TODO check this is available in mobile
-            if (server[key] instanceof Array) {
-                var serverRepeatCount = server[key].length;
-                var localRepeatCount = local[key].length;
-                if (serverRepeatCount == undefined || localRepeatCount == undefined)
-                    continue;
-
-                if (serverRepeatCount > localRepeatCount) {
-                    fillRepeat(local[key], serverRepeatCount-localRepeatCount);
-                } else {
-                    fillRepeat(server[key], localRepeatCount-serverRepeatCount);
-                }
-            }
-            //TODO skip inside repeats also needs to be handled for null. Try to fix this at server
-            if (local[key] === null) {
-                local[key] = '-';
-            }
-            if (server[key] === null) {
-                server[key] = '-';
-            }
-        }
-
-    }
-
-}]);
+};
+dcsApp.controller('submissionConflictController', ['$rootScope', '$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'app', submissionConflictController]);

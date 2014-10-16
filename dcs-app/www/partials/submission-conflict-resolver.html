@@ -1,0 +1,29 @@
+<div ng-include="'partials/menu-bar.html'"></div>
+
+<div class="scrollable">  
+   <div class="scrollable-content">
+    <div class="list-group bg-white">
+      <table class="bg-white table table-condensed">
+          <tr>
+            <td></td>
+            <td><button ng-click="applyServerChanges()">Apply</button></td>
+            <td><button ng-click="applyLocalChanges()">Apply</button></td>
+          </tr>
+          <thead>
+          <tr>
+            <th>Questions</th>
+            <th>Server Data</th>
+            <th>Local Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="submission" ng-repeat="(header, value) in conflictDict" >
+            <td>{{header}}</td>
+            <td>{{value.server}}</td>
+            <td>{{value.local}}</td>
+          </tr>
+         </tbody>
+      </table>
+    </div>
+  </div>
+</div>

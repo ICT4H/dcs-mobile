@@ -24,10 +24,6 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
         })
-        .when('/submission/conflict/id/:submission_id/project_uuid/:project_uuid',{
-          templateUrl: "partials/submission-conflict.html",
-          controller: 'submissionConflictController',
-        })
         .when('/about',{
           templateUrl: "partials/about.html",
           controller: 'localProjectListController',
@@ -43,6 +39,14 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
         .when('/change-password', {
           templateUrl: "partials/change-password.html",
           controller:'changePasswordController'
+        })
+        .when('/conflict-submission-list/:project_uuid', {
+          templateUrl: "partials/conflict-submission-list.html",
+          controller: 'submissionConflictController'
+        })
+        .when('/conflict-resolver/:project_uuid/:submission_uuid', {
+          templateUrl: "partials/submission-conflict-resolver.html", 
+          controller: 'submissionConflictResolverController'
         }); 
     $httpProvider.defaults.timeout = 1000;
 }]);

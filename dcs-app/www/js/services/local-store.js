@@ -77,16 +77,11 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 
 	var transformRows = function(resultSet, isSingleRecord) {
 		var rows = [];
-		console.log('in transformRows');
-		if(isSingleRecord && resultSet.length > 0) {
-			console.log('resultString: ' + JSON.stringify(resultSet.item(0)) );
+		if(isSingleRecord && resultSet.length > 0) 
 			return angular.copy(resultSet.item(0));
-		}
 	
-		for (var i=0; i < resultSet.length; i++) {
-			console.log('resultString: ' + JSON.stringify(resultSet.item(i)) );
+		for (var i=0; i < resultSet.length; i++) 
 			 rows.push(resultSet.item(i));
-		}
 		return angular.copy(rows);
 	};
 
@@ -97,7 +92,7 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 				console.log("success: " + query);
 				deferred.resolve(transformRows(resp.rows, isSingleRecord));
 			},function(tx, error){
-				console.log("fail: ");
+				console.log("fail: " + query);
 				console.log(error);
 				deferred.reject(error);
 			});

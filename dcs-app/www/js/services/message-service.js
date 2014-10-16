@@ -7,14 +7,14 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
         this.css = css;
     };
 
-    this.addInfo = function(text) {
-       $rootScope.messages[text] = new message("", "alert-info"); 
+    this.addInfo = function(text, backUrl) {
+       $rootScope.messages[text] = new message(backUrl || "", "alert-info"); 
        $rootScope.notificationLength = Object.keys($rootScope.messages).length;
        apply();
     };
 
-    this.addError = function(error){
-        $rootScope.messages[error] = new message("", "alert-danger");
+    this.addError = function(error, backUrl){
+        $rootScope.messages[error] = new message(backUrl || "", "alert-danger");
         $rootScope.notificationLength = Object.keys($rootScope.messages).length;
         apply();
     };
