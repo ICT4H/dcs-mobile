@@ -16,7 +16,7 @@ dcsApp.service('submissionDao',['store', function(store){
 
 	var getSubmissionAsValues = function(submission){
 		var values = [submission.submission_uuid, submission.version, submission.status, submission.is_modified, submission.project_uuid,
-			submission.created, JSON.stringify(submission.data), submission.xml, submission.new_files_added, submission.un_changed_files];
+			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
 

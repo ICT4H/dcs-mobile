@@ -17,10 +17,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="submission" ng-repeat="(header, value) in conflictDict" >
-            <td>{{header}}</td>
-            <td>{{value.server}}</td>
-            <td>{{value.local}}</td>
+          <tr class="submission" ng-repeat="(header, value) in conflictDict" 
+          ng-bind-html="formatSubmission(header, value)">
           </tr>
          </tbody>
       </table>

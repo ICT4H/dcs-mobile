@@ -14,7 +14,8 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
                 localSubmission[0].data = JSON.parse(localSubmission[0].data);
                 $scope.localSubmission = localSubmission[0];
                 submissionDao.getProjectById(project_uuid).then(function(project) {
-                    getConflictDict(JSON.parse(project.headers), $scope.serverSubmission.data, $scope.localSubmission);
+                    $scope.headers = JSON.parse(project.headers);
+                    getConflictDict(JSON.parse(project.headers), $scope.serverSubmission.data, $scope.localSubmission.data);
                 });
             });
         });
@@ -22,9 +23,37 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
 
     var getConflictDict = function(headers, serverSubmission, localSubmission) {
         angular.forEach(headers, function(value, key) { 
-            $scope.conflictDict[key] = {'server': serverSubmission[key], 'local': localSubmission[key]};
+            if(!exculdeHeaders.hasOwnProperty(key))
+                $scope.conflictDict[key] = {'server': serverSubmission[key], 'local': localSubmission[key]};
         }); 
         msg.hideAll();  
+    };
+
+    var handleRepeat = function(header, data) {
+        var ret = '<td><table class="bg-white table table-condensed"><tr>';
+        angular.forEach(header, function(value, key) {
+            ret = ret + "<th>" + key + "</th>";
+        });
+        ret = ret + "</tr>";
+        angular.forEach(data, function(item) {
+            ret = ret + "<tr>";
+            angular.forEach(header, function(value, key) {
+                ret = ret + "<td>" + item[key] + "</td>";
+            });
+            ret = ret + "</tr>";
+        });
+        return ret + '</table></td>';
+    };
+
+    $scope.formatSubmission = function(header, value) {
+        var ret = '<td>' + header + '</td>';
+        var serverValue  = value.server;
+        var localValue = value.local;
+        if(serverValue.constructor == [].constructor)
+            ret =  ret + handleRepeat($scope.headers[header], serverValue);
+        if(localValue.constructor == [].constructor)
+            return ret + handleRepeat($scope.headers[header], localValue);
+        return ret + "<td>" + serverValue + "</td><td>" + localValue + "</td>";
     };
 
     $scope.applyServerChanges = function() {
@@ -32,6 +61,7 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
         $scope.serverSubmission.status = "new";
         $scope.serverSubmission.is_modified = false;
         $scope.serverSubmission.submission_id = $scope.localSubmission.submission_id;
+        $scope.serverSubmission.data = JSON.stringify($scope.serverSubmission.data);
         submissionDao.updateSubmission($scope.serverSubmission).then(function(response) {
             msg.hideLoadingWithInfo("Applied server changes.");
         });

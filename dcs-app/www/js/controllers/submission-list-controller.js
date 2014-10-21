@@ -110,6 +110,10 @@ dcsApp.controller('submissionListController',
         $scope.conflictSubmissions = [];
         var promises;
         localStore.getLastFetch($scope.project_uuid).then(function(result) {
+            if(result.last_fetch == "0")
+                msg.hideLoadingWithInfo("Fetching all submission. + <br> <span style='margin-top:5px;'> Refer notification for further details. <span>"  );
+            else
+                msg.hideLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 promises = result.submissions.map(function(submission) { 
                                     return localStore.getSubmissionByuuid(submission.submission_uuid).then(function(result) {
@@ -137,12 +141,12 @@ dcsApp.controller('submissionListController',
 
                     app.promises(newSubmissionsPro, function() {
                         if($scope.newSubmissions != 0)
-                            msg.addInfo($scope.newSubmissions.length + " submission added.");
+                            msg.addInfo($scope.newSubmissions.length + " submission added.", "#submission-list/" + $scope.project_uuid);
                     });
 
                     app.promises(updatedSubmissionsPro, function() {
                         if($scope.updatedSubmissions != 0)
-                            msg.addInfo($scope.updatedSubmissions.length + " submission updated.");
+                            msg.addInfo($scope.updatedSubmissions.length + " submission updated.", "#submission-list/" + $scope.project_uuid);
                     });
 
                     app.promises(conflictSubmissionsPro, function() {
