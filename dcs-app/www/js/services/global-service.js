@@ -2,17 +2,28 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
     this.user = {'name':'', 'password': '', 'serverUrl':''};
     this.isAuthenticated = false;
     var exculdeHeaders = {'ds_name': 'ds_name', 'date':'date'};
-
 	this.httpRequest = function(uri){
 		var deferred = $q.defer();
+        var timeout = $q.defer();
+
+        setTimeout(function () {
+            timeout.resolve();
+        }, 20000);
+
         user = this.user;
         console.log('calls user name: ' + user.name + '; url: ' + user.url + uri + "password: " +user.password);
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
-                
-        $http.get(user.url + uri).success(function(response) {
+        var responsePromise = $http({
+                method : 'get',
+                url: user.url + uri,
+                timeout: timeout.promise
+        });
+
+        responsePromise.success(function(response) {
             console.log("Success: " + uri);
             deferred.resolve(response);
-        }).error(function(data, status, headers, config) {
+        });
+        responsePromise.error(function(data, status, headers, config) {
             console.log("failed: " + uri);
             deferred.reject(status);
         });
@@ -21,17 +32,24 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
 
     this.httpPostRequest = function(uri, data) {
         var deferred = $q.defer();
+        var timeout = $q.defer();
+
+        setTimeout(function () {
+            timeout.resolve();
+        }, 20000);
+
         user = this.user;
         console.log('calls user name: ' + user.name + '; url: ' + user.url + uri);
         $http.defaults.headers.post["Content-Type"] = "text/plain";
         $http.defaults.headers.common.Authorization = 'Basic ' + btoa(user.name + ':' + user.password);
-
-        $http.post(user.url + uri, data)
-            .success(deferred.resolve)
-            .error(function(data, status, headers, config) {
-                deferred.reject(status);
+        var responsePromise = $http({
+                method : 'post',
+                url: user.url + uri,
+                data: data,
+                timeout: timeout.promise
             });
-
+        responsePromise.success(deferred.resolve);
+        responsePromise.error(deferred.reject);
         return deferred.promise;
     };
 
