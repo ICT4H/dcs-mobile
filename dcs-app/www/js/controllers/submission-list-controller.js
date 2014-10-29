@@ -111,7 +111,7 @@ dcsApp.controller('submissionListController',
         var promises;
         localStore.getLastFetch($scope.project_uuid).then(function(result) {
             if(result.last_fetch == "0")
-                msg.hideLoadingWithInfo("Fetching all submission. + <br> <span style='margin-top:5px;'> Refer notification for further details. <span>"  );
+                msg.hideLoadingWithInfo("Fetching all submission. <br> <span style='margin-top:5px;'> Refer notification for further details. <span>"  );
             else
                 msg.hideLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
@@ -127,11 +127,12 @@ dcsApp.controller('submissionListController',
                     localStore.updatelastFetch($scope.project_uuid, result.last_fetch);           
 
                     $scope.newSubmissions.forEach(function(submission) {
+                        submission.status = "new";
                         newSubmissionsPro.push(localStore.createSubmission(submission));
                     });
 
                     $scope.updatedSubmissions.forEach(function(submission) {
-                        submission.is_modified = true;
+                        submission.status = "Both";
                         updatedSubmissionsPro.push(localStore.updateSubmission(submission));
                     });
 
@@ -140,18 +141,23 @@ dcsApp.controller('submissionListController',
                     });
 
                     app.promises(newSubmissionsPro, function() {
-                        if($scope.newSubmissions != 0)
+                        if($scope.newSubmissions != 0) {
+                            loadSubmissions(0); 
                             msg.addInfo($scope.newSubmissions.length + " submission added.", "#submission-list/" + $scope.project_uuid);
+                        }
                     });
 
                     app.promises(updatedSubmissionsPro, function() {
-                        if($scope.updatedSubmissions != 0)
+                        if($scope.updatedSubmissions != 0) {
+                            loadSubmissions(0); 
                             msg.addInfo($scope.updatedSubmissions.length + " submission updated.", "#submission-list/" + $scope.project_uuid);
+                        }
                     });
 
                     app.promises(conflictSubmissionsPro, function() {
-                        if($scope.conflictSubmissions != 0)
+                        if($scope.conflictSubmissions != 0) 
                             msg.addInfo($scope.conflictSubmissions.length + " submission are in conflict.", "#conflict-submission-list/" + $scope.project_uuid);
+                        
                     });
                 });
             });
@@ -163,10 +169,12 @@ dcsApp.controller('submissionListController',
             $scope.newSubmissions.push(submission);
         else
         {
-            if(result[0].is_modified)   
+            submission.submission_id = result[0].submission_id;
+            if(submission.version != result[0].version)
+                if(Boolean(result[0].is_modified))
                     $scope.conflictSubmissions.push(submission);
-            else
-                $scope.updatedSubmissions.push(submission);
+                else
+                    $scope.updatedSubmissions.push(submission);
         }
     };
 

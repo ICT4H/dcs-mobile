@@ -28,11 +28,11 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
     };
 
     $scope.onNext = function(pageNumber) {
-        loadProjects(pageNumber);
+        fetchProjects(pageNumber);
     };
 
     $scope.onPrevious = function(pageNumber) {
-        loadProjects(pageNumber);
+        fetchProjects(pageNumber);
     };
 
     $scope.isLastPage = function() {
