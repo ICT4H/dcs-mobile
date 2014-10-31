@@ -1,10 +1,10 @@
 <div ng-include="'partials/menu-bar.html'"></div>
-
+<span content-for="title">{{resourceBundle.settings_title}}</span>
 <div class="scrollable-content section">
     
     <div bs-panel>
         <div class ="form-group">
-            <label>Items Per Page</label>
+            <label>{{resourceBundle.item_per_page}}</label>
             <span >
 		    	<select class="select-in-bar form-control" ng-model="pageSize.value" ng-options="pageSize for pageSize in pageSizes" ng-change = "onPageSizeChange()"></select>
 			</span>

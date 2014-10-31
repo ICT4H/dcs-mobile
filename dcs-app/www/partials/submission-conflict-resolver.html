@@ -1,19 +1,19 @@
 <div ng-include="'partials/menu-bar.html'"></div>
-
+<span content-for="title">{{resourceBundle.conflict_resolver_title}}</span>
 <div class="scrollable">  
    <div class="scrollable-content">
     <div class="list-group bg-white">
       <table class="bg-white table table-condensed">
           <tr>
             <td></td>
-            <td><button ng-click="applyServerChanges()">Apply</button></td>
-            <td><button ng-click="applyLocalChanges()">Apply</button></td>
+            <td><button ng-click="applyServerChanges()">{{resourceBundle.apply}}</button></td>
+            <td><button ng-click="applyLocalChanges()">{{resourceBundle.apply}}</button></td>
           </tr>
           <thead>
           <tr>
-            <th>Questions</th>
-            <th>Server Data</th>
-            <th>Local Data</th>
+            <th>{resourceBundle.questions}}</th>
+            <th>{resourceBundle.server_data}}</th>
+            <th>{resourceBundle.mobile_data}}</th>
           </tr>
         </thead>
         <tbody>

@@ -4,7 +4,7 @@
     
     <div bs-panel>
         <div class ="form-group">
-            <label>Username</label>
+            <label>{{resourceBundle.username}}</label>
             <div angucomplete-alt 
               id="ex1" 
               pause="100" 
@@ -16,17 +16,17 @@
               input-class="form-control form-control-small"/>
          </div>
         <div class ="form-group">
-            <label>Password</label>
+            <label>{{resourceBundle.password}}</label>
             <input class="form-control" type ="password" ng-model="user.password"> 
         </div>
         <div class ="form-group">
-            <a href="" ng-click="forgetPassword()">Forget Password</a>
+            <a href="" ng-click="forgetPassword()">{{resourceBundle.forget_password}}</a>
         </div>
         <div class="form-group">
-            <label>Url</label>    
+            <label>{{resourceBundle.url}}</label>    
             <input class="form-control" type ="text" ng-model="user.url">
         </div>
-        <button class="btn btn-primary" ng-click="login()">Login</button>
+        <button class="btn btn-primary" ng-click="login()">{{resourceBundle.login}}</button>
     </div>
 </div>
  
