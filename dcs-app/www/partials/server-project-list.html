@@ -4,7 +4,7 @@
 <div class="scrollable">  
     <div class="scrollable-content">
         <div class="list-group bg-white">
-            <div class="list-group-item">
+            <div class="list-group-item project-tab">
                 <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
                   <li><a href="#local-project-list" >{{resourceBundle.installed}}</a></li>
                   <li><a href="#Tab2" toggle="on" parent-active-class="active">{{resourceBundle.server}}</a></li>
@@ -18,7 +18,7 @@
         </div>
         <div class="list-group">
             <div ng-repeat="project in projects  | filter:searchText" href="#server-project-list" class="list-group-item" ng-class="project.status" >
-                <i class="fa fa-download fa-lg pull-right" ng-click="downloadProject(project)"></i>
+                <i class="fa fa-download fa-2x pull-right" ng-click="downloadProject(project)" style="margin-top: -10px;font-weight: bolder;"></i>
                 <span>{{ project.name }}</span>
             </div>
             <div ng-show="total>=5" ng-include="'partials/pagination_tag.html'"     class="bg-white black-font table-bar list-group-item ">

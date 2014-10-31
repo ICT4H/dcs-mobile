@@ -1,8 +1,12 @@
 <div ng-include="'partials/menu-bar.html'"></div>
 
 <div content-for="new">
-    <i class="fa fa-lg fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
-    <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="getChanges()"></i>
+  <div class="btn btn-navbar sidebar-toggle">
+     <i class="fa fa-2x fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse()"></i>
+  </div>
+  <div class="btn btn-navbar sidebar-toggle">
+     <i class="fa fa-2x fa-arrow-circle-down" ng-hide="projectWarning" ng-click="getChanges()"></i>
+  </div>
 </div>
 <span content-for="title">{{pageTitle}}</span>
 
@@ -10,11 +14,11 @@
     <!-- <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i> -->
 </div>
 <div content-for="context-info">
-    <div class="context-info">
+ <!--    <div class="context-info">
     <span>{{project_name}}</span>
     <span class="pull-right">
-      <li toggle="toggle" target-class="toggle-full-screen" class="fa fa-lg fa-chevron-up" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></span>
-  </div>
+      <li toggle="toggle" target-class="toggle-full-screen" class="fa fa-2x fa-chevron-up" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></span>
+  </div> -->
 </div>
 
 <div class="scrollable">  
@@ -23,18 +27,20 @@
             <p>{{projectWarning}}</p>
         </div>
     <div class="list-group bg-white">
-      <div class="list-group-item">
+      <div class="list-group-item project-tab">
       <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
         <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
-        <li><a href="#server-submissions/{{project_uuid}}">{{resourceBundle.server}}</a></li>
+        <li><a href="#server-submissions/{{project_uuid}}">{{resourceBundle.server}}</a></li> 
+        <li><li toggle="toggle" target-class="toggle-full-screen" class="fa fa-2x fa-arrows-alt" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></li> 
+         <!-- <li  toggle="toggle" target-class="toggle-full-screen" inactive-class="fa-chevron-down"></li> -->
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
            <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom" ng-include="'partials/pagination_tag.html'">
             </div>
             <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
-                <span><i class="fa fa-lg fa-upload" ng-click="postSubmissions()"></i></span>
-                <span><i class="fa fa-lg fa-times" ng-click="deleteSubmissions()"></i></span>
+                <span><i class="fa fa-2x fa-upload" ng-click="postSubmissions()"></i></span>
+                <span><i class="fa fa-2x fa-times" ng-click="deleteSubmissions()"></i></span>
             </div>
             <div ng-init="selectedField='all'">
                   <select class="form-control pull-left" style="width:20%" ng-model="selectedField">

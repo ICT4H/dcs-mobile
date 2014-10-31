@@ -97,7 +97,7 @@ dcsApp.controller('submissionListController',
         $scope.listIndex = index;
         angular.forEach($scope.orderHeaders, function(header) {
               if(header == "more") 
-                ret += "<td><a href='#project/" + submission.project_uuid + "/submission/" + submission.submission_id + "'>more</a></td>";
+                ret += "<td><a href='#project/" + submission.project_uuid + "/submission/" + submission.submission_id + "' style='font-weight: bolder;'>more</a></td>";
             else
                 ret += "<td>" + submission.data[header] + "</td>";
         });

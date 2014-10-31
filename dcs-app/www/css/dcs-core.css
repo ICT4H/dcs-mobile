@@ -154,14 +154,61 @@ h1 {
   background-color: #fff;
 }
 
-.submission-tab .active {
-  background-color: #adadad !important;
-  border-radius: 6px;
+.submission-tab .active{
+/*  background-color: #adadad !important;
+  border-radius: 6px;*/
+  margin-right: 0px;
+  border-radius: 0px;
+  border:0px;
+  border-bottom: 3px solid #555;
 }
 
-/*.submission-tab > li:last-child > a{
-  border-color: #adadad !important;
-}*/
+.submission-tab {
+  border-bottom: 0px;
+}
+
+.submission-tab li:before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  border-left: 2px solid rgb(215, 215, 215);
+  height: 1.5em;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.submission-tab li:first-child:before {
+  content: initial;
+}
+
+.fa {
+  display: inline-block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: 400;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+ .project-tab {
+  padding-top: 0px; 
+  padding-right: 15px;
+  padding-bottom: 10px;
+  padding-left: 15px;
+}
+
+.nav-tabs>li>a {
+  border-radius: 0px;
+  margin-right: 0px; 
+}
+
+.nav-tabs > li > a,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover {
+  border: 0px;
+}
 
 .line-bottom {
   border-bottom: 1px solid #adadad;

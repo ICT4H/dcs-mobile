@@ -85,7 +85,7 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
         var ret = '';
         angular.forEach($scope.orderHeaders, function(header) {
               if(header == "more") 
-                ret += "<td><a class='fa fa-lg fa-external-link' href='#project/" + $scope.project_uuid + "/submission/" + submission.id[0] + "?server=true'></a></td>";
+                ret += "<td><a class='fa fa-lg fa-external-link' href='#project/" + $scope.project_uuid + "/submission/" + submission.id[0] + "?server=true' style='font-weight: bolder;'></a></td>";
             else
                 ret += "<td>" + submission[header] + "</td>";
         });

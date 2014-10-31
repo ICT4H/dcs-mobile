@@ -3,14 +3,14 @@
 <span content-for="title">{{pageTitle}}</span>
 <div content-for="refreshContents">
     <div ng-click="$sync()">
-        <a><i class="fa fa-lg  fa-arrow-circle-down"></i></a>
+        <a><i class="fa fa-2x  fa-arrow-circle-down"></i></a>
     </div>
 </div>
 
 <div class="scrollable">  
     <div class="scrollable-content">
         <div class="list-group bg-white">
-            <div class="list-group-item">
+            <div class="list-group-item project-tab">
                 <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
                   <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
                   <li><a href="#server-project-list">{{resourceBundle.server}}</a></li>
@@ -24,8 +24,8 @@
         </div>
         <div class="list-group">
             <div ng-repeat="project in projects  | filter:searchText" href="#local-project-list" class="list-group-item" ng-class="project.status" >
-                <i class="fa fa-times fa-lg pull-right" ng-click="onDelete(project)"></i>
-                <a href="#submission-list/{{project.project_uuid}}" >{{ project.name }}</a>
+                <i class="fa fa-trash-o fa-2x pull-right" ng-click="onDelete(project)" style="margin-top: -10px;"></i>
+                <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
             </div>
               <div ng-show="total>=5" ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar list-group-item " >
               </div>
