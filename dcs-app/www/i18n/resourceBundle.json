@@ -1,5 +1,8 @@
 {
-    "text_view_1": "It is an application created using angularjs and android simulators. This app can be used on Android Devices and Smart Phones.",
+    "app_title": "Garner",
+    "projects": "Forms",
+    "submissions": "Submissions",
+    "about_us": "It is an application created using angularjs and android simulators. This app can be used on Android Devices and Smart Phones.",
     "loading_projects" : "Loading Projects",
     "loading_submissions" : "Loading Submissions",
     "fetching_projects" : "Fetching Projects",
@@ -11,5 +14,6 @@
     "installed": "Downloaded",
     "server": "Server",
     "no_projects": "No project downloaded. Go to Server tab and download.",
-    "end_of_list": "You are on last Page"
+    "end_of_list": "You are on last Page",
+    "notification": "Notification"
 }

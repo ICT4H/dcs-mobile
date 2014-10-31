@@ -2,7 +2,6 @@ dcsApp.controller('submissionListController',
     ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
     function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
 
-    $scope.pageTitle = "Submissions";
     $scope.pageSizes = $rootScope.pageSizes;
     $scope.pageSize = $rootScope.pageSize.value;
     $scope.searchFields = {all: 'All'};  

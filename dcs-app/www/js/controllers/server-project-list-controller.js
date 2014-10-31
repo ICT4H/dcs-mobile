@@ -1,6 +1,5 @@
 dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
 
-    $scope.pageTitle = $rootScope.title + ' - Projects';
     $scope.pageSize = $rootScope.pageSize.value;
     $scope.pageSizes = $rootScope.pageSizes;
     $scope.total = 0;

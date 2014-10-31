@@ -1,7 +1,6 @@
 var localProjectListController = function($rootScope, $scope, $q, dcsService, projectDao, msg) {
 
     resourceBundle = $rootScope.resourceBundle;
-    $scope.pageTitle = $rootScope.title + ' - Projects';
     $scope.pageSizes = $rootScope.pageSizes;
     $scope.pageSize = $rootScope.pageSize.value;
     $scope.total = 0;

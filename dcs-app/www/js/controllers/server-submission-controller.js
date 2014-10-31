@@ -1,7 +1,6 @@
 dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
     function($q, $rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg){
 
-    $scope.pageTitle = "Server";
     msg.showLoadingWithInfo('Loading submissions');
     $scope.displayHeaders = {}; 
     $scope.orderHeaders = []; 
