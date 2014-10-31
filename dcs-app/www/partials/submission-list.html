@@ -13,13 +13,6 @@
 <div content-for="refreshContents">
     <!-- <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i> -->
 </div>
-<div content-for="context-info">
- <!--    <div class="context-info">
-    <span>{{project_name}}</span>
-    <span class="pull-right">
-      <li toggle="toggle" target-class="toggle-full-screen" class="fa fa-2x fa-chevron-up" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></span>
-  </div> -->
-</div>
 
 <div class="scrollable">  
    <div class="scrollable-content">
@@ -31,8 +24,6 @@
       <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
         <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
         <li><a href="#server-submissions/{{project_uuid}}">{{resourceBundle.server}}</a></li> 
-        <li><li toggle="toggle" target-class="toggle-full-screen" class="fa fa-2x fa-arrows-alt" inactive-class="fa-chevron-down" active-class="fa-chevron-up" style="padding-right:10px"></li></li> 
-         <!-- <li  toggle="toggle" target-class="toggle-full-screen" inactive-class="fa-chevron-down"></li> -->
       </ul>
       <div class="tab-content">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
