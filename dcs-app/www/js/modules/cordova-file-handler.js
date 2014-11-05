@@ -38,6 +38,8 @@
     CordovaFileSytem.prototype.fileNameToFileInfo = function(fileName, onSuccess) {
         fileNameToFileEntry(fileName, function(fileEntry) {
             fileEntry.file(function(file) {
+                var slice = file.slice(0,4);
+
                 var reader = new FileReader();
                 reader.onload = function( e ) {
                     console.log('in reader.load');
@@ -46,7 +48,7 @@
                 reader.onerror = function( e ) {
                     console.log('error trying to get file: ' + fileName);
                 };
-                reader.readAsArrayBuffer( file );
+                reader.readAsArrayBuffer( slice );
             });
         });
 
