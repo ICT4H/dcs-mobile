@@ -234,10 +234,6 @@ dcsApp.controller('submissionListController',
     //         });
     // }
 
-    $scope.createSurveyResponse = function() {
-        $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
-    };
-
     $scope.editSurveyResponse = function() {
         if(selectedCount==1) {
             $location.path('/project/' + $scope.project_uuid + '/submission/' + selected[0]);

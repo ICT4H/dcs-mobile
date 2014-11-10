@@ -70,4 +70,8 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
             window.history.back();
     };
 
+    $rootScope.createSurveyResponse = function(project_uuid) {
+        $location.path('/project/' + project_uuid + '/submission/' + null);
+    };
+
 }]);
