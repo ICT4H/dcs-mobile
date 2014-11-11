@@ -24,7 +24,7 @@
         </div>
         <div class="list-group">
             <div ng-repeat="project in projects  | filter:searchText" href="#local-project-list" class="list-group-item" ng-class="project.status" >
-                <i class="fa fa-2x fa-file pull-right" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
+                <i class="fa fa-2x fa-file-o pull-right" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
                 <i class="fa fa-trash-o fa-2x pull-right" ng-click="onDelete(project)" style="margin-top: -10px;"></i>
                 <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
             </div>
