@@ -109,10 +109,7 @@ dcsApp.controller('submissionListController',
         $scope.conflictSubmissions = [];
         var promises;
         localStore.getLastFetch($scope.project_uuid).then(function(result) {
-            if(result.last_fetch == "0")
-                msg.hideLoadingWithInfo("Fetching all submission. <br> <span style='margin-top:5px;'> Refer notification for further details. <span>"  );
-            else
-                msg.hideLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
+            msg.hideLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 promises = result.submissions.map(function(submission) { 
                                     return localStore.getSubmissionByuuid(submission.submission_uuid).then(function(result) {

@@ -3,7 +3,7 @@ dcsApp.service('projectDao',['store', function(store){
 	this.createProject = function(project) {
 		return store.execute(
 			'INSERT INTO projects (project_uuid, version, status, name, xform, headers, last_fetch) VALUES (?,?,?,?,?,?,?)',
-			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, "0"]);
+			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created]);
 	};
 
 	this.getAll = function() {
@@ -18,7 +18,7 @@ dcsApp.service('projectDao',['store', function(store){
 		var values = getProjectValues(project);
 		values.push(project_uuid);
 		return store.execute('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
-	};
+	};				
 
 	this.deleteProject = function(project_uuid) {
 		return store.execute('DELETE FROM submissions where project_uuid=?', [project_uuid])
