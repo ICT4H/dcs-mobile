@@ -46,9 +46,9 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
                     initializeForm();
             };
             navigator.notification.confirm(
-                'Do you want to submit another one?',
+                'Do you want to create another one?',
                 onClick,
-                'Delete submission',
+                'New submission',
                 ['Yes','No']
             );
             msg.displaySuccess('Saved');
