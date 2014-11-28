@@ -1,6 +1,6 @@
 {
     "app_title": "Garner",
-    "projects": "Forms",
+    "projects": "Surveys",
     "submissions": "Submissions",
     "about_us": "It is an application created using angularjs and android simulators. This app can be used on Android Devices and Smart Phones.",
     "loading_projects" : "Loading Projects",

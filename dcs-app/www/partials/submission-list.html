@@ -2,7 +2,7 @@
 
 <div content-for="new">
   <div class="btn btn-navbar sidebar-toggle">
-     <i class="fa fa-2x fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_uuid)"></i>
+     <i class="fa fa-2x fa-file" ng-hide="isProjectOutdated(project)" ng-click="createSurveyResponse(project_uuid)" ></i>
   </div>
   <div class="btn btn-navbar sidebar-toggle">
      <i class="fa fa-2x fa-arrow-circle-down" ng-hide="projectWarning" ng-click="getChanges()"></i>
@@ -16,8 +16,8 @@
 
 <div class="scrollable">  
    <div class="scrollable-content">
-        <div class="list-group alert-danger" ng-show="projectWarning">
-            <p>{{projectWarning}}</p>
+        <div class="alert-danger" ng-show="projectWarning">
+            <span style=>{{projectWarning}}</span>
         </div>
     <div class="list-group bg-white">
       <div class="list-group-item project-tab">

@@ -1,34 +1,41 @@
 <div ng-include="'partials/menu-bar.html'"></div>
 
-<span content-for="title">{{resourceBundle.projects}}</span>
+<span content-for="title">
+    <img src="img/surveys.png"/>
+    {{resourceBundle.projects}}
+</span>
 <div content-for="refreshContents">
     <div ng-click="$sync()">
         <a><i class="fa fa-2x  fa-arrow-circle-down"></i></a>
     </div>
 </div>
 
+<div content-for="right">
+    <div ng-click="toggle('notification')" class="btn btn-navbar sidebar-toggle">
+        <i class="fa fa-2x fa-search"></i>
+    </div>
+    <div ng-click="toggle('notification')" class="btn btn-navbar sidebar-toggle" style="float:left">
+        <i class="fa fa-2x fa-ellipsis-v"></i>
+    </div>
+</div>
+
 <div class="scrollable">  
     <div class="scrollable-content">
-        <div class="list-group bg-white">
-            <div class="list-group-item project-tab">
-                <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
-                  <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
-                  <li><a href="#server-project-list">{{resourceBundle.server}}</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div  class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
-                        <div ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar" style="padding:5px 0 0 0;">
-                    </div>
-                </div>  
-            </div>
-        </div>
         <div class="list-group">
-            <div ng-repeat="project in projects  | filter:searchText" href="#local-project-list" class="list-group-item" ng-class="project.status" >
-                <i class="fa fa-2x fa-file-o pull-right" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
-                <i class="fa fa-trash-o fa-2x pull-right" ng-click="onDelete(project)" style="margin-top: -10px;"></i>
-                <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
+            <div ng-repeat="project in projects  | filter:searchText" ng-class="project.status" class="display-table" ng-init="isDisplayable.push(true)">
+                <div class="display-table-cell garner-view-flipper">
+                    <img src="img/surveys.png" ng-click="check($index)" ng-show="isDisplayable[$index]"/>
+                    <i class="fa fa-check-square fa-2x" ng-click="unCheck($index)" ng-hide="isDisplayable[$index]" ></i>
+                </div>
+                <div class="display-table-cell">
+                    <a href="#submission-list/{{project.project_uuid}}">{{ project.name }}</a>
+                </div>
+                <div class="display-table-cell garner-actions">
+                    <div class="garner-actions-icon"><div class="circle"><span>100</span></div></div>
+                    <i class="fa fa-2x fa-plus garner-actions-icon" ng-click="createSurveyResponse(project.project_uuid)"></i>
+                </div>
             </div>
-              <div ng-show="total>=5" ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar list-group-item " >
-              </div>
+            <div ng-include="'partials/pagination_tag.html'" class="navbar navbar-app navbar-absolute-bottom" ></div>
+        </div>
     </div>
 </div>

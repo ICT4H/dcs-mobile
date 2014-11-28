@@ -1,4 +1,47 @@
-#lightbulb {
+.fa-bars {
+  margin-left: -30px;
+}
+
+.app {
+  background-color: rgb(255, 255, 255);
+}
+.display-table{
+  display: table;
+  width: 100%;
+  border-bottom: 1px solid rgb(240, 240, 240);
+}
+.display-table-cell{
+  display: table-cell;
+}
+.garner-view-flipper{
+  width: 60px;
+}
+.garner-actions{
+  width: 100px;
+}
+
+.garner-actions-icon{
+  width: 50px;
+  text-align: center;
+}
+
+
+.garner-btn {
+  padding-right: 20px;
+}
+
+.circle{
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    float:left;
+    margin-top: 10px;
+    background-color: #838383;
+    width: 35px;
+    height: 35px;
+} 
+
+/*#lightbulb {
   font-size: 100px;
   display: block;
   text-align: center;
@@ -268,3 +311,4 @@ h1 {
 .bg-transparent {
   background-color: transparent !important;
 }
+*/

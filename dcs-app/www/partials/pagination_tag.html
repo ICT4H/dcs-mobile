@@ -1,7 +1,11 @@
 <div style="text-align:center;">
-	<span ng-show="!isFirstPage()" ng-click="onPrevious(pageNumber-1)" class="fa fa-lg fa-chevron-left" style="float: left;"></span>
+	<span ng-hide="pagination.isFirstPage()" ng-click="pagination.onPrevious()" class="fa fa-lg fa-chevron-left" style="float: left;"></span>
     <span style="text-align:center;">
-    	{{(pageNumber * pageSize) + Math.max(0,Math.min(1, total*pageSize))}}  - {{(pageNumber * pageSize) + Math.min((total - (pageSize * pageNumber)), pageSize)}} of {{total}}
+    	{{(pagination.pageNumber * pagination.pageSize) + Math.max(0, Math.min(1, pagination.totalElement*pagination.pageSize))}}  
+    	- 
+    	{{(pagination.pageNumber * pagination.pageSize) + Math.min((pagination.totalElement - (pagination.pageSize * pagination.pageNumber)), pagination.pageSize)}} 
+    	of 
+    	{{pagination.totalElement}}
     </span>
-    <span ng-show="!isLastPage()" ng-click="onNext(pageNumber+1)" class="fa fa-lg fa-chevron-right pull-right"></span>
+    <span ng-hide="pagination.isLastPage()" ng-click="pagination.onNext()" class="fa fa-lg fa-chevron-right pull-right"></span>
  </div>
