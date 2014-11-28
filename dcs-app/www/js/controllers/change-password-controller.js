@@ -8,7 +8,7 @@ var changePasswordController = function($scope, $location, userDao, app, msg, dc
         })
         .then(function() {
             msg.hideAll();
-            $location.path('/')
+            $location.path('/');
         }, function(error) {
              msg.hideLoadingWithErr(error);
         });

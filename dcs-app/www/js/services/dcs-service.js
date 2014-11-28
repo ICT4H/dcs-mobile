@@ -179,7 +179,6 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     function getFilesMeta(fileNamesString) {
         console.log('in getFilesMeta, fileNamesString: ' + fileNamesString);
 
-        var deferred = $q.defer();
         var fileNames = fileNamesString.split(',');
         var promises = [];
         angular.forEach(fileNames, function(fileName) {

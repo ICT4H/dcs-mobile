@@ -1,10 +1,32 @@
 {
-  "node": true,
+    "node": true,
+    "browser": true,
+    "esnext": true,
+    "bitwise": true,
+    "camelcase": false,
+    "curly": true,
+    "eqeqeq": true,
+    "immed": true,
+    "indent": 4,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "quotmark": "single",
+    "undef": true,
+    "unused": true,
+    "strict": true,
+    "trailing": true,
+    "smarttabs": true,
+    "multistr": true,
+    "globals": {
+        "$": false,
+        "CordovaFileSytem": false,
+        "CordovaDeviceHandler": false,
+        "LocalFileSystem": false,
 
-  "curly": true,
-  "latedef": true,
-  "quotmark": true,
-  "undef": true,
-  "unused": true,
-  "trailing": true
+        "angular": false,
+        "dcsApp": false,
+        "user": false,
+        "fileSystem": false
+    }
 }

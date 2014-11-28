@@ -2,7 +2,7 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
 
     $rootScope.messages = {};
     $rootScope.notificationLength = 0;
-    function message(backUrl, css) {
+    var message = function(backUrl, css) {
         this.backUrl = backUrl;
         this.css = css;
     };
@@ -45,22 +45,23 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     };
 
     this.handleError = function(status,message) {
-        if(status == 404){
-        this.hideLoadingWithErr('unable to reach server');
-        return;
+        if(status == 404) {
+            this.hideLoadingWithErr('unable to reach server');
+            return;
         }
         this.hideLoadingWithErr(message);
 
     };
+
     this.hideLoadingWithInfo = function(message) {
         $rootScope.loading = false;
         this.displayInfo(message);
-    }
+    };
 
     this.hideLoadingWithErr = function(message) {
         $rootScope.loading = false;
         this.displayError(message);
-    }
+    };
 
     this.hideMessage = function() {
         $rootScope.showMessage = false;
@@ -75,7 +76,7 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     this.showLoadingWithInfo = function(msg) {
         $rootScope.loading = true;
         this.displaySuccess(msg);
-    }
+    };
 
     this.displaySuccess = function(msg) {
         console.log($rootScope.messages);

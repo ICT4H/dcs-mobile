@@ -13,27 +13,27 @@
         //Making static with assumption that there will be only one type of filessytem to intreact with
         if(!_fsReady)
             _fsReady = initFileSystem();
-    }
+    };
 
     CordovaFileSytem.prototype.moveFile = function(imageUrl, callbacks) {
         getFileAndDestDirEntry(imageUrl, moveToDir, callbacks);
-    }
+    };
 
     CordovaFileSytem.prototype.copyFile = function(imageUrl, callbacks) {
         getFileAndDestDirEntry(imageUrl, copyToDir, callbacks);
-    }
+    };
 
     CordovaFileSytem.prototype.fileNameToURL = function(fileName, onSuccess) {
         fileNameToFileEntry(fileName, function(fileEntry) {
             onSuccess(fileEntry.toURL());
         });
-    }
+    };
 
     CordovaFileSytem.prototype.fileNameToFile = function(fileName, onSuccess) {
         fileNameToFileEntry(fileName, function(file, type) {
             onSuccess(file, type);
         });
-    }
+    };
 
     CordovaFileSytem.prototype.fileNameToFileInfo = function(fileName, onSuccess) {
         fileNameToFileEntry(fileName, function(fileEntry) {
@@ -41,18 +41,18 @@
                 var slice = file.slice(0,4);
 
                 var reader = new FileReader();
-                reader.onload = function( e ) {
+                reader.onload = function() {
                     console.log('in reader.load');
                     onSuccess( fileEntry.toURL(), file.type );
                 };
-                reader.onerror = function( e ) {
+                reader.onerror = function() {
                     console.log('error trying to get file: ' + fileName);
                 };
                 reader.readAsArrayBuffer( slice );
             });
         });
 
-    }
+    };
 
     var initFileSystem = function() {
         var deffered = $.Deferred();
@@ -65,7 +65,7 @@
             deffered.reject);
         console.log('cordovaMediaManager init called');
         return deffered.promise();
-    }
+    };
 
     var getFileAndDestDirEntry = function(imageUrl, onSuccess, callbacks) {
         var resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
@@ -89,7 +89,7 @@
                 }
             },callbacks.error);
         });
-    }
+    };
 
     var moveToDir = function(dirEntry, fileEntry, callbacks) {
         console.log('fileEntry.toURL:' + fileEntry.toURL());
@@ -97,7 +97,7 @@
             console.log('moved file to media folder. New url: ' + newFileEntry.toURL());
             callbacks.success(newFileEntry.toURL(), newFileEntry.name);
         }, callbacks.error);
-    }
+    };
 
     var copyToDir = function(dirEntry, fileEntry, callbacks) {
         // Hack to get the real name instead of asset number /media/external/images/media/397
@@ -108,7 +108,7 @@
             console.log('copied selected file to media folder. New url: ' + newFileEntry.toURL());
             callbacks.success(newFileEntry.toURL(), newFileEntry.name);
         }, callbacks.error);
-    }
+    };
 
     var fileNameToFileEntry = function(fileName, onSuccess) {
         _fsReady.then(function(fs) {
@@ -119,7 +119,7 @@
                 console.log('error trying to get file: ' + fileName);
             });
         });
-    }
+    };
 
 }());
 

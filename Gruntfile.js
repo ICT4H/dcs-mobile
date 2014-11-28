@@ -67,7 +67,9 @@ module.exports = function (grunt) {
       },
       all: [
         'Gruntfile.js',
-        '<%= yeoman.app %>/js/{,*/}*.js'
+        '<%= yeoman.app %>/js/{,*/}*.js',
+        '!<%= yeoman.app %>/js/lib/{,*/}*.js',
+        '!<%= yeoman.app %>/js/enketo.min.js'
       ]
       // ,
       // test: {
@@ -349,6 +351,10 @@ module.exports = function (grunt) {
     //'autoprefixer',
     //'connect:test',
     'karma'
+  ]);
+
+  grunt.registerTask('hint',[
+    'jshint'
   ]);
 
   grunt.registerTask('build', [
