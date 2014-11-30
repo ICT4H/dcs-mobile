@@ -13,8 +13,8 @@ module.exports = function(config){
       'js/controllers/*.js',
       'js/services/*.js',
 
-
-      '../../test/unit/fake-ctrl-test.js',
+      '../../test/unit/mocks.js',
+      '../../test/unit/project-list-controller-tests.js',
       { pattern: 'i18n/resourceBundle.json',
           watched: true,
           served:  true,
