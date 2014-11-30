@@ -14,7 +14,7 @@ module.exports = function(config){
       'js/services/*.js',
 
       '../../test/unit/mocks.js',
-      '../../test/unit/project-list-controller-tests.js',
+      '../../test/unit/local-project-list-controller-tests.js',
       { pattern: 'i18n/resourceBundle.json',
           watched: true,
           served:  true,
