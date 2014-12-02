@@ -150,7 +150,7 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
         return submission[searchField].toLowerCase().indexOf(searchStr.toLowerCase()) >= 0;
     };
 
-    this.flickArray = function(array, element) {
+    this.flipArrayElement = function(array, element) {
         if(array.indexOf(element) >= 0)
             array.splice(array.indexOf(element), 1);
         else

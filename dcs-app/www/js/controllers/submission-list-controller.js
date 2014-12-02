@@ -263,7 +263,7 @@ dcsApp.controller('submissionListController',
 
     $scope.update_selected_submissions = function(submissionRow) {
         submissionRow.selected = !submissionRow.selected;
-        app.flickArray(selected, submissionRow.item.submission_id);
+        app.flipArrayElement(selected, submissionRow.item.submission_id);
         $scope.showActions = (selected.length >= 1);
     };
 
@@ -312,16 +312,15 @@ dcsApp.controller('submissionListController',
     };
 
     $scope.deleteSubmissions = function() {
-        msg.showLoading();
         function onConfirm(buttonIndex) {
             if(buttonIndex==BUTTON_NO) return;
 
+            msg.showLoading();
             localStore.deleteSubmissions(selected)
             .then(function(){
                 $scope.showActions = false;
                 loadSubmissions(0);
                 msg.hideLoadingWithInfo("Submission(s) deleted");
-
             }
             ,function(error){
                 console.log(error);

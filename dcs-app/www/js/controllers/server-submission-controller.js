@@ -38,7 +38,7 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
         $scope.pageNumber = pageNumber;
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
-        .then(assignSubmissions, ErrorLoadingSubmissions);
+            .then(assignSubmissions, ErrorLoadingSubmissions);
     };
 
     $scope.onLoad = function() {
@@ -151,7 +151,7 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
 
     $scope.update_selected_submissions = function(submissionRow) {
         submissionRow.selected = !submissionRow.selected;
-        app.flickArray(selected, submissionRow.item.id[0]);
+        app.flipArrayElement(selected, submissionRow.item.id[0]);
         $scope.showActions = (selected.length >= 1);
     };
 

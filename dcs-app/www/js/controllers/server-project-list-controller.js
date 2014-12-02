@@ -19,7 +19,7 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         $scope.pageNumber = pageNumber;
         msg.showLoadingWithInfo(resourceBundle.fetching_projects);
         dcsService.getProjects(pageNumber * $scope.pageSize, $scope.pageSize)
-        .then(assignProjects, ErrorLoadingProjects);
+            .then(assignProjects, ErrorLoadingProjects);
     };
 
     var onLoad = function() {
@@ -53,11 +53,11 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
     $scope.downloadProject = function(project) {
         msg.showLoadingWithInfo('Downloading project');
         dcsService.getQuestion(project.project_uuid)
-        .then(localStore.createProject)
-        .then(function() {      
-            msg.hideLoadingWithInfo('Project downloaded.');
-        }, function(error) {
-            msg.hideLoadingWithInfo('this project is already downloaded.');
-        });
+            .then(localStore.createProject)
+            .then(function() {
+                msg.hideLoadingWithInfo('Project downloaded.');
+            }, function(error) {
+                msg.hideLoadingWithInfo('this project is already downloaded.');
+            });
     };
 }]);
