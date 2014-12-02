@@ -47,22 +47,43 @@ dcsApp.controller('submissionListController',
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         localStore.getSubmissionsByProjectId($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
-        .then(assignSubmissions, ErrorLoadingSubmissions);
+            .then(assignSubmissions, ErrorLoadingSubmissions);
         msg.hideAll();
     };
 
     $scope.onLoad = function() {
-        localStore.getProjectById($scope.project_uuid)
-            .then(function(project) {
-                $scope.project_name = project.name;
-                $scope.project_uuid = project.project_uuid;
-                $scope.headers = JSON.parse(project.headers);
-                $scope.orderHeaders = app.extractHeaders($scope.headers);
-                angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
-                // setObseleteProjectWarning(project_uuidject);
-                loadSubmissions(0);
+        getProjectFromCache($scope.project_uuid).then(function(project) {
+            processProject(project);
+            loadSubmissions(0);
         });
     };
+
+    function getProjectFromCache(project_uuid) {
+        $rootScope.currentProject = $rootScope.currentProject || {project_uuid: ''};
+        var project_in_cache = project_uuid == $rootScope.currentProject.project_uuid;
+        var deferred = $q.defer();
+
+        if (project_in_cache) {
+            deferred.resolve($rootScope.currentProject);
+        } else {
+            localStore.getProjectById($scope.project_uuid)
+                .then(function(project) {
+                    $rootScope.currentProject = project;
+                    deferred.resolve(project)
+            });
+        }
+        return deferred.promise;
+    }
+
+    function processProject(project) {
+        $scope.project_name = project.name;
+        $scope.project_uuid = project.project_uuid;
+        $scope.headers = JSON.parse(project.headers);
+        $scope.orderHeaders = app.extractHeaders($scope.headers);
+        angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
+        // setObseleteProjectWarning(project_uuidject);
+    }
+
     $scope.onLoad();
 
     $scope.onNext = function(pageNumber) {

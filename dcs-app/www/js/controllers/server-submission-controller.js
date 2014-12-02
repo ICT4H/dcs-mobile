@@ -42,15 +42,13 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
     };
 
     $scope.onLoad = function() {
-        localStore.getProjectById($scope.project_uuid)
-            .then(function(project) {
-                $scope.project_name = project.name;
-                $scope.project_uuid = project.project_uuid;
-                $scope.headers = JSON.parse(project.headers);
-                $scope.orderHeaders = app.extractHeaders($scope.headers);
-                angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
-                loadSubmissions(0);
-        });
+        var project = $rootScope.currentProject;
+        $scope.project_name = project.name;
+        $scope.project_uuid = project.project_uuid;
+        $scope.headers = JSON.parse(project.headers);
+        $scope.orderHeaders = app.extractHeaders($scope.headers);
+        angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
+        loadSubmissions(0);
     };
     $scope.onLoad();
 
