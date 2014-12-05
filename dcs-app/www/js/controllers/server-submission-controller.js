@@ -53,11 +53,11 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
     $scope.onLoad();
 
     $scope.onNext = function(pageNumber) {
-        loadProjects(pageNumber);
+        loadSubmissions(pageNumber);
     };
 
     $scope.onPrevious = function(pageNumber) {
-        loadProjects(pageNumber);
+        loadSubmissions(pageNumber);
     };
 
     $scope.isLastPage = function() {
