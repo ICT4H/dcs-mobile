@@ -50,7 +50,7 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 
 	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
-		return store.execute('SELECT * FROM submissions WHERE project_uuid = ? limit ? offset ?', [project_uuid, limit, offset]);
+		return store.execute('SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ? ', [project_uuid, limit, offset]);
 	};
 
 	var getParamHolders = function(paramArray) {

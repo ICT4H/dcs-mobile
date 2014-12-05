@@ -5,6 +5,7 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "ngSanitize",
     "ngI18n",
     "angucomplete-alt",
+    "angularMoment"
 ]);
 
 var isEmulator = false;

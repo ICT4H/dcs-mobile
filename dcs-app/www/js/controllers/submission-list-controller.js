@@ -261,9 +261,9 @@ dcsApp.controller('submissionListController',
 
     };
 
-    $scope.update_selected_submissions = function(submissionRow) {
+    $scope.update_selected_submissions = function(submissionRow, submission) {
         submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selected, submissionRow.item.submission_id);
+        app.flipArrayElement(selected, submission.submission_id);
         $scope.showActions = (selected.length >= 1);
     };
 

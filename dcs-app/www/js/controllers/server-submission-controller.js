@@ -149,9 +149,9 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
         return deferred.promise;
     }
 
-    $scope.update_selected_submissions = function(submissionRow) {
+    $scope.update_selected_submissions = function(submissionRow, submission) {
         submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selected, submissionRow.item.id[0]);
+        app.flipArrayElement(selected, submission.id[0]);
         $scope.showActions = (selected.length >= 1);
     };
 

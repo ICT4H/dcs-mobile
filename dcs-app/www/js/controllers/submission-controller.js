@@ -4,11 +4,7 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
     var buttonLabel = submission_id == "null" ?'Save':'Update';
 
     var getDate = function() {
-        var now  =new Date();
-        var date = now.toLocaleDateString();
-        var time = now.toLocaleTimeString();
-        time = time.replace(time.slice(time.length-6,time.length-3),'');
-        return date.concat(' '+time)
+        return new Date().toJSON();
     };
 
     var getSubmissionFromServer = function(submissionId) {
