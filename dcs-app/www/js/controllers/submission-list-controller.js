@@ -22,6 +22,11 @@ dcsApp.controller('submissionListController',
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
+    $scope.showSearch = false;
+
+    $scope.toggleSearch = function() {
+        $scope.showSearch = !$scope.showSearch;
+    }
 
     var assignSubmissions = function(submissions){
         if(submissions.length == 0)
