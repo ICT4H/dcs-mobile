@@ -1,10 +1,17 @@
 <div ng-include="'partials/menu-bar.html'"></div>
 
 <div content-for="new">
-  <div class="btn btn-navbar sidebar-toggle">
+  <div ng-show="showActions" class="btn btn-navbar">
+    <i class="fa fa-2x fa-times" ng-click="deleteSubmissions()"></i>
+  </div>
+  <div ng-show="showActions" class="btn btn-navbar">
+    <i class="fa fa-2x fa-upload" ng-click="postSubmissions()"></i>
+  </div>
+
+  <div ng-show="!showActions" class="btn btn-navbar sidebar-toggle">
      <i class="fa fa-2x fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_uuid)"></i>
   </div>
-  <div class="btn btn-navbar sidebar-toggle">
+  <div ng-show="!showActions" class="btn btn-navbar sidebar-toggle">
      <i class="fa fa-2x fa-arrow-circle-down" ng-hide="projectWarning" ng-click="getChanges()"></i>
   </div>
 </div>
@@ -25,14 +32,8 @@
         <li><a href="#Tab1" toggle="on" parent-active-class="active">{{resourceBundle.installed}}</a></li>
         <li><a href="#server-submissions/{{project_uuid}}">{{resourceBundle.server}}</a></li> 
       </ul>
-      <div class="tab-content">
+      <div class="tab-content margin-top-10">
         <div class="tab-pane" toggleable active-class="active" default="active" id="Tab1" exclusion-group="myTabs">
-           <div ng-show="!showActions" class="bg-white black-font table-bar line-bottom" ng-include="'partials/pagination_tag.html'">
-            </div>
-            <div ng-show="showActions" class="bg-white black-font table-bar line-bottom">
-                <span><i class="fa fa-2x fa-upload" ng-click="postSubmissions()"></i></span>
-                <span><i class="fa fa-2x fa-times" ng-click="deleteSubmissions()"></i></span>
-            </div>
             <div ng-init="selectedField='all'">
                   <select class="form-control pull-left" style="width:20%" ng-model="selectedField">
                     <option ng-repeat="(name, label) in searchFields " value="{{name}}">{{label}}</option>
@@ -43,7 +44,7 @@
               <table id="local-submissions" style="margin-bottom:0px;" class="bg-white table table-condensed">
                   <thead>
                   <tr>
-                      <th colspan="3">Created</th>
+                      <th colspan="2">Created</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -52,16 +53,14 @@
                       ng-click="update_selected_submissions(this, item)">
                       <td>
                         <span am-time-ago="item.created" am-preprocess="utc"></span>
+                        <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
                       </td>
-                      <td>
-                        on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}
-                      </td>
-                      <td>
-                        <a href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style='font-weight: bolder;'>view</a>
+                      <td class="cell-align-middle">
+                        <a href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style='font-weight: bolder; margin-top'>view</a>
                       </td>
                   </tr>
                   <tr ng-show="total>=5">
-                    <td colspan="3">
+                    <td colspan="2">
                       <div ng-include="'partials/pagination_tag.html'">
                     </td>
                   </tr>

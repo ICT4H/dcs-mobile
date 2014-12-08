@@ -98,7 +98,7 @@ h1 {
 }
 
 .list-group a {
-  color: #000;
+  color: #333;
 }
 
 .navbar-absolute-top {
@@ -268,3 +268,17 @@ h1 {
 .bg-transparent {
   background-color: transparent !important;
 }
+
+.margin-top-10 {
+  margin-top: 10px;
+}
+
+.cell-align-middle {
+  vertical-align: middle !important;
+}
+
+.small {
+  font-size: x-small;
+  padding: 0px !important;
+}
+
