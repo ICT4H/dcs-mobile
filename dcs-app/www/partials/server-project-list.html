@@ -3,17 +3,12 @@
 
 <div class="scrollable">  
     <div class="scrollable-content">
-        <div class="list-group bg-white">
+    <div class="list-group bg-white">
             <div class="list-group-item project-tab">
                 <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
                   <li><a href="#local-project-list" >{{resourceBundle.installed}}</a></li>
                   <li><a href="#Tab2" toggle="on" parent-active-class="active">{{resourceBundle.server}}</a></li>
                 </ul>
-                <div class="tab-content">
-                    <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
-                         <div ng-include="'partials/pagination_tag.html'" class="bg-white black-font table-bar" style="padding:5px 0 0 0;">
-                    </div>
-                </div>
             </div>
         </div>
         <div class="list-group">
@@ -21,7 +16,7 @@
                 <i class="fa fa-download fa-2x pull-right" ng-click="downloadProject(project)" style="margin-top: -10px;font-weight: bolder;"></i>
                 <span>{{ project.name }}</span>
             </div>
-            <div ng-show="total>=5" ng-include="'partials/pagination_tag.html'"     class="bg-white black-font table-bar list-group-item ">
-            </div>
+            <div ng-include="'partials/pagination_tag.html'" class="navbar navbar-app navbar-absolute-bottom" ></div>
+        </div>
     </div>
 </div>

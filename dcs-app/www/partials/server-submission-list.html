@@ -1,4 +1,4 @@
-<div ng-include="'partials/menu-bar.html'"></div>
+\<div ng-include="'partials/menu-bar.html'"></div>
 
 <div content-for="new">
   <div ng-show="showActions" class="btn btn-navbar">
@@ -44,15 +44,11 @@
                         <a href='#project/{{project_uuid}}/submission/{{item.id[0]}}?server=true' style='font-weight: bolder;'>view</a>
                       </td>
                     </tr>
-                    <tr ng-show="total>=5">
-                    <td colspan="2">
-                      <div ng-include="'partials/pagination_tag.html'">
-                    </td>
-                  </tr>
                   </tbody>
                 </table>
               </div> <!-- table panel -->
             </div>
         </div>
+        <div ng-include="'partials/pagination_tag.html'" class="navbar navbar-app navbar-absolute-bottom" ></div>
         </div>
   </div>

@@ -1,15 +1,11 @@
-dcsApp.controller('submissionListController', 
-    ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
-    function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, contextService){
 
-    $scope.pageSizes = $rootScope.pageSizes;
-    $scope.pageSize = $rootScope.pageSize.value;
+    $scope.pagination = contextService.pagination;
+
     $scope.searchFields = {all: 'All'};  
     $scope.displayHeaders = {}; 
     $scope.orderHeaders = []; 
     $scope.showActions = false;
-    $scope.Math = window.Math;
-    $scope.total = 0;
     msg.showLoadingWithInfo('Loading submissions');
         
     var MODIFIED = 1;
@@ -45,21 +41,21 @@ dcsApp.controller('submissionListController',
         msg.hideLoadingWithErr('Failed to load Submissions');
     };
 
-    var loadSubmissions = function(pageNumber) {
-        $scope.pageNumber = pageNumber;
+    var loadSubmissions = function() {
         localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-            $scope.total = result.total;
+            $scope.pagination.totalElement = result.total;
         });
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
-        localStore.getSubmissionsByProjectId($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
+        localStore.getSubmissionsByProjectId($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
             .then(assignSubmissions, ErrorLoadingSubmissions);
         msg.hideAll();
     };
 
     $scope.onLoad = function() {
+        $scope.pagination.init($rootScope.pageSize.value, 0, loadSubmissions);
         getProjectFromCache($scope.project_uuid).then(function(project) {
             processProject(project);
-            loadSubmissions(0);
+            loadSubmissions();
         });
     };
 
@@ -90,28 +86,6 @@ dcsApp.controller('submissionListController',
     }
 
     $scope.onLoad();
-
-    $scope.onNext = function(pageNumber) {
-        loadSubmissions(pageNumber);
-    };
-
-    $scope.onPrevious = function(pageNumber) {
-        loadSubmissions(pageNumber);
-    };
-
-    $scope.isLastPage = function() {
-        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
-    };
-
-    $scope.isFirstPage = function() {
-        return $scope.pageNumber == 0;
-    };
-
-    $scope.isAtLast = function(index) {
-        if($scope.isLastPage())
-            return index ==  $scope.total % $scope.pageSize - 1 ;
-        return index == $scope.pageSize-1;
-    }
     
     $scope.isSubmissionDisplayable = function(submissionData) {
         return app.isSubmissionDisplayable(submissionData.data, $scope.searchStr, $scope.selectedField);
@@ -385,4 +359,7 @@ dcsApp.controller('submissionListController',
     //     }
     //     submitAfterConfirm();
     // };
-}]);
+};
+
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'contextService', submissionListController]);
+

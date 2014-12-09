@@ -1,21 +1,17 @@
-dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService',
-    function($q, $rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg){
+var serverSubmissionController = function($q, $rootScope, app, $scope, $routeParams, $location, dcsService, localStore, msg, contextService){
 
+    $scope.pagination = contextService.pagination;
     msg.showLoadingWithInfo('Loading submissions');
     $scope.displayHeaders = {}; 
     $scope.orderHeaders = []; 
     $scope.searchFields = {all: 'All'}; 
     $scope.showActions = false;
-    $scope.Math = window.Math;  
-    $scope.pageSizes = $rootScope.pageSizes;
-    $scope.pageSize = $rootScope.pageSize.value;
-    $scope.total = 0;
     $scope.project_uuid = $routeParams.project_uuid;
     var selected = [];
 
     var assignSubmissions = function(submissions){
         msg.hideAll();
-        $scope.total = submissions.total;
+        $scope.pagination.totalElement = submissions.total;
         if(submissions.length == 0)
             msg.hideLoadingWithInfo('No server submissions !');
         $scope.submissions = submissions.data;
@@ -34,45 +30,23 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
         msg.hideLoadingWithErr('Failed to load Submissions');
     };
 
-    var loadSubmissions = function(pageNumber) {
-        $scope.pageNumber = pageNumber;
+    var loadSubmissions = function() {
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
-        dcsService.getSubmissions($scope.project_uuid, pageNumber * $scope.pageSize, $scope.pageSize)
+        dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
             .then(assignSubmissions, ErrorLoadingSubmissions);
     };
 
     $scope.onLoad = function() {
+        $scope.pagination.init($rootScope.pageSize.value, 0, loadSubmissions);
         var project = $rootScope.currentProject;
         $scope.project_name = project.name;
         $scope.project_uuid = project.project_uuid;
         $scope.headers = JSON.parse(project.headers);
         $scope.orderHeaders = app.extractHeaders($scope.headers);
         angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
-        loadSubmissions(0);
+        loadSubmissions();
     };
     $scope.onLoad();
-
-    $scope.onNext = function(pageNumber) {
-        loadSubmissions(pageNumber);
-    };
-
-    $scope.onPrevious = function(pageNumber) {
-        loadSubmissions(pageNumber);
-    };
-
-    $scope.isLastPage = function() {
-        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
-    };
-
-    $scope.isFirstPage = function() {
-        return $scope.pageNumber == 0;
-    };
-
-    $scope.isAtLast = function(index) {
-        if($scope.isLastPage())
-            return index ==  $scope.total % $scope.pageSize - 1 ;
-        return index == $scope.pageSize-1;
-    }
 
     $scope.isSubmissionDisplayable = function(submissionData) {
         return app.isSubmissionDisplayable(submissionData, $scope.searchStr, $scope.selectedField);
@@ -162,4 +136,7 @@ dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$sc
             .then(localStore.createSubmission);
             
     }
-}]);
+};
+
+dcsApp.controller('serverSubmissionController', ['$q', '$rootScope', 'app', '$scope', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'contextService', serverSubmissionController]);
+

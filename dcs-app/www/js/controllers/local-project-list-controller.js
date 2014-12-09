@@ -1,11 +1,12 @@
-var localProjectListController = function($rootScope, $scope, $q, dcsService, projectDao, msg) {
+var localProjectListController = function($rootScope, $scope, $q, dcsService, contextService, projectDao, msg) {
 
     resourceBundle = $rootScope.resourceBundle;
-    $scope.pageSizes = $rootScope.pageSizes;
-    $scope.pageSize = $rootScope.pageSize.value;
-    $scope.total = 0;
-    $scope.pageNumber = 0;
-    $scope.Math = window.Math;
+    $scope.createSurveyResponse = contextService.createSurveyResponse;
+    $scope.isProjectOutdated = contextService.isProjectOutdated;
+    $scope.pagination = contextService.pagination;
+    $scope.isDisplayable = [];
+    $scope.selectedProjects = [];
+
     var assignProjects = function(projects) {
         $scope.projects = projects;
     };
@@ -15,42 +16,20 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     };
 
     var loadProjects  = function(pageNumber) {
-        $scope.pageNumber = pageNumber;
         msg.showLoadingWithInfo(resourceBundle.loading_projects);
-        projectDao.getProjects(pageNumber * $scope.pageSize, $scope.pageSize)
+        projectDao.getProjects($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
         .then(assignProjects, ErrorLoadingProjects);
         msg.hideAll();
     };
 
     var onLoad = function() {
+        $scope.pagination.init($rootScope.pageSize.value, 0, loadProjects);
         projectDao.getCountOfProjects().then(function(result){
             if(result.total == 0) return;
-            $scope.total = result.total;
+            $scope.pagination.totalElement = result.total;
             loadProjects(0);
         });
     };
-
-    $scope.onNext = function(pageNumber) {
-        loadProjects(pageNumber);
-    };
-
-    $scope.onPrevious = function(pageNumber) {
-        loadProjects(pageNumber);
-    };
-
-    $scope.isLastPage = function() {
-        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
-    };
-
-    $scope.isFirstPage = function() {
-        return $scope.pageNumber == 0;
-    };
-
-    $scope.isAtLast = function(index) {
-        if($scope.isLastPage())
-            return index ==  $scope.total % $scope.pageSize - 1 ;
-        return index == $scope.pageSize-1;
-    }
 
     onLoad();
 
@@ -87,7 +66,6 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
             $q.all(promises).then(function() {
             msg.hideLoadingWithInfo('updated project list');
             $scope.pageSizes.push($scope.total);
-             // $scope.pageSize = {'value':$scope.total};
              loadProjects(0);
             },function() {
                 msg.hideLoadingWithErr('projects not updated properly');
@@ -96,4 +74,4 @@ var localProjectListController = function($rootScope, $scope, $q, dcsService, pr
     };
 };
 
-dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'projectDao', 'messageService', localProjectListController]);
+dcsApp.controller('localProjectListController', ['$rootScope', '$scope', '$q', 'dcsService', 'contextService', 'projectDao', 'messageService', localProjectListController]);

@@ -66,16 +66,12 @@
                         <a href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style='font-weight: bolder; margin-top'>view</a>
                       </td>
                   </tr>
-                  <tr ng-show="total>=5">
-                    <td colspan="2">
-                      <div ng-include="'partials/pagination_tag.html'">
-                    </td>
-                  </tr>
                  </tbody>
               </table>
             </div>
           </div>
         </div>
+        <div ng-include="'partials/pagination_tag.html'" class="navbar navbar-app navbar-absolute-bottom" ></div>
         </div>
       </div>
     </div>

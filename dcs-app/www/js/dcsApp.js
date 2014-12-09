@@ -8,7 +8,7 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "angularMoment"
 ]);
 
-var isEmulator = true;
+var isEmulator = false;
 var BUTTON_NO = isEmulator ? 3 : 2;
 
 var SERVER = 'server';

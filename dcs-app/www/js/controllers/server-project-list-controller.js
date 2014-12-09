@@ -1,12 +1,8 @@
-dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', function($rootScope, $scope, dcsService, localStore, msg) {
-
-    $scope.pageSize = $rootScope.pageSize.value;
-    $scope.pageSizes = $rootScope.pageSizes;
-    $scope.total = 0;
-    $scope.Math = window.Math;
+var serverProjectListController = function($rootScope, $scope, dcsService, localStore, msg, contextService) {
+    $scope.pagination = contextService.pagination;
 
     var assignProjects = function(projects) {
-        $scope.total = projects.total;
+        $scope.pagination.totalElement = projects.total;
         $scope.projects = projects.projects;
         msg.hideAll();
     };
@@ -15,38 +11,16 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
         msg.hideLoadingWithErr('Failed to fetch projects');
     };
 
-    var fetchProjects  = function(pageNumber) {
-        $scope.pageNumber = pageNumber;
+    var fetchProjects  = function() {
         msg.showLoadingWithInfo(resourceBundle.fetching_projects);
-        dcsService.getProjects(pageNumber * $scope.pageSize, $scope.pageSize)
+        dcsService.getProjects($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
             .then(assignProjects, ErrorLoadingProjects);
     };
 
     var onLoad = function() {
-        fetchProjects(0);
+        $scope.pagination.init($rootScope.pageSize.value, 0, fetchProjects);
+        fetchProjects();
     };
-
-    $scope.onNext = function(pageNumber) {
-        fetchProjects(pageNumber);
-    };
-
-    $scope.onPrevious = function(pageNumber) {
-        fetchProjects(pageNumber);
-    };
-
-    $scope.isLastPage = function() {
-        return Math.ceil($scope.total/$scope.pageSize) == $scope.pageNumber + 1;
-    };
-
-    $scope.isFirstPage = function() {
-        return $scope.pageNumber == 0;
-    };
-
-    $scope.isAtLast = function() {
-        if($scope.isLastPage())
-            return $scope.listIndex ==  $scope.total % $scope.pageSize - 1 ;
-        return $scope.listIndex == $scope.pageSize-1;
-    }
 
     onLoad();
 
@@ -60,4 +34,6 @@ dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsSe
                 msg.hideLoadingWithInfo('this project is already downloaded.');
             });
     };
-}]);
+};
+
+dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', 'contextService', serverProjectListController]);
