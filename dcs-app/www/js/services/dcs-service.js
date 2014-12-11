@@ -117,6 +117,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
             return deferred.promise;
         }
 
+        fileSystem.setWorkingDir(app.user.name, $rootScope.currentProject.name);
         return getFilesMeta(fileNamesString)
             .then(function(filesMetaData) {
                 console.log('all getFilesMeta promises done, result length: ' + filesMetaData.length);

@@ -3,7 +3,7 @@
         console.log('CordovaFileSytem constructor');
     }
 
-    var _fsReady;
+    var _fsReady, _working_dir;
 
     CordovaFileSytem.prototype = Object.create( FileSystemInterface );
 
@@ -13,6 +13,54 @@
         //Making static with assumption that there will be only one type of filessytem to intreact with
         if(!_fsReady)
             _fsReady = initFileSystem();
+    };
+
+    /*
+    * This sets _working_dir for file to be copied/read into/from.
+    * This working dir should be set before copying/moving/reading file.
+    */
+    CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_name) {
+        var deffered = $.Deferred();
+
+        _fsReady.then(function(fs) {
+            // TODO read the dcs (app_path) from config
+            var path = 'dcs/' + slugify(user_email) + '/' + slugify(project_name);
+            console.log('fs is ready creating/setting current directory to: ' + path);
+            createDir(fs.root, path.split('/'), deffered.reject);
+            // dirs created, set _working_dir to it.
+            fs.root.getDirectory(
+                path,
+                {create:true, exclusive:false},
+                deffered.resolve,
+                deffered.reject
+            );
+        }, deffered.reject);
+
+        _working_dir = deffered.promise();
+    };
+
+    CordovaFileSytem.prototype.getWorkingDirEntry = function() {
+        return _working_dir;
+    };
+    var slugify = function(text) {
+        // convert text to lowercase and replaces non alpa chars and -(hypen) with _ (underscore)
+        return text
+            .toLowerCase()
+            .replace(/[^\w-]+/g,'_');
+    };
+
+    function createDir(rootDirEntry, folders, errorHandler) {
+        console.log('in createDirEntry: ' + folders);
+        // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
+      if (folders[0] == '.' || folders[0] == '') {
+        folders = folders.slice(1);
+      }
+
+      rootDirEntry.getDirectory(folders[0], {create: true}, function(dirEntry) {
+        if (folders.length > 1) {
+          createDir(dirEntry, folders.slice(1), errorHandler);
+        }
+      }, errorHandler);
     };
 
     CordovaFileSytem.prototype.moveFile = function(imageUrl, callbacks) {
@@ -74,15 +122,10 @@
 
             fileEntry.file(function(file){
                 console.log('fileEntry.file.size: ' + file.size);
+                // fileSizeInBytes
                 if (file.size > 0) {
-                    _fsReady.then(function(fs) {
-                        console.log('in _fsReady then');
-                        //TODO /dcs/media can't be created by one call. Make a recurssive method to handle this
-                        fs.root.getDirectory('dcs/', {create:true, exclusive:false},
-                            function(dirEntry) {
-                                onSuccess(dirEntry, fileEntry, callbacks);
-                            }, callbacks.error
-                        );
+                    _working_dir.then(function(dirEntry) {
+                        onSuccess(dirEntry, fileEntry, callbacks);
                     }, callbacks.error);
                 } else {
                     callbacks.error('Empty file');
@@ -113,10 +156,12 @@
     var fileNameToFileEntry = function(fileName, onSuccess) {
         _fsReady.then(function(fs) {
             console.log('fileName in fileNameToFileEntry: ' + fileName)
-            fs.root.getFile('dcs/' + fileName, {create: false}, function(fileEntry) {
-                onSuccess(fileEntry);
-            }, function() {
-                console.log('error trying to get file: ' + fileName);
+            _working_dir.then(function(dirEntry) {
+                dirEntry.getFile(fileName, {create: false}, function(fileEntry) {
+                    onSuccess(fileEntry);
+                }, function() {
+                    console.log('error trying to get file: ' + fileName);
+                });
             });
         });
     };

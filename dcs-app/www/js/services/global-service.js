@@ -1,4 +1,4 @@
-dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg){
+dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($q, $http, msg, $rootScope){
     this.user = {'name':'', 'password': '', 'serverUrl':''};
     this.isAuthenticated = false;
     var exculdeHeaders = {'ds_name': 'ds_name', 'date':'date'};
@@ -94,15 +94,22 @@ dcsApp.service('app', ['$q', '$http', 'messageService', function($q, $http, msg)
     }
 
     this.httpGetMediaFile = function(submission_uuid, fileName) {
+        var deferred = $q.defer();
         user = this.user;
         var url = user.url + '/client/attachment/' + submission_uuid + '/' + fileName;
         var headersMap = {"Authorization": 'Basic ' + btoa(this.user.name + ':' + this.user.password)};
-        // TODO use file system to find the base url.
-        var saveToFileUrl = 'file:///sdcard/dcs/' + fileName;
 
-        console.log('downloading file: ' + fileName);
-
-        return downloadMedia(headersMap, url, saveToFileUrl);
+        fileSystem.setWorkingDir(this.user.name, $rootScope.currentProject.name);
+        fileSystem.getWorkingDirEntry().then(function(dirEntry) {
+            var userProjectFolder = dirEntry.toURL();
+            var saveToFileUrl = userProjectFolder + fileName;
+            console.log('downloading file to: ' + saveToFileUrl);
+            downloadMedia(headersMap, url, saveToFileUrl).then(
+                deferred.resolve,
+                deferred.reject
+            );
+        });
+        return deferred.promise;
     }
 
     function downloadMedia(headerMap, url, saveToFileUrl) {

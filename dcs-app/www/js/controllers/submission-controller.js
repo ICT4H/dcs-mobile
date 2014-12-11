@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', function($routeParams, $location, localStore, msg, dcsService){
+dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'app', function($routeParams, $location, localStore, msg, dcsService, app){
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
@@ -54,16 +54,24 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
         });
     };
 
-    options = {
-        'saveSubmission': onSubmit,
-        'localStore': localStore,
-        'buttonLabel': buttonLabel,
-        'project_uuid': $routeParams.project_uuid,
-        'submission_id': submission_id,
-        'getDate': getDate,
-        'getSubmissionFromServer': getSubmissionFromServer, 
-        'isServerSubmission' : $routeParams.server ? true : false 
-    };
-    loadEnketo(options);
+    // project can be taken from rootScope
+    localStore.getProjectById($routeParams.project_uuid).then(function(project) {
+
+        var options = {
+            'saveSubmission': onSubmit,
+            'localStore': localStore,
+            'buttonLabel': buttonLabel,
+            'project': project,
+            'submission_id': submission_id,
+            'getDate': getDate,
+            'getSubmissionFromServer': getSubmissionFromServer,
+            'isServerSubmission' : $routeParams.server ? true : false
+        };
+        var project_name = project.name;
+        var userEmail = app.user.name;
+
+        fileSystem.setWorkingDir(userEmail, project_name);
+        loadEnketo(options);
+    });
 
 }]);
