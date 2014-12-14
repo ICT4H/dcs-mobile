@@ -10,14 +10,20 @@
     CordovaFileSytem.prototype.constructor = FileSystemInterface;
 
     CordovaFileSytem.prototype.init = function() {
-        //Making static with assumption that there will be only one type of filessytem to intreact with
+        //Making var static with assumption that there will be only one filessytem to intreact with
         if(!_fsReady)
             _fsReady = initFileSystem();
     };
 
+    CordovaFileSytem.prototype.getFs = function() {
+        return _fsReady;
+    };
+
     /*
-    * This sets _working_dir for file to be copied/read into/from.
-    * This working dir should be set before copying/moving/reading file.
+    * This creates and or sets _working_dir to dirEntry for file to be copied/read into/from.
+    * The working dir should be set before copying/moving/reading file.
+    *
+    * dirEntry created as: dcs/user_email/project_name; special chars replaced with _ (underscore)
     */
     CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_name) {
         var deffered = $.Deferred();
@@ -25,42 +31,20 @@
         _fsReady.then(function(fs) {
             // TODO read the dcs (app_path) from config
             var path = 'dcs/' + slugify(user_email) + '/' + slugify(project_name);
-            console.log('fs is ready creating/setting current directory to: ' + path);
-            createDir(fs.root, path.split('/'), deffered.reject);
-            // dirs created, set _working_dir to it.
-            fs.root.getDirectory(
-                path,
-                {create:true, exclusive:false},
-                deffered.resolve,
+            console.log('trying to create path: ' + path);
+
+            createPath(fs.root, path).then(function() {
+                setCurrentDirTo(path, fs, deffered);
+            },
                 deffered.reject
             );
         }, deffered.reject);
 
-        _working_dir = deffered.promise();
+        return _working_dir = deffered.promise();
     };
 
     CordovaFileSytem.prototype.getWorkingDirEntry = function() {
         return _working_dir;
-    };
-    var slugify = function(text) {
-        // convert text to lowercase and replaces non alpa chars and -(hypen) with _ (underscore)
-        return text
-            .toLowerCase()
-            .replace(/[^\w-]+/g,'_');
-    };
-
-    function createDir(rootDirEntry, folders, errorHandler) {
-        console.log('in createDirEntry: ' + folders);
-        // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
-      if (folders[0] == '.' || folders[0] == '') {
-        folders = folders.slice(1);
-      }
-
-      rootDirEntry.getDirectory(folders[0], {create: true}, function(dirEntry) {
-        if (folders.length > 1) {
-          createDir(dirEntry, folders.slice(1), errorHandler);
-        }
-      }, errorHandler);
     };
 
     CordovaFileSytem.prototype.moveFile = function(imageUrl, callbacks) {
@@ -114,6 +98,57 @@
         console.log('cordovaMediaManager init called');
         return deffered.promise();
     };
+
+    var slugify = function(text) {
+        // convert text to lowercase and replaces non alpa chars and -(hypen) with _ (underscore)
+        return text
+            .toLowerCase()
+            .replace(/[^\w-]+/g,'_');
+    };
+
+    var createPath = function(rootDirEntry, path) {
+        var deffered = $.Deferred();
+        var folders = path.split('/');
+        _createSubFoldersRecursively(rootDirEntry, folders, deffered);
+        return deffered.promise();
+    }
+
+    var _createSubFoldersRecursively = function(rootDirEntry, folders, deffered) {
+        folders = _cleanCurrentPath(folders);
+        var currentParent = folders[0];
+
+        rootDirEntry.getDirectory(currentParent, {
+            create: true
+            }, function(dirEntry) {
+                var isNonLeafFolder = folders.length > 1;
+                if (isNonLeafFolder) {
+                    var subFolders = folders.slice(1);
+                    _createSubFoldersRecursively(dirEntry, subFolders, deffered);
+                } else {
+                    deffered.resolve();
+                }
+            },
+            deffered.reject
+        );
+    };
+
+    var _cleanCurrentPath = function(folders) {
+        // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
+        if (folders[0] == '.' || folders[0] == '') {
+            folders = folders.slice(1);
+        }
+        return folders;
+    }
+
+    var setCurrentDirTo = function(path, fs, deffered) {
+        console.log('trying to set current dir to: ' + path);
+        fs.root.getDirectory(
+            path,
+            {create:true, exclusive:false},
+            deffered.resolve,
+            deffered.reject
+        );
+    }
 
     var getFileAndDestDirEntry = function(imageUrl, onSuccess, callbacks) {
         var resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;

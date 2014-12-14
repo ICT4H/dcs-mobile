@@ -18,6 +18,7 @@ module.exports = function(config){
 
       //'../../test/unit/mocks.js',
       '../../test/unit/media-test.js',
+      '../../test/unit/file-handler-test.js',
       { pattern: 'i18n/resourceBundle.json',
           watched: true,
           served:  true,
