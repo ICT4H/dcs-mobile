@@ -12,9 +12,12 @@ module.exports = function(config){
 
       'js/controllers/*.js',
       'js/services/*.js',
+      'js/modules/device-handler.js',
+      'js/modules/file-handler.js',
+      'js/modules/*.js',
 
-      '../../test/unit/mocks.js',
-      '../../test/unit/local-project-list-controller-tests.js',
+      //'../../test/unit/mocks.js',
+      '../../test/unit/media-test.js',
       { pattern: 'i18n/resourceBundle.json',
           watched: true,
           served:  true,

@@ -12,29 +12,29 @@
         var mediaTypeOptions = {
             'image/*': [{
                 label: 'Camera',
-                clickHandler: this.deviceHandler.openCamera,
+                deviceHandle: this.deviceHandler.openCamera,
                 fsCallbacks: this.fileSystem.copyFile,
                 callbacks: widgetCallbacks
             }, {
                 label: 'Gallery',
-                clickHandler: this.deviceHandler.openPhotoGallery,
+                deviceHandle: this.deviceHandler.openPhotoGallery,
                 fsCallbacks: this.fileSystem.copyFile,
                 callbacks: widgetCallbacks
             }],
             'video/*': [{
                 label: 'Video',
-                clickHandler: this.deviceHandler.openVideoCamera,
+                deviceHandle: this.deviceHandler.openVideoCamera,
                 fsCallbacks: this.fileSystem.copyFile,
                 callbacks: widgetCallbacks
             }, {
                 label: 'Gallery-v',
-                clickHandler: this.deviceHandler.openVideoGallery,
+                deviceHandle: this.deviceHandler.openVideoGallery,
                 fsCallbacks: this.fileSystem.copyFile,
                 callbacks: widgetCallbacks
             }],
             'audio/*': [{
                 label: 'Audio',
-                clickHandler: this.deviceHandler.openAudioRecorder,
+                deviceHandle: this.deviceHandler.openAudioRecorder,
                 fsCallbacks: this.fileSystem.copyFile,
                 callbacks: widgetCallbacks
             }]};
@@ -55,14 +55,12 @@
             type  : 'button',
             html : options.label,
             on    : {
-                click: function() {
-                    options.clickHandler({
-                        success: function(fileUrl) {
-                            options.fsCallbacks(fileUrl, options.callbacks);
-                        },
-                        error: options.callbacks.error
-                    })
-                }
+                click: options.deviceHandle({
+                    success: function(fileUrl) {
+                        options.fsCallbacks(fileUrl, options.callbacks);
+                    },
+                    error: options.callbacks.error
+                })
             }
         });
     }
