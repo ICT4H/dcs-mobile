@@ -2,6 +2,6 @@
   "name": "mobile-app",
   "version": "0.0.1",
   "dependencies": {
-    "mobile-angular-ui": "09b8792c950fe6fb0e2f4d64b4426721c409b072"
+    "mobile-angular-ui": "~1.2.0-beta.2"
   }
 }
