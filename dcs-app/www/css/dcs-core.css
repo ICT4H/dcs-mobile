@@ -1,4 +1,4 @@
-#lightbulb {
+/*#lightbulb {
   font-size: 100px;
   display: block;
   text-align: center;
@@ -155,8 +155,8 @@ h1 {
 }
 
 .submission-tab .active{
-/*  background-color: #adadad !important;
-  border-radius: 6px;*/
+  background-color: #adadad !important;
+  border-radius: 6px;
   margin-right: 0px;
   border-radius: 0px;
   border:0px;
@@ -247,9 +247,9 @@ h1 {
   border-right: 1px solid #adadad;
 }
 
-/*.table-bar > span:first-child {
+.table-bar > span:first-child {
   border-left: 1px solid #adadad;
-}*/
+}
 
 .table-bar button {
   border-color: #fff !important;
@@ -280,5 +280,33 @@ h1 {
 .small {
   font-size: x-small;
   padding: 0px !important;
+}*/
+
+/*new css*/
+.app {
+  background-color: rgb(255, 255, 255);
 }
 
+.selected {
+  background-color: #dff0d8;
+}
+
+.disable {
+  color: #ccc !important;
+   background-color: #fff !important;
+}
+
+/*
+.garner-actions{
+  width: 100px;
+}
+
+.garner-actions-icon{
+  width: 50px;
+  text-align: center;
+}
+
+.garner-btn {
+  padding-right: 20px;
+}
+*/

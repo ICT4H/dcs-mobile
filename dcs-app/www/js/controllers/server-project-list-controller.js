@@ -1,6 +1,6 @@
 var serverProjectListController = function($rootScope, $scope, dcsService, localStore, msg, contextService) {
     $scope.pagination = contextService.pagination;
-
+    $scope.selectedProject = [];
     var assignProjects = function(projects) {
         $scope.pagination.totalElement = projects.total;
         $scope.projects = projects.projects;
@@ -24,7 +24,20 @@ var serverProjectListController = function($rootScope, $scope, dcsService, local
 
     onLoad();
 
-    $scope.downloadProject = function(project) {
+    $scope.onChange = function(project_id) {
+        var index = $scope.selectedProject.indexOf(project_id);
+        if(index > -1)
+            $scope.selectedProject.splice(index, 1);
+        else
+            $scope.selectedProject.push(project_id);
+
+    };
+
+    $scope.downloadProject = function() {
+        if($scope.selectedProject.length <= 0) {
+           navigator.notification.alert('Please Select atleast one project', function(){return;});
+            return;
+        }
         msg.showLoadingWithInfo('Downloading project');
         dcsService.getQuestion(project.project_uuid)
             .then(localStore.createProject)

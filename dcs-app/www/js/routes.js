@@ -2,51 +2,63 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
     $routeProvider
         .when('/',{
           templateUrl: "partials/login.html",
-          controller: 'loginController'
+          controller: 'loginController',
+          reloadOnSearch: false
          })
         .when('/server-submissions/:project_uuid',{
           templateUrl: "partials/server-submission-list.html",
-          controller: 'serverSubmissionController'
+          controller: 'serverSubmissionController',
+          reloadOnSearch: false
          })
         .when('/manage-columns/:project_uuid',{
           templateUrl: "partials/manage-columns.html",
-          controller: 'manageColumnsController'
+          controller: 'manageColumnsController',
+          reloadOnSearch: false
          })
         .when('/local-project-list',{
           templateUrl: "partials/local-project-list.html",
-          controller: 'localProjectListController'
+          controller: 'localProjectListController',
+          reloadOnSearch: false
          })
         .when('/server-project-list',{
           templateUrl: "partials/server-project-list.html",
-          controller: 'serverProjectListController'
+          controller: 'serverProjectListController',
+          reloadOnSearch: false
          })
         .when('/submission-list/:project_uuid',{
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
+          reloadOnSearch: false
         })
         .when('/about',{
           templateUrl: "partials/about.html",
           controller: 'localProjectListController',
+          reloadOnSearch: false
         })
         .when('/project/:project_uuid/submission/:submission_id', {
           templateUrl: "partials/submission.html",
-          controller: 'submissionController'
+          controller: 'submissionController',
+          reloadOnSearch: false
         })
         .when('/settings', {
           templateUrl: "partials/settings.html",
-          controller: 'settingsController'
+          controller: 'settingsController',
+          reloadOnSearch: false
         })
         .when('/change-password', {
           templateUrl: "partials/change-password.html",
-          controller:'changePasswordController'
+          controller:'changePasswordController',
+          reloadOnSearch: false
         })
         .when('/conflict-submission-list/:project_uuid', {
           templateUrl: "partials/conflict-submission-list.html",
-          controller: 'submissionConflictController'
+          controller: 'submissionConflictController',
+          reloadOnSearch: false
         })
         .when('/conflict-resolver/:project_uuid/:submission_uuid', {
           templateUrl: "partials/submission-conflict-resolver.html", 
-          controller: 'submissionConflictResolverController'
+          controller: 'submissionConflictResolverController',
+          reloadOnSearch: false
         }); 
     $httpProvider.defaults.timeout = 1000;
 }]);

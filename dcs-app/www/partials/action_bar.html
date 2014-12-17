@@ -1,0 +1,19 @@
+<div class="btn-group pull-right">
+    <a ui-turn-on='myDropdown' class='btn'>
+      <i class="fa fa-ellipsis-v fa-2x"></i>
+    </a>
+    <ul 
+      class="dropdown-menu"
+      ui-outer-click="Ui.turnOff('myDropdown')"
+      ui-outer-click-if="Ui.active('myDropdown')"
+      role="menu"
+      ui-show="myDropdown" 
+      ui-state="myDropdown"
+      ui-turn-off="myDropdown">
+
+    	<li ng-repeat="(name, options) in actions" ng-click="options.onClick()"> 
+      	<a ng-class="{'disable': options.isDisabled}">{{options.label}}</a>
+      </li>
+    </ul>
+</div>
+     
