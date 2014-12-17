@@ -1,6 +1,6 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, contextService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, paginationService){
 
-    $scope.pagination = contextService.pagination;
+    $scope.pagination = paginationService.pagination;
 
     $scope.searchFields = {all: 'All'};  
     $scope.displayHeaders = {}; 
@@ -12,7 +12,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var UNMODIFIED = 0;
     var selectedCount = 0;
     var serverSubmissions = [];
-    var selected = [];
+    var selectedSubmission = [];
     $scope.conflictSubmissionCount = 0;
 
     $scope.project_uuid = $routeParams.project_uuid;
@@ -240,10 +240,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     };
 
-    $scope.update_selected_submissions = function(submissionRow, submission) {
+    $scope.onSubmissionSelect = function(submissionRow, submission) {
         submissionRow.selected = !submissionRow.selected;
         app.flipArrayElement(selected, submission.submission_id);
-        $scope.showActions = (selected.length >= 1);
     };
 
     // $scope.syncWithServer = function() {
@@ -290,29 +289,30 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         });
     };
 
-    $scope.deleteSubmissions = function() {
-        function onConfirm(buttonIndex) {
-            if(buttonIndex==BUTTON_NO) return;
+    var onDelete = function() {
+        if(app.areItemSelected(selectedSubmission)){
+            function onConfirm(buttonIndex) {
+                if(buttonIndex==BUTTON_NO) return;
+                msg.showLoading();
+                localStore.deleteSubmissions(selectedSubmission)
+                .then(function(){
+                    $scope.showActions = false;
+                    loadSubmissions(0);
+                    msg.hideLoadingWithInfo("Submission(s) deleted");
+                }
+                ,function(error){
+                    console.log(error);
+                    msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
+                });
+            };
 
-            msg.showLoading();
-            localStore.deleteSubmissions(selected)
-            .then(function(){
-                $scope.showActions = false;
-                loadSubmissions(0);
-                msg.hideLoadingWithInfo("Submission(s) deleted");
-            }
-            ,function(error){
-                console.log(error);
-                msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
-            });
-        };
-
-        navigator.notification.confirm(
-            'Do you want to delete ?',
-            onConfirm,
-            'Delete submission',
-            ['Yes','No']
-        );
+            navigator.notification.confirm(
+                'Do you want to delete ?',
+                onConfirm,
+                'Delete submission',
+                ['Yes','No']
+            );
+        }
     };
 
     $scope.downloadSubmission = function(submission) {
@@ -359,7 +359,18 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     //     }
     //     submitAfterConfirm();
     // };
+
+    var initActions =  function() {
+        $scope.actions['delete'] = {'onClick': onDelete, 'label': 'Delete' };
+        $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
+        $scope.actions['new'] = {'onClick': onNew, 'label': 'Create new submission'};
+    };
+
+    $scope.onSubmissionSelect = function(submissionRow, submission) {
+        submissionRow.selected = !submissionRow.selected;
+        app.flipArrayElement(selected, submission.submission_id);
+    };
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'contextService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', submissionListController]);
 
