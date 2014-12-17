@@ -1,4 +1,4 @@
-var contextService = function($location) {
+var contextService = function() {
 
     //Pagination
     this.pagination = {};
@@ -51,4 +51,4 @@ var contextService = function($location) {
     };
 
 };
-dcsApp.service('contextService', ['$location', contextService]);
+dcsApp.service('contextService', [contextService]);
