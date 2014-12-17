@@ -1,6 +1,10 @@
-var serverProjectListController = function($rootScope, $scope, dcsService, localStore, msg, contextService) {
-    $scope.pagination = contextService.pagination;
-    $scope.selectedProject = [];
+var serverProjectListController = function($rootScope, $scope, dcsService, localStore, msg, app, paginationService) {
+    resourceBundle = $rootScope.resourceBundle;
+    $scope.pagination = paginationService.pagination;
+    $scope.actions = {};
+
+    var selectedProject = [];
+
     var assignProjects = function(projects) {
         $scope.pagination.totalElement = projects.total;
         $scope.projects = projects.projects;
@@ -17,36 +21,35 @@ var serverProjectListController = function($rootScope, $scope, dcsService, local
             .then(assignProjects, ErrorLoadingProjects);
     };
 
-    var onLoad = function() {
-        $scope.pagination.init($rootScope.pageSize.value, 0, fetchProjects);
-        fetchProjects();
-    };
-
-    onLoad();
-
-    $scope.onChange = function(project_id) {
-        var index = $scope.selectedProject.indexOf(project_id);
-        if(index > -1)
-            $scope.selectedProject.splice(index, 1);
-        else
-            $scope.selectedProject.push(project_id);
-
-    };
-
-    $scope.downloadProject = function() {
-        if($scope.selectedProject.length <= 0) {
-           navigator.notification.alert('Please Select atleast one project', function(){return;});
-            return;
-        }
-        msg.showLoadingWithInfo('Downloading project');
-        dcsService.getQuestion(project.project_uuid)
+    var onDownloadProject = function() {
+        if(app.areItemSelected(selectedProject)) {
+            msg.showLoadingWithInfo('Downloading projects');
+            dcsService.getQuestion(selectedProject)
             .then(localStore.createProject)
             .then(function() {
                 msg.hideLoadingWithInfo('Project downloaded.');
             }, function(error) {
                 msg.hideLoadingWithInfo('this project is already downloaded.');
             });
+        }
     };
+
+    var initActions =  function() {
+        $scope.actions['download'] = {'onClick': onDownloadProject, 'label': 'Download' };
+    };
+
+    $scope.onProjectSelect = function(projectRow, project) {
+        projectRow.selected = !projectRow.selected;
+        app.flipArrayElement(selectedProject, project.project_uuid);
+    };
+
+    var onLoad = function() {
+        $scope.pagination.init($rootScope.pageSize.value, 0, fetchProjects);
+        fetchProjects();
+        initActions();
+    };
+
+    onLoad();
 };
 
-dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', 'contextService', serverProjectListController]);
+dcsApp.controller('serverProjectListController', ['$rootScope', '$scope', 'dcsService', 'projectDao', 'messageService', 'app', 'paginationService', serverProjectListController]);
