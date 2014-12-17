@@ -1,32 +1,34 @@
 <link rel="stylesheet" href="css/angucomplete.css" />
-<span content-for="title">{{resourceBundle.app_title}}</span>
-<div class="scrollable-content section">
-    
-    <div bs-panel>
-        <div class ="form-group">
-            <label>{{resourceBundle.username}}</label>
-            <div angucomplete-alt 
-              id="ex1" 
-              pause="100" 
-              selected-object="userSelected" 
-              local-data="users" 
-              search-fields="name" 
-              title-field="name" 
-              minlength="1" 
-              input-class="form-control form-control-small"/>
-         </div>
-        <div class ="form-group">
-            <label>{{resourceBundle.password}}</label>
-            <input class="form-control" type ="password" ng-model="user.password"> 
-        </div>
-        <div class ="form-group">
-            <a href="" ng-click="forgetPassword()">{{resourceBundle.forget_password}}</a>
-        </div>
-        <div class="form-group">
-            <label>{{resourceBundle.url}}</label>    
-            <input class="form-control" type ="text" ng-model="user.url">
-        </div>
-        <button class="btn btn-primary" ng-click="login()">{{resourceBundle.login}}</button>
-    </div>
+<div ui-content-for="title">{{resourceBundle.app_title}}</div>
+<div ui-content-for="sideBar"></div>
+<div ui-content-for="navbarAction"></div>
+<div class="scrollable">
+  <div class="scrollable-content section">
+      <div bs-panel>
+          <div class ="form-group">
+              <label>{{resourceBundle.username}}</label>
+              <div angucomplete-alt
+                id="ex1"
+                pause="100"
+                selected-object="userSelected"
+                local-data="users"
+                search-fields="name"
+                title-field="name"
+                minlength="1"
+                input-class="form-control form-control-small"/>
+           </div>
+          <div class ="form-group">
+              <label>{{resourceBundle.password}}</label>
+              <input class="form-control" type ="password" ng-model="user.password">
+          </div>
+          <div class ="form-group">
+              <a href="" ng-click="forgetPassword()">{{resourceBundle.forget_password}}</a>
+          </div>
+          <div class="form-group">
+              <label>{{resourceBundle.url}}</label>
+              <input class="form-control" type ="text" ng-model="user.url">
+          </div>
+          <button class="btn btn-primary" ng-click="login()">{{resourceBundle.login}}</button>
+      </div>
+  </div>
 </div>
- 
