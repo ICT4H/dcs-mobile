@@ -1,10 +1,5 @@
 dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
     $routeProvider
-        .when('/',{
-          templateUrl: "partials/login.html",
-          controller: 'loginController',
-          reloadOnSearch: false
-         })
         .when('/server-submissions/:project_uuid',{
           templateUrl: "partials/server-submission-list.html",
           controller: 'serverSubmissionController',
@@ -59,6 +54,10 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
           templateUrl: "partials/submission-conflict-resolver.html", 
           controller: 'submissionConflictResolverController',
           reloadOnSearch: false
-        }); 
+        })
+        .otherwise({
+          templateUrl: "partials/login.html",
+          controller: 'loginController'
+        });
     $httpProvider.defaults.timeout = 1000;
 }]);
