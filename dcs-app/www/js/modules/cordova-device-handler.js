@@ -66,5 +66,3 @@
     }
 
 }());
-
-var cordovaDeviceHandler = new CordovaDeviceHandler(navigator);

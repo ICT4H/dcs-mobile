@@ -203,4 +203,4 @@
 
 }());
 
-var fileSystem = new CordovaFileSytem();
+
