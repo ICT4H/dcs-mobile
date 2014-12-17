@@ -1,7 +1,8 @@
-<div ng-include="'partials/menu-bar.html'"></div>
-<span content-for="title">{{resourceBundle.settings_title}}</span>
+<span ui-content-for="title">{{resourceBundle.settings_title}}</span>
+<div ui-content-for="navbarAction">
+    <div ng-include="'partials/action_bar.html'"></div>
+</div>
 <div class="scrollable-content section">
-    
     <div bs-panel>
         <div class ="form-group">
             <label>{{resourceBundle.item_per_page}}</label>
