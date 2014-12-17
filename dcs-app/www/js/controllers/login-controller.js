@@ -26,6 +26,10 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
     $scope.login = function(){  
         msg.showLoading();
         app.user = $scope.user;
+        if(!$scope.user.hasOwnProperty("name") || !$scope.user.hasOwnProperty("password")) {
+            onError("Username and password cannot be empty");
+            return;
+        }
         if(!isNewUser)
             userDao.openUserStore(app.user)
             .then(function() {
