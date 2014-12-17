@@ -199,5 +199,13 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
 
     this.promises = function(array, onSuccess, onError) {
         $q.all(array).then(onSuccess, onError);
-    }
+    };
+
+    this.areItemSelected = function(selectedProject) {
+        if(selectedProject.length ==0) {
+            navigator.notification.alert('You need to select atleast one item.', function() {}, "Garner");
+            return false;
+        }
+        return true;
+    };
 }]);
