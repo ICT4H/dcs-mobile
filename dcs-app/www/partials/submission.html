@@ -1,8 +1,10 @@
 <head>
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,600&subset=latin,cyrillic-ext,cyrillic,greek-ext,greek,vietnamese,latin-ext' rel='stylesheet' type='text/css'>
 </head>
-<div ng-include="'partials/menu-bar.html'"></div>
-<span content-for="title">{{resourceBundle.createSubmission}}</span>
+<span ui-content-for="title">{{resourceBundle.createSubmission}}</span>
+<div ui-content-for="navbarAction">
+    <div ng-include="'partials/action_bar.html'"></div>
+</div>
 <div class="scrollable">  
   <div class="scrollable-content">
   <div class="panel">
