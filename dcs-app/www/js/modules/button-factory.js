@@ -55,12 +55,14 @@
             type  : 'button',
             html : options.label,
             on    : {
-                click: options.deviceHandle({
-                    success: function(fileUrl) {
-                        options.fsCallbacks(fileUrl, options.callbacks);
-                    },
-                    error: options.callbacks.error
-                })
+                click: function() {
+                    options.deviceHandle({
+                        success: function(fileUrl) {
+                            options.fsCallbacks(fileUrl, options.callbacks);
+                        },
+                        error: options.callbacks.error
+                    })
+                }
             }
         });
     }
