@@ -2,67 +2,18 @@
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
-<!-- <div content-for="new">
-  <div class="btn btn-navbar sidebar-toggle">
-     <i class="fa fa-2x fa-search" ng-click="toggleSearch()"></i>
-  </div>
-
-  <div ng-show="showActions" class="btn btn-navbar">
-    <i class="fa fa-2x fa-times" ng-click="deleteSubmissions()"></i>
-  </div>
-  <div ng-show="showActions" class="btn btn-navbar">
-    <i class="fa fa-2x fa-upload" ng-click="postSubmissions()"></i>
-  </div>
-
-  <div ng-show="!showActions" class="btn btn-navbar sidebar-toggle">
-     <i class="fa fa-2x fa-file" ng-hide="projectWarning" ng-click="createSurveyResponse(project_uuid)"></i>
-  </div>
-  <div ng-show="!showActions" class="btn btn-navbar sidebar-toggle">
-     <i class="fa fa-2x fa-arrow-circle-down" ng-hide="projectWarning" ng-click="getChanges()"></i>
-  </div>
-</div> -->
-
-  <!-- <span content-for="title" ng-init="selectedField='all'">
-    <span ng-show="!showSearch">{{resourceBundle.submissions}}</span>
-    <span ng-show="showSearch" >
-    <select ng-show="showSearch" class="pull-left" style="width:20%" ng-model="selectedField">
-      <option ng-repeat="(name, label) in searchFields " value="{{name}}">{{label}}</option>
-    </select>
-    <input ng-show="showSearch" type="search" placeholder="{{resourceBundle.submissions}} Search..." ng-model="searchStr"/>
-    </span>
-  </span> -->
-
-<!-- <div content-for="refreshContents"> -->
-    <!-- <i class="fa fa-lg fa-arrow-circle-down" ng-hide="projectWarning" ng-click="$refreshContents()"></i> -->
-<!-- </div> -->
-
 <div class="scrollable">  
   <div class="scrollable-content">
     <div class="list-group">
-      <table class="bg-white table table-condensed">
-        <thead>
-          <tr>
-              <th colspan="2">Created</th>
-          </tr>
-        </thead>
-          <tbody>
-            <tr class="submission" ng-repeat="item in submissions" ng-init="selected=false"
-                ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'success':selected}"
-                ng-click="onSubmissionSelect(this, item)">
-                <td>
-                  <span am-time-ago="item.created" am-preprocess="utc"></span>
-                  <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-                </td>
-                <td class="cell-align-middle">
-                  <a href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}'>view</a>
-                </td>
-            </tr>
-          </tbody>
-      </table>
+        <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected}"
+      ng-click="onSubmissionSelect(this, item)">
+        <span am-time-ago="item.created" am-preprocess="utc"></span>
+        <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
+        <a class="pull-right" href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style="margin-top: -30px;">view</a>
+      </div>
       <div ui-content-for="bottom">
         <div ng-include="'partials/pagination_tag.html'"></div>
       </div>
     </div>
   </div>  
 </div>
-

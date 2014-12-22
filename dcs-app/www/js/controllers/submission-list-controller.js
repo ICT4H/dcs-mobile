@@ -1,13 +1,10 @@
 var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, paginationService){
 
     $scope.pagination = paginationService.pagination;
-
+    $scope.actions = {};
+    
     $scope.searchFields = {all: 'All'};  
-    $scope.displayHeaders = {}; 
-    $scope.orderHeaders = []; 
-    $scope.showActions = false;
-    msg.showLoadingWithInfo('Loading submissions');
-        
+
     var MODIFIED = 1;
     var UNMODIFIED = 0;
     var selectedCount = 0;
@@ -22,7 +19,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.toggleSearch = function() {
         $scope.showSearch = !$scope.showSearch;
-    }
+    };
 
     var assignSubmissions = function(submissions){
         if(submissions.length == 0)
@@ -56,6 +53,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         getProjectFromCache($scope.project_uuid).then(function(project) {
             processProject(project);
             loadSubmissions();
+            initActions();
         });
     };
 
@@ -90,18 +88,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.isSubmissionDisplayable = function(submissionData) {
         return app.isSubmissionDisplayable(submissionData.data, $scope.searchStr, $scope.selectedField);
     }
-
-    $scope.formatSubmission = function(index, submission) {
-        var ret = '';
-        $scope.listIndex = index;
-        angular.forEach($scope.orderHeaders, function(header) {
-              if(header == "more") 
-                ret += "<td><a href='#project/" + submission.project_uuid + "/submission/" + submission.submission_id + "' style='font-weight: bolder;'>more</a></td>";
-            else
-                ret += "<td>" + submission.data[header] + "</td>";
-        });
-        return ret;
-    };
 
     $scope.getChanges = function() {
         $scope.newSubmissions = [];
@@ -237,12 +223,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             return;
         }
         msg.displayInfo('you can edit only one submission at a time !');
-
-    };
-
-    $scope.onSubmissionSelect = function(submissionRow, submission) {
-        submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selected, submission.submission_id);
     };
 
     // $scope.syncWithServer = function() {
@@ -269,7 +249,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var post_selected_submissions = function() {
         var multiplePromises = [];
-        selected.forEach(function(submissionId) {
+        selectedSubmission.forEach(function(submissionId) {
             multiplePromises.push(
                 localStore.getSubmissionById(submissionId)
                     .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
@@ -279,7 +259,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return multiplePromises;
     };
 
-    $scope.postSubmissions = function() {
+    var onSubmit = function() {
+        if(!app.areItemSelected(selectedSubmission)) return;
+
         msg.showLoading();
         $q.all(post_selected_submissions())
         .then(function(){
@@ -290,29 +272,33 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onDelete = function() {
-        if(app.areItemSelected(selectedSubmission)){
-            function onConfirm(buttonIndex) {
-                if(buttonIndex==BUTTON_NO) return;
-                msg.showLoading();
-                localStore.deleteSubmissions(selectedSubmission)
-                .then(function(){
-                    $scope.showActions = false;
-                    loadSubmissions(0);
-                    msg.hideLoadingWithInfo("Submission(s) deleted");
-                }
-                ,function(error){
-                    console.log(error);
-                    msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
-                });
-            };
+        if(!app.areItemSelected(selectedSubmission)) return;
 
-            navigator.notification.confirm(
-                'Do you want to delete ?',
-                onConfirm,
-                'Delete submission',
-                ['Yes','No']
-            );
-        }
+        function onConfirm(buttonIndex) {
+            if(buttonIndex==BUTTON_NO) return;
+            msg.showLoading();
+            localStore.deleteSubmissions(selectedSubmission)
+            .then(function(){
+                $scope.showActions = false;
+                loadSubmissions(0);
+                msg.hideLoadingWithInfo("Submission(s) deleted");
+            }
+            ,function(error){
+                console.log(error);
+                msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
+            });
+        };
+
+        navigator.notification.confirm(
+            'Do you want to delete ?',
+            onConfirm,
+            'Delete submission',
+            ['Yes','No']
+        );
+    };
+
+    var onNew = function() {
+        $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
     };
 
     $scope.downloadSubmission = function(submission) {
@@ -328,6 +314,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             }, function(error) {
                 msg.hideLoadingWithErr('Unable to download submission.');
             });
+    };
+
+    var onSurveyPull = function() {
+        $location.path(('/server-submissions/' + $scope.project_uuid));
     };
 
     // $scope.postSubmission = function(submission) {
@@ -359,16 +349,21 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     //     }
     //     submitAfterConfirm();
     // };
+    var onUpdate =  function() {
+        
+    };
 
     var initActions =  function() {
         $scope.actions['delete'] = {'onClick': onDelete, 'label': 'Delete' };
+        $scope.actions['push'] = {'onClick': onSubmit, 'label': 'Submit Submissions'};
+        $scope.actions['new'] = {'onClick': onNew, 'label': 'Make submission'};
+        $scope.actions['pull'] = {'onClick': onSurveyPull, 'label': 'Pull Submissions'};
         $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
-        $scope.actions['new'] = {'onClick': onNew, 'label': 'Create new submission'};
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {
         submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selected, submission.submission_id);
+        app.flipArrayElement(selectedSubmission, submission.submission_id);
     };
 };
 
