@@ -1,54 +1,21 @@
-\<div ng-include="'partials/menu-bar.html'"></div>
-
-<div content-for="new">
-  <div ng-show="showActions" class="btn btn-navbar">
-    <i class="fa fa-2x fa-download" ng-click="download()"></i>
-  </div>
+<span ui-content-for="title">{{resourceBundle.submissions}}</span>
+<div ui-content-for="navbarAction">
+    <div ng-include="'partials/action_bar.html'"></div>
 </div>
-<span content-for="title">{{resourceBundle.submissions}}</span>
-
 <div class="scrollable">  
-   <div class="scrollable-content">
-        <div class="list-group alert-danger" ng-show="projectWarning">
+  <div class="scrollable-content">
+    <div class="list-group alert-danger" ng-show="projectWarning">
             <p>{{projectWarning}}</p>
         </div>
-        <div class="list-group bg-white">
-        <div class="list-group-item project-tab">
-            <ul class="nav nav-tabs submission-tab toggle-full-screen" toggleable default="active" inactive-class="hide">
-              <li><a href="#submission-list/{{project_uuid}}">{{resourceBundle.installed}}</a></li>
-              <li><a href="#Tab2" toggle="on" parent-active-class="active">{{resourceBundle.server}}</a></li>
-            </ul>
-            <div class="tab-content margin-top-10">
-              <div class="tab-pane" toggleable active-class="active" default="active" id="Tab2" exclusion-group="myTabs">
-                <div ng-init="selectedField='all'">
-                  <select class="form-control pull-left" style="width:20%" ng-model="selectedField">
-                    <option ng-repeat="(name, label) in searchFields " value="{{name}}">{{label}}</option>
-                  </select>
-                <input type="search" class="form-control app-search" style="width:80%" placeholder="Search.." ng-model="searchStr"/>
-              </div>
-                  <table id="server-submissions" style="margin-bottom:0px;" class="bg-white table table-condensed">
-                    <thead>
-                    <tr>
-                        <th colspan="2">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="submission" ng-repeat="item in submissions | filter:isSubmissionDisplayable "
-                        ng-class="{'success':selected}"
-                        ng-click="update_selected_submissions(this, item)">
-                      <td>
-                        <span am-time-ago="item.date" am-preprocess="utc"></span>
-                        <p class="small">on {{ item.date | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-                      </td>
-                      <td>
-                        <a href='#project/{{project_uuid}}/submission/{{item.id[0]}}?server=true' style='font-weight: bolder;'>view</a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div> <!-- table panel -->
-            </div>
-        </div>
-        <div ng-include="'partials/pagination_tag.html'" class="navbar navbar-app navbar-absolute-bottom" ></div>
-        </div>
+    <div class="list-group">
+        <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected}"
+      ng-click="onSubmissionSelect(this, item)">
+        <span am-time-ago="item.date" am-preprocess="utc"></span>
+        <p class="small">on {{ item.date | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
+      </div>
+      <div ui-content-for="bottom">
+        <div ng-include="'partials/pagination_tag.html'"></div>
+      </div>
+    </div>
   </div>
+</div>  
