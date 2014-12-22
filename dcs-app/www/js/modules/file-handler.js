@@ -3,7 +3,9 @@ var FileSystemInterface = {
     setWorkingDir: function(userEmail, project_name) {},
     moveFile: function(url, callbacks) {},
     copyFile: function(imageUrl, callbacks) {},
-    fileNameToURL: function(fileName, onSuccess) {},
-    fileNameToFile: function(fileName, onSuccess) {},
-    fileNameToFileInfo: function(fileName, onSuccess) {}
+    deleteFile: function(fileName) {},
+    deleteCurrentFolder: function() {},
+    fileNameToURL: function(fileName, onSuccess, onError) {},
+    fileNameToFile: function(fileName, onSuccess, onError) {},
+    fileNameToFileInfo: function(fileName, onSuccess, onError) {}
 };

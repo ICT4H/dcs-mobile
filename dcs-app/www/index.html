@@ -91,6 +91,7 @@
     <script type="text/javascript" src="js/lib/angular-route.js"></script>
     <script type="text/javascript" src="js/lib/mobile-angular-ui.js"></script>
     
+    <script type="text/javascript" src="js/lib/q.js"></script>
     <script type="text/javascript" src="js/lib/xml2json.min.js"></script>
     <script type="text/javascript" src="js/lib/ng-i18n.js"></script>
     <!-- endbuild -->
@@ -143,8 +144,8 @@
 
     <script type="text/javascript">
         var xmlToJson = new X2JS();
-        var fileSystem = new CordovaFileSytem();
-        var cordovaDeviceHandler = new CordovaDeviceHandler(navigator);
+        var fileSystem;
+        var cordovaDeviceHandler;
         app.initialize();
     </script>
     

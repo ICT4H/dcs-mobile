@@ -26,7 +26,7 @@
     * dirEntry created as: dcs/user_email/project_name; special chars replaced with _ (underscore)
     */
     CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_name) {
-        var deffered = $.Deferred();
+        var deffered = Q.defer();
 
         _fsReady.then(function(fs) {
             // TODO read the dcs (app_path) from config
@@ -40,11 +40,15 @@
             );
         }, deffered.reject);
 
-        return _working_dir = deffered.promise();
+        return _working_dir = deffered.promise;
     };
 
     CordovaFileSytem.prototype.getWorkingDirEntry = function() {
         return _working_dir;
+    };
+
+    CordovaFileSytem.prototype.setWorkingDirForTest = function(working_dir) {
+        _working_dir = working_dir;
     };
 
     CordovaFileSytem.prototype.moveFile = function(imageUrl, callbacks) {
@@ -55,20 +59,20 @@
         getFileAndDestDirEntry(imageUrl, copyToDir, callbacks);
     };
 
-    CordovaFileSytem.prototype.fileNameToURL = function(fileName, onSuccess) {
-        fileNameToFileEntry(fileName, function(fileEntry) {
+    CordovaFileSytem.prototype.fileNameToURL = function(fileName, onSuccess, onError) {
+        fileNameToFileEntry(fileName).then(function(fileEntry) {
             onSuccess(fileEntry.toURL());
-        });
+        }, onError);
     };
 
-    CordovaFileSytem.prototype.fileNameToFile = function(fileName, onSuccess) {
-        fileNameToFileEntry(fileName, function(file, type) {
-            onSuccess(file, type);
-        });
+    CordovaFileSytem.prototype.fileNameToFile = function(fileName, onSuccess, onError) {
+        fileNameToFileEntry(fileName).then(function(fileEntry) {
+            onSuccess(file);
+        }, onError);
     };
 
-    CordovaFileSytem.prototype.fileNameToFileInfo = function(fileName, onSuccess) {
-        fileNameToFileEntry(fileName, function(fileEntry) {
+    CordovaFileSytem.prototype.fileNameToFileInfo = function(fileName, onSuccess, onError) {
+        fileNameToFileEntry(fileName).then(function(fileEntry) {
             fileEntry.file(function(file) {
                 var slice = file.slice(0,4);
 
@@ -79,15 +83,42 @@
                 };
                 reader.onerror = function() {
                     console.log('error trying to get file: ' + fileName);
+                    onError();
                 };
                 reader.readAsArrayBuffer( slice );
             });
-        });
+        }, onError);
 
     };
 
+    CordovaFileSytem.prototype.deleteFile = function(fileName) {
+        return fileNameToFileEntry(fileName).then(removeFileEntry);
+    };
+
+    CordovaFileSytem.prototype.deleteCurrentFolder = function(folderName) {
+        var deffered = Q.defer();
+        _working_dir.then(function(workingDirEntry) {
+            workingDirEntry.removeRecursively(function() {
+                console.log('Directory removed.');
+                deffered.resolve();
+            }, deffered.reject);
+        })
+        return deffered.promise;
+    };
+
+    var removeFileEntry = function(fileEntry) {
+        var deffered = Q.defer();
+        fileEntry.remove(function() {
+                console.log('File removed.');
+                deffered.resolve();
+            },
+            deffered.reject
+        );
+        return deffered.promise;
+    }
+
     var initFileSystem = function() {
-        var deffered = $.Deferred();
+        var deffered = Q.defer();
         var fileSystemRequest  = window.requestFileSystem || window.webkitRequestFileSystem;
 
         fileSystemRequest(
@@ -96,7 +127,7 @@
             deffered.resolve,
             deffered.reject);
         console.log('cordovaMediaManager init called');
-        return deffered.promise();
+        return deffered.promise;
     };
 
     var slugify = function(text) {
@@ -107,10 +138,10 @@
     };
 
     var createPath = function(rootDirEntry, path) {
-        var deffered = $.Deferred();
+        var deffered = Q.defer();
         var folders = path.split('/');
         _createSubFoldersRecursively(rootDirEntry, folders, deffered);
-        return deffered.promise();
+        return deffered.promise;
     }
 
     var _createSubFoldersRecursively = function(rootDirEntry, folders, deffered) {
@@ -152,7 +183,7 @@
 
     var getFileAndDestDirEntry = function(imageUrl, onSuccess, callbacks) {
         var resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
-
+        console.log('in getFileAndDestDirEntry: ' + imageUrl);
         resolveLocalFileSystemURL(imageUrl, function(fileEntry) {
 
             fileEntry.file(function(file){
@@ -188,17 +219,21 @@
         }, callbacks.error);
     };
 
-    var fileNameToFileEntry = function(fileName, onSuccess) {
-        _fsReady.then(function(fs) {
-            console.log('fileName in fileNameToFileEntry: ' + fileName)
-            _working_dir.then(function(dirEntry) {
-                dirEntry.getFile(fileName, {create: false}, function(fileEntry) {
-                    onSuccess(fileEntry);
-                }, function() {
-                    console.log('error trying to get file: ' + fileName);
-                });
+    var fileNameToFileEntry = function(fileName) {
+        var deffered = Q.defer();
+
+        console.log('fileName in fileNameToFileEntry: ' + fileName);
+        _working_dir.then(function(dirEntry) {
+            dirEntry.getFile(fileName, {create: false}, function(fileEntry) {
+                console.log('fileEntry found...' + Object.keys(fileEntry));
+                deffered.resolve(fileEntry);
+            }, function(e) {
+                console.log('error trying to get file: ' + fileName);
+                deffered.reject();
             });
         });
+
+        return deffered.promise;
     };
 
 }());

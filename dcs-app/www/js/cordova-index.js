@@ -39,6 +39,8 @@ var app = {
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
         angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
+        fileSystem = new CordovaFileSytem();
+        cordovaDeviceHandler = new CordovaDeviceHandler(navigator);
         fileSystem.init();
         console.log('app loaded');
     }
