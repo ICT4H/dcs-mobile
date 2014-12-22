@@ -25,8 +25,25 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         msg.hideAll();
     };
 
+    var assignServerProjects = function(projects) {
+        $scope.pagination.totalElement = projects.total;
+        $scope.projects = projects.projects;
+        msg.hideAll();
+    };
+
+    var ErrorLoadingServerProjects = function(data, error) {
+        msg.hideLoadingWithErr('Failed to fetch projects');
+    };
+
+    var fetchProjects  = function() {
+        msg.showLoadingWithInfo(resourceBundle.fetching_projects);
+        dcsService.getProjects($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+            .then(assignServerProjects, ErrorLoadingServerProjects);
+    };
+    
     var onNew = function() {
-        $location.path('/server-project-list');
+        fetchProjects();
+        initServerActions();
     };
 
     var onDelete = function(){
@@ -61,6 +78,19 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         }
     };
 
+    var onDownloadProject = function() {
+        if(app.areItemSelected(selectedProject)) {
+            msg.showLoadingWithInfo('Downloading projects');
+            dcsService.getQuestion(selectedProject)
+            .then(localStore.createProject)
+            .then(function() {
+                msg.hideLoadingWithInfo('Project downloaded.');
+            }, function(error) {
+                msg.hideLoadingWithInfo('this project is already downloaded.');
+            });
+        }
+    };
+
     var updateProjects  = function(projects) {
         msg.showLoading();
         var promises = [];
@@ -77,15 +107,21 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
     
-    var initActions =  function() {
+    var initLocalActions =  function() {
+        $scope.actions = {};
         $scope.actions['delete'] = {'onClick': onDelete, 'label': 'Delete' };
         $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
         $scope.actions['new'] = {'onClick': onNew, 'label': 'Get new survey'};
     };
 
+    var initServerActions =  function() {
+        $scope.actions = {};
+        $scope.actions['download'] = {'onClick': onDownloadProject, 'label': 'Download' };
+    };
+
     var onLoad = function() {
         $scope.pagination.init($rootScope.pageSize.value, 0, loadProjects);
-        initActions();
+        initLocalActions();
         projectDao.getCountOfProjects().then(function(result){
             if(result.total == 0) return;
             $scope.pagination.totalElement = result.total;
