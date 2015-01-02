@@ -12,6 +12,7 @@ var paginationService = function() {
         this.totalElement = totalElement;
         this.pageNumber = 0;
         this.paginationCallBack = callBack;
+        this.paginationCallBack(this.pageNumber);
     };
 
     this.pagination.onNext = function() {

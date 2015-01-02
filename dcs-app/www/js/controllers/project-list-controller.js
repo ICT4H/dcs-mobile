@@ -1,69 +1,77 @@
-var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg) {
+var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg, dialogService) {
 
     resourceBundle = $rootScope.resourceBundle;
     $scope.pagination = paginationService.pagination;
     $scope.projects = [];
     $scope.actions = {};
-
+    $scope.title = "";
     // private variable
     var selectedProject = [];
 
-    var assignProjects = function(projects) {
-        $scope.projects = projects;
-    };
-
-    var ErrorLoadingProjects = function(data,error) {
-        msg.hideLoadingWithErr('Failed to load projects');
-    };
-
-    var loadProjects  = function(pageNumber) {
-        msg.showLoadingWithInfo(resourceBundle.loading_projects);
-        projectDao.
-            getProjects($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                .then(assignProjects, ErrorLoadingProjects);
-        
+    var assignResult = function(result) {
+        $scope.projects = result.projects;
+        $scope.pagination.totalElement = result.total;
         msg.hideAll();
     };
 
-    var assignServerProjects = function(projects) {
-        $scope.pagination.totalElement = projects.total;
-        $scope.projects = projects.projects;
-        msg.hideAll();
+    var exitApp = function() {
+        dialogService.confirmBox('Are you sure want to exit from the App?', function() {
+            navigator.app.exitApp();
+        });
     };
 
-    var ErrorLoadingServerProjects = function(data, error) {
-        msg.hideLoadingWithErr('Failed to fetch projects');
+    var loadLocalQuestionnaire = function() {
+        $scope.serverPage = false;
+        (501).showInfo();
+        initOfflineActionItems();
+        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            projectDao.
+                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    .then(assignResult, (103).showError);
+        });
     };
 
-    var fetchProjects  = function() {
-        msg.showLoadingWithInfo(resourceBundle.fetching_projects);
-        dcsService.getProjects($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-            .then(assignServerProjects, ErrorLoadingServerProjects);
+    var loadServerQuestionnaire = function() {
+        $scope.serverPage = true;
+        (501).showInfo();
+        initOnlineActionItems();
+        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            dcsService.
+                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    .then(assignResult, (103).showError);
+        });
     };
-    
-    var onNew = function() {
-        fetchProjects();
-        initServerActions();
+
+    var onDownloadProject = function() {
+        if(app.areItemSelected(selectedProject)) {
+            (502).showInfo();
+            dcsService.getQuestionnaires(selectedProject)
+            .then(function(projects) {
+                app.mapPromise(projects, projectDao.createProject)
+                    .then( function(response) {
+                        loadLocalQuestionnaire();
+                        (504).showInfo();
+                    }, (104).showError);  
+            }, (105).showError);
+        }
+    };
+
+    var initOnlineActionItems = function() {
+        $scope.actions = {};
+        $scope.actions['download'] = {'onClick': onDownloadProject, 'label': resourceBundle.download };
+        document.addEventListener('backbutton', loadLocalQuestionnaire, false);
+        $scope.title = resourceBundle.serverProjectTitle;
     };
 
     var onDelete = function(){
         if(app.areItemSelected(selectedProject)) {
-            function onConfirm(buttonIndex) {
-                if(buttonIndex!=BUTTON_NO){
-                    projectDao.deleteProject(selectedProject[0]).then(function(response) {
-                        loadProjects($scope.pageNumber);
-                        msg.hideLoadingWithInfo(resourceBundle.project_deleted);
-                    }, function(error) {
-                        msg.handleError(error, resourceBundle.project_delete_error);
-                    });
-                }
-            };
-            navigator.notification.confirm(
-                'Do you want to delete "' + selectedProject[0].name + '"?',
-                onConfirm,
-                'Delete project',
-                ['Yes','No']
-            );
+            dialogService.confirmBox('Do you want to delete selected projects?', function() {
+                projectDao.deleteProject(selectedProject[0])
+                .then(function(response) {
+                        loadLocalQuestionnaire();
+                        (504).showInfo();
+                    }, (106).showError);
+            });
         }
     };
 
@@ -72,22 +80,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             projectDao.getAll().then(function(projects){
                 updateProjects(projects);
             });
-        }
-        else {
+        } else {
             updateProjects(selectedProject);
-        }
-    };
-
-    var onDownloadProject = function() {
-        if(app.areItemSelected(selectedProject)) {
-            msg.showLoadingWithInfo('Downloading projects');
-            dcsService.getQuestion(selectedProject)
-            .then(localStore.createProject)
-            .then(function() {
-                msg.hideLoadingWithInfo('Project downloaded.');
-            }, function(error) {
-                msg.hideLoadingWithInfo('this project is already downloaded.');
-            });
         }
     };
 
@@ -100,43 +94,30 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             });
         }));
         $q.all(promises).then(function() {
-        msg.hideLoadingWithInfo('updated project list');
-        loadProjects(0);
-        },function() {
-            msg.hideLoadingWithErr('projects not updated properly');
-        });
-    };
-    
-    var initLocalActions =  function() {
-        $scope.actions = {};
-        $scope.actions['delete'] = {'onClick': onDelete, 'label': 'Delete' };
-        $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
-        $scope.actions['new'] = {'onClick': onNew, 'label': 'Get new survey'};
+            loadLocalQuestionnaire();
+            (505).showInfo();
+        }, (107).showError);
     };
 
-    var initServerActions =  function() {
+    var initOfflineActionItems = function() {
         $scope.actions = {};
-        $scope.actions['download'] = {'onClick': onDownloadProject, 'label': 'Download' };
+        $scope.actions['delete'] = {'onClick': onDelete, 'label': resourceBundle.delete };
+        $scope.actions['update'] = {'onClick': onUpdate, 'label': resourceBundle.update };
+        $scope.actions['new'] = {'onClick': loadServerQuestionnaire, 'label': resourceBundle.getNewSurvey };
+        document.addEventListener('backbutton', exitApp, false);
+        $scope.title = resourceBundle.localProjectTitle;
     };
 
     var onLoad = function() {
-        $scope.pagination.init($rootScope.pageSize.value, 0, loadProjects);
-        initLocalActions();
-        projectDao.getCountOfProjects().then(function(result){
-            if(result.total == 0) return;
-            $scope.pagination.totalElement = result.total;
-            loadProjects(0);
-        });
+        loadLocalQuestionnaire();
     };
 
-    onLoad();
-    
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
         app.flipArrayElement(selectedProject, project.project_uuid);
     };
 
-    
+    onLoad();
 };
 
-dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', localProjectListController]);
+dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', localProjectListController]);

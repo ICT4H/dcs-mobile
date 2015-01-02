@@ -1,17 +1,25 @@
-<span ui-content-for="title">{{resourceBundle.projects}}</span>
+<span ui-content-for="title">{{ title }}</span>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
 <div class="scrollable">  
     <div class="scrollable-content">
-        <div class="list-group">
+        <div class="list-group" ng-if="projects.length !=0">
             <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'selected': selected}">
-                <i class="fa fa-file-o pull-right fa-2x" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
-                <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
+                <div ng-if="!serverPage">
+                    <i class="fa fa-file-o pull-right fa-2x" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
+                    <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
+                </div>
+                <div ng-if="serverPage">
+                    <span>{{ project.name }}</span>
+                </div>
             </div>
             <div ui-content-for="bottom">
                 <div ng-include="'partials/pagination_tag.html'"></div>
             </div>
+        </div>
+        <div style ng-if="projects.length == 0">
+                There are no projects to display
         </div>
     </div>  
 </div>

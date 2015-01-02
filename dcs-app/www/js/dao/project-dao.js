@@ -1,6 +1,6 @@
 dcsApp.service('projectDao',['$q', 'store', function($q, store){
 
-	this.createProject = function(projects) {
+	this.createProject = function(project) {
 		return store.execute(
 			'INSERT INTO projects (project_uuid, version, status, name, xform, headers, last_fetch) VALUES (?,?,?,?,?,?,?)',
 			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created]);

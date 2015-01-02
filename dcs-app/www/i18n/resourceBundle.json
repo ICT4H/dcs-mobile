@@ -1,5 +1,4 @@
 {
-    // Errors and warning
     "101": "Username and password cannot be empty",
     "102": "Invalid username and password.",
     "103": "Error in loading projects",
@@ -7,15 +6,11 @@
     "105": "Error in Downloading Projects",
     "106": "Projects cannot be deleted",
     "107": "Projects not updated properly",
-
-    // Information text
     "501": "Loading Projects",
     "502": "Downloading projects",
     "503": "Projects Downloaded.",
     "504": "Project Deleted",
     "505": "Updated project list",
-    
-    //Normal text
     "localProjectTitle": "Offline Surveys",
     "serverProjectTitle": "Online Surveys",
     "getNewSurvey": "Get new survey",
