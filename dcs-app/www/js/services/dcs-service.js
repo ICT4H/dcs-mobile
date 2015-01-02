@@ -1,19 +1,27 @@
 dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope, app) {
 
-    this.getProjects = function(start,length) {
-        return app.httpRequest("/client/project/?start="+start+"&length="+length);
+    this.getProjectsList = function(start,length) {
+        var params = {
+            'start': start,
+            'length': length
+        };
+        return app.httpRequest("/client/projects/", params);
+    };
+
+    this.getQuestionnaires = function(project_uuids) {
+        var params = {
+            'ids': project_uuids
+        };
+        return app.httpRequest("/client/projects/" , params);
     };
 
     this.verifyUser = function() {
-        return app.httpRequest("/client/auth/");
+        return app.httpRequest("/client/auth/", {});
     };
+
 
     this.checkProjectsStatus = function(projects) {
         return app.httpPostRequest('/client/projects/validate/', 'projects=' + JSON.stringify(projects));
-    };
-
-    this.getQuestion = function(project_uuid) {
-        return app.httpRequest("/client/project/" + project_uuid);
     };
 
     this.getAllSubmissions = function(project_uuid) {

@@ -1,8 +1,9 @@
 dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($q, $http, msg, $rootScope){
-    this.user = {'name':'', 'password': '', 'serverUrl':''};
+    this.user = {'name':'', 'password': '', 'url':''};
     this.isAuthenticated = false;
     var exculdeHeaders = {'ds_name': 'ds_name', 'date':'date'};
-	this.httpRequest = function(uri){
+
+	this.httpRequest = function(uri, queryParams){
 		var deferred = $q.defer();
         var timeout = $q.defer();
 
@@ -16,7 +17,8 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
         var responsePromise = $http({
                 method : 'get',
                 url: user.url + uri,
-                timeout: timeout.promise
+                timeout: timeout.promise,
+                params: queryParams
         });
 
         responsePromise.success(function(response) {
@@ -164,23 +166,6 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
             array.push(element);
     };
 
-    this.extractHeaders = function(headers) {
-        var orderHeaders = [];
-        var flag = false;
-                
-        angular.forEach(headers, function(value, key) { 
-            if(typeof value != "object") {
-                if(!exculdeHeaders.hasOwnProperty(key))
-                    orderHeaders.push(key);
-                flag = true;
-            }
-        }); 
-        
-        if(flag) 
-            orderHeaders.push("more");
-        return orderHeaders;
-    };
-
     this.getSearchFields = function(headers, parent) {
         var self = this;
         var searchFields = {};
@@ -199,6 +184,10 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
 
     this.promises = function(array, onSuccess, onError) {
         $q.all(array).then(onSuccess, onError);
+    };
+
+    this.mapPromise = function(array, callBack) {
+        return $q.all(array.map(callBack));
     };
 
     this.areItemSelected = function(selectedProject) {

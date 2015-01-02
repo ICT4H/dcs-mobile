@@ -1,6 +1,6 @@
-dcsApp.service('projectDao',['store', function(store){
+dcsApp.service('projectDao',['$q', 'store', function($q, store){
 
-	this.createProject = function(project) {
+	this.createProject = function(projects) {
 		return store.execute(
 			'INSERT INTO projects (project_uuid, version, status, name, xform, headers, last_fetch) VALUES (?,?,?,?,?,?,?)',
 			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created]);
@@ -27,12 +27,17 @@ dcsApp.service('projectDao',['store', function(store){
 		});
 	};
 
-	this.getCountOfProjects = function() {
-		return store.execute('select count(*) as total FROM projects',[], true);
-	};
-
-	this.getProjects = function(offset,limit) {
-		return store.execute('SELECT * FROM projects limit ? offset ?', [limit,offset]);
+	this.getProjectsList = function(offset,limit) {
+		var deferred = $q.defer();
+		store.execute('select count(*) as total FROM projects', [], true).then(function(countResultset) {
+			store.execute('SELECT * FROM projects limit ? offset ?', [limit, offset]).then(function(projectsResultset) {
+				var result = {};
+				result.total = countResultset.total;
+				result.projects = projectsResultset;
+				deferred.resolve(result);
+			}, deferred.reject);
+		}, deferred.reject);
+		return deferred.promise;
 	};
 
 	this.getProjectById = function(project_uuid) {
