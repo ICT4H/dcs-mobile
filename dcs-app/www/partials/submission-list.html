@@ -4,11 +4,14 @@
 </div>
 <div class="scrollable">  
   <div class="scrollable-content">
+    <div class="list-group alert-danger" ng-show="projectWarning">
+        <p>{{projectWarning}}</p>
+    </div>
     <div class="list-group">
         <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected}"
       ng-click="onSubmissionSelect(this, item)">
-        <span am-time-ago="item.created" am-preprocess="utc"></span>
-        <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
+        <span am-time-ago="item.date" am-preprocess="utc"></span>
+        <p class="small">on {{ item.date | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
         <a class="pull-right" href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style="margin-top: -30px;">view</a>
       </div>
       <div ui-content-for="bottom">
