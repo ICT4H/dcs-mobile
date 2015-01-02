@@ -1,13 +1,33 @@
 {
+    // Errors and warning
+    "101": "Username and password cannot be empty",
+    "102": "Invalid username and password.",
+    "103": "Error in loading projects",
+    "104": "Error while saving projects",
+    "105": "Error in Downloading Projects",
+    "106": "Projects cannot be deleted",
+    "107": "Projects not updated properly",
+
+    // Information text
+    "501": "Loading Projects",
+    "502": "Downloading projects",
+    "503": "Projects Downloaded.",
+    "504": "Project Deleted",
+    "505": "Updated project list",
+    
+    //Normal text
+    "localProjectTitle": "Offline Surveys",
+    "serverProjectTitle": "Online Surveys",
+    "getNewSurvey": "Get new survey",
+    "delete": "Delete",
+    "update": "Update",
+    "download": "Download",
     "app_title": "Garner",
     "projects": "Forms",
     "submissions": "Submissions",
     "about_us": "It is an application created using angularjs and android simulators. This app can be used on Android Devices and Smart Phones.",
-    "loading_projects" : "Loading Projects",
     "loading_submissions" : "Loading Submissions",
     "fetching_projects" : "Fetching Projects",
-    "project_deleted" : "Project Deleted",
-    "project_delete_error" : "Project cannot be deleted",
     "page_number": "Page :",
     "manage_columns_info" : "Tap to add/remove column of submission table",
     "manage_columns_page_title" : "Server",

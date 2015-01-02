@@ -59,10 +59,20 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
             msg.hideAll();
         },2000);
     };
+    
+    Number.prototype.showError = function(callback) {
+        msg.hideLoadingWithErr($rootScope.resourceBundle[this]);
+    };
+
+    Number.prototype.showInfo = function() {
+        msg.showLoadingWithInfo(resourceBundle[this]);
+    };
+
+    Number.prototype.sjow
 
     $rootScope.removeMessage = function(index){
         msg.removeMessage(index);
-    } 
+    };
 
     $rootScope.$back = function() {
         if($location.path() != '/local-project-list')

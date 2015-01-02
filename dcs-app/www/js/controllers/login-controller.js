@@ -27,7 +27,8 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
         msg.showLoading();
         app.user = $scope.user;
         if(!$scope.user.hasOwnProperty("name") || !$scope.user.hasOwnProperty("password")) {
-            onError("Username and password cannot be empty");
+            (101).showError();
+            $location.path('/');    
             return;
         }
         if(!isNewUser)
@@ -35,8 +36,9 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
             .then(function() {
                 return userDao.updateUrl(app.user);
             })
-            .then(onSuccess, function() { 
-                onError("Invalid username and password.");
+            .then(onSuccess, function() {
+                (102).showError();
+                $location.path('/');    
             });
         else 
             dcsService.verifyUser($scope.user)
