@@ -20,7 +20,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
 
-    var loadLocalQuestionnaire = function() {
+    var loadLocal = function() {
         $scope.serverPage = false;
         (501).showInfo();
         initOfflineActionItems();
@@ -31,7 +31,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
 
-    var loadServerQuestionnaire = function() {
+    var loadServer = function() {
         $scope.serverPage = true;
         (501).showInfo();
         initOnlineActionItems();
@@ -49,7 +49,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             .then(function(projects) {
                 app.mapPromise(projects, projectDao.createProject)
                     .then( function(response) {
-                        loadLocalQuestionnaire();
+                        loadLocal();
                         (504).showInfo();
                     }, (104).showError);  
             }, (105).showError);
@@ -59,7 +59,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var initOnlineActionItems = function() {
         $scope.actions = {};
         $scope.actions['download'] = {'onClick': onDownloadProject, 'label': resourceBundle.download };
-        document.addEventListener('backbutton', loadLocalQuestionnaire, false);
+        document.addEventListener('backbutton', loadLocal, false);
         $scope.title = resourceBundle.serverProjectTitle;
     };
 
@@ -68,7 +68,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             dialogService.confirmBox('Do you want to delete selected projects?', function() {
                 projectDao.deleteProject(selectedProject[0])
                 .then(function(response) {
-                        loadLocalQuestionnaire();
+                        loadLocal();
                         (504).showInfo();
                     }, (106).showError);
             });
@@ -76,7 +76,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var onUpdate = function() {
-        if(selectedProject.length ==0) {
+        if(selectedProject.length == 0) {
             projectDao.getAll().then(function(projects){
                 updateProjects(projects);
             });
@@ -94,7 +94,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             });
         }));
         $q.all(promises).then(function() {
-            loadLocalQuestionnaire();
+            loadLocal();
             (505).showInfo();
         }, (107).showError);
     };
@@ -103,13 +103,9 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.actions = {};
         $scope.actions['delete'] = {'onClick': onDelete, 'label': resourceBundle.delete };
         $scope.actions['update'] = {'onClick': onUpdate, 'label': resourceBundle.update };
-        $scope.actions['new'] = {'onClick': loadServerQuestionnaire, 'label': resourceBundle.getNewSurvey };
+        $scope.actions['new'] = {'onClick': loadServer, 'label': resourceBundle.getNewSurvey };
         document.addEventListener('backbutton', exitApp, false);
         $scope.title = resourceBundle.localProjectTitle;
-    };
-
-    var onLoad = function() {
-        loadLocalQuestionnaire();
     };
 
     $scope.onProjectSelect = function(projectRow, project) {
@@ -117,7 +113,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         app.flipArrayElement(selectedProject, project.project_uuid);
     };
 
-    onLoad();
+    loadLocal();
 };
 
 dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', localProjectListController]);
