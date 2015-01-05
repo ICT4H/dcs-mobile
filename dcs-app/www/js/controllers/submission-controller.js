@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'app', function($routeParams, $location, localStore, msg, dcsService, app){
+dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'app', 'contextService', function($scope, $routeParams, $location, localStore, msg, dcsService, app, contextService){
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
@@ -54,24 +54,38 @@ dcsApp.controller('submissionController', ['$routeParams', '$location', 'submiss
         });
     };
 
-    // project can be taken from rootScope
-    localStore.getProjectById($routeParams.project_uuid).then(function(project) {
+    var setParametersForEnketo = function(submissionId) {
+        localStore.getProjectById($routeParams.project_uuid).then(function(project) {
+                var options = {
+                    'saveSubmission': onSubmit,
+                    'localStore': localStore,
+                    'buttonLabel': buttonLabel,
+                    'project': project,
+                    'submission_id': submissionId,
+                    'getDate': getDate,
+                    'getSubmissionFromServer': getSubmissionFromServer,
+                    'isServerSubmission' : $routeParams.server ? true : false
+                };
+                var project_name = project.name;
+                var userEmail = app.user.name;
 
-        var options = {
-            'saveSubmission': onSubmit,
-            'localStore': localStore,
-            'buttonLabel': buttonLabel,
-            'project': project,
-            'submission_id': submission_id,
-            'getDate': getDate,
-            'getSubmissionFromServer': getSubmissionFromServer,
-            'isServerSubmission' : $routeParams.server ? true : false
-        };
-        var project_name = project.name;
-        var userEmail = app.user.name;
+                fileSystem.setWorkingDir(userEmail, project_name);
+                loadEnketo(options);
+            });
+    }
+    var onLoad = function() {
+        setParametersForEnketo(submission_id);            
+    };
+    $scope.onNext = function() {
+        contextService.submissionIndex = contextService.submissionIndex + 1;
+        $location.path('/project/' +  $routeParams.project_uuid + '/submission/' + contextService.submissions[contextService.submissionIndex].submission_id);
+    };
 
-        fileSystem.setWorkingDir(userEmail, project_name);
-        loadEnketo(options);
-    });
+    $scope.onPrevious = function() {
+        contextService.submissionIndex = contextService.submissionIndex - 1;
+        $location.path('/project/' +  $routeParams.project_uuid + '/submission/' + contextService.submissions[contextService.submissionIndex].submission_id);
+    };
 
+
+    onLoad();
 }]);

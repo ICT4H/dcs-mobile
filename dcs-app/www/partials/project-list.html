@@ -8,7 +8,7 @@
             <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'selected': selected}">
                 <div ng-if="!serverPage">
                     <i class="fa fa-file-o pull-right fa-2x" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
-                    <a href="#submission-list/{{project.project_uuid}}" style="font-weight: bolder;">{{ project.name }}</a>
+                    <a href="#submission-list/{{project.project_uuid}}?type=all" style="font-weight: bolder;">{{ project.name }}</a>
                 </div>
                 <div ng-if="serverPage">
                     <span>{{ project.name }}</span>
@@ -19,7 +19,7 @@
             </div>
         </div>
         <div style ng-if="projects.length == 0">
-                There are no projects to display
+            There are no projects to display
         </div>
     </div>  
 </div>

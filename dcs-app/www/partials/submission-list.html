@@ -1,22 +1,28 @@
-<span ui-content-for="title">{{resourceBundle.submissions}}</span>
+<span ui-content-for="title">{{ title }}</span>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
 <div class="scrollable">  
   <div class="scrollable-content">
-    <div class="list-group alert-danger" ng-show="projectWarning">
-        <p>{{projectWarning}}</p>
-    </div>
-    <div class="list-group">
+    <div class="list-group" ng-if="submissions.length !=0">
         <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected}"
       ng-click="onSubmissionSelect(this, item)">
-        <span am-time-ago="item.date" am-preprocess="utc"></span>
-        <p class="small">on {{ item.date | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-        <a class="pull-right" href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style="margin-top: -30px;">view</a>
+        <div ng-if="!serverPage">
+          <span am-time-ago="item.created" am-preprocess="utc"></span>
+          <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
+          <a class="pull-right" href='#project/{{item.project_uuid}}/submission/{{item.submission_id}}' style="margin-top: -30px;">view</a>
+        </div>
+        <div ng-if="serverPage">
+          <span am-time-ago="item.date" am-preprocess="utc"></span> 
+          <p class="small">on {{ item.date | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
+        </div>
       </div>
       <div ui-content-for="bottom">
         <div ng-include="'partials/pagination_tag.html'"></div>
       </div>
+    </div>
+    <div style ng-if="projects.length == 0">
+      There are no submissions to display
     </div>
   </div>  
 </div>

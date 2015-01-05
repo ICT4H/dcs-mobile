@@ -26,5 +26,18 @@
 		</article>
 	</div>
   </div>
+  <div ui-content-for="bottom">
+  	<div style="text-align:center;">
+	<span ng-hide="contextService.submissionIndex == 0" ng-click="onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
+     <span class="btn">
+    	Showing 
+    	 
+    	{{ contextService.submissionIndex + 1 }} 
+    	of 
+    	{{ contextService.submissions.length }} 
+     </span>
+   <span ng-hide="contextService.submissionIndex == contextService.submissions.length -1" ng-click="onNext()" class="fa fa-lg fa-chevron-right pull-right btn"></span>
+</div>	
+  </div>
   </div>
 </div>	

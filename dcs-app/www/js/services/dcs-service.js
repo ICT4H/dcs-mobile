@@ -108,7 +108,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     function getCreateOrUpdateUrl(submission_uuid) {
-        var baseUrl = "/client/project/dummy/submission/";
+        var baseUrl = "/client/projects/dummy/submission/";
         var isNewSubmission = angular.isUndefined(submission_uuid) || submission_uuid == "undefined";
         return isNewSubmission ? baseUrl : (baseUrl + submission_uuid);
     }

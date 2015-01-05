@@ -68,8 +68,6 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
         msg.showLoadingWithInfo(resourceBundle[this]);
     };
 
-    Number.prototype.sjow
-
     $rootScope.removeMessage = function(index){
         msg.removeMessage(index);
     };
