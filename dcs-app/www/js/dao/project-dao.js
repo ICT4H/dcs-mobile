@@ -40,18 +40,6 @@ dcsApp.service('projectDao',['$q', 'store', function($q, store){
 		return deferred.promise;
 	};
 
-	this.getProjectById = function(project_uuid) {
-		return store.execute('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
-	};
-
-	this.getSubmissionHeaders = function(project_uuid) {
-        return store.execute('SELECT local_headers as headers from projects WHERE project_uuid = ?',[project_uuid], true);
-    };
-
-   	this.setSubmissionHeaders = function(project_uuid, headers) {
-	    return store.execute('UPDATE projects SET local_headers = ? WHERE project_uuid = ?',[JSON.stringify(headers), project_uuid]);
-   	};
-
 	var getProjectValues = function(project){
 		return [project.version, project.status, project.name, project.xform, project.headers];
 	};

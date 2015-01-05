@@ -77,9 +77,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     function processProject(project) {
         $scope.project_name = project.name;
         $scope.project_uuid = project.project_uuid;
-        $scope.headers = JSON.parse(project.headers);
-        $scope.orderHeaders = app.extractHeaders($scope.headers);
-        angular.extend($scope.searchFields, app.getSearchFields($scope.headers));
         // setObseleteProjectWarning(project_uuidject);
     }
 
@@ -407,8 +404,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         var project = $rootScope.currentProject;
         $scope.project_name = project.name;
         $scope.project_uuid = project.project_uuid;
-        $scope.headers = JSON.parse(project.headers);
-        $scope.orderHeaders = app.extractHeaders($scope.headers);
         initServerActions();
         loadServerSubmissions();
     };
