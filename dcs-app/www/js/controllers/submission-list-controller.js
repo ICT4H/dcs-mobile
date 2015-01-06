@@ -286,12 +286,22 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions['download'] = {'onClick': onDownload, 'label': 'Download'};
     };
 
-    var assignServerSubmissions = function(submissions){
+    var createSubmissions = function(results) {
+        var submissions = [];
+        angular.forEach(results, function(item) {
+            submissions.push({'date': item[2]});
+        });
+        return submissions;
+    };
+
+    var assignServerSubmissions = function(response) {
         msg.hideAll();
-        $scope.pagination.totalElement = submissions.total;
+        submissions = createSubmissions(response.data);
+        $scope.pagination.totalElement = response.total;
         if(submissions.length == 0)
             msg.hideLoadingWithInfo('No server submissions !');
-        $scope.submissions = submissions.data;
+
+        $scope.submissions = submissions;
     };
 
     var loadServer = function() {
