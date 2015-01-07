@@ -25,7 +25,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.getAllSubmissions = function(project_uuid) {
-        return app.httpRequest("/client/project/" + project_uuid + "/submission/");
+        return app.httpRequest("/client/projects/" + project_uuid + "/submission/");
     };
     
     this.getSubmissions = function(project_uuid, start, length){
@@ -38,7 +38,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
 
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
-        app.httpRequest("/client/project/" + submission.project_uuid + "/submission/" + submission.submission_uuid)
+        app.httpRequest("/client/projects/" + submission.project_uuid + "/submissions/" + submission.submission_uuid + "/")
             .then(function(serverSubmission) {
                 serverSubmission.project_uuid = submission.project_uuid;
                 serverSubmission.status = submission.status;
@@ -83,7 +83,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.getSubmissionById = function(project_uuid, submission_uuid) {
-        return app.httpRequest("/client/project/" + project_uuid + "/submission/" + submission_uuid);
+        return app.httpRequest("/client/projects/" + project_uuid + "/submissions/" + submission_uuid);
     };
 
     this.postSubmissionAndPurgeObsoluteMedia = function(submission) {
@@ -108,7 +108,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     function getCreateOrUpdateUrl(submission_uuid) {
-        var baseUrl = "/client/projects/dummy/submission/";
+        var baseUrl = "/client/projects/dummy/submissions/";
         var isNewSubmission = angular.isUndefined(submission_uuid) || submission_uuid == "undefined";
         return isNewSubmission ? baseUrl : (baseUrl + submission_uuid);
     }

@@ -23,6 +23,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var assignSubmissions = function(submissions){
+        selectedSubmission = [];
         $scope.submissions = submissions;
         contextService.isListing = true;
         contextService.submissions = submissions;
@@ -199,55 +200,13 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
     };
 
-    $scope.downloadSubmission = function(submission) {
-        msg.showLoading();
-        submission.status = BOTH;
-        dcsService.getSubmission(submission)
-            .then(localStore.createSubmission)
-            .then(function(resp) {
-                submission.submission_id = resp.submission_id;
-                submission.data = resp.data;
-                submission.xml = resp.xml;
-                msg.hideLoadingWithInfo("Submission downloaded.");
-            }, function(error) {
-                msg.hideLoadingWithErr('Unable to download submission.');
-            });
-    };
-
     function loadLocalSubmissionUuid(submission_uuid) {
         var deferred = $q.defer();
-
-        localStore.getsubmissionUuidByUuid(submission_uuid)
-            .then(function(result) {
-                console.log('getsubmissionUuidByUuid uuid: ' + submission_uuid + '; submission found: ' + result.length);
-                if (result.length == 0)
-                    deferred.resolve(submission_uuid);
-                else
-                    deferred.resolve();
-            }, deferred.reject);
-
-        return deferred.promise;
-    };
-
-    function downloadNonLocalSubmissions(localSubmissionPromises) {
-        var deferred = $q.defer();
-        var submissionDownloaders = [];
-
-        $q.all(localSubmissionPromises)
-            .then(function(results) {
-                results.forEach(function(nonLocalSubmissionUuid) {
-                    console.log('nonLocalSubmissionUuid: ' + nonLocalSubmissionUuid);
-                    if (nonLocalSubmissionUuid) {
-                        submissionDownloaders.push(
-                            downloadSubmission({submission_uuid: nonLocalSubmissionUuid,
-                                                project_uuid:$scope.project_uuid}));
-                    }
-                });
-                deferred.resolve(submissionDownloaders);
-
-            }, function(e) {
-                console.log('Error during submission download: ' + e);
-            });
+        localStore.getsubmissionUuidByUuid(submission_uuid).then(function(result) {
+            if(result.length != 0)
+                app.flipArrayElement(selectedSubmission, submission_uuid);
+            deferred.resolve();
+        }, deferred.reject);
         return deferred.promise;
     };
 
@@ -261,24 +220,42 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var onDownload = function() {
         msg.showLoading();
         var localSubmissionPromises = [];
+        var downloadSubmissionPromises = [];
 
         selectedSubmission.forEach(function(submission_uuid) {
-            // adding to array needs to be sync.
             localSubmissionPromises.push(loadLocalSubmissionUuid(submission_uuid));
         });
+        
+        if(selectedSubmission.length == 0) 
+            msg.hideLoadingWithInfo("All submissions are downloaded");
 
-        console.log('localSubmissionPromises.length: ' + localSubmissionPromises.length);
-
-        downloadNonLocalSubmissions(localSubmissionPromises)
-            .then(function(submissionDownloaders) {
-
-                $q.all(submissionDownloaders)
-                    .then(function(results) {
-                        msg.hideLoadingWithInfo("Submission downloaded.");
-                    }, function(e) {
-                        msg.hideLoadingWithErr('Unable to download submission.');
-                    });
+        $q.all(localSubmissionPromises).then(function() {
+            
+            selectedSubmission.forEach(function(submission_uuid){
+                downloadSubmissionPromises.push(
+                    downloadSubmission({submission_uuid: submission_uuid,
+                                        project_uuid: $scope.project_uuid}));
             });
+
+            $q.all(downloadSubmissionPromises).then(function(){
+                msg.hideLoadingWithInfo("Submission downloaded.");
+            }, function(error) {
+                msg.hideLoadingWithErr('Unable to download submission.');
+            });
+        });
+
+        // console.log('localSubmissionPromises.length: ' + localSubmissionPromises.length);
+
+        // downloadNonLocalSubmissions(localSubmissionPromises)
+        //     .then(function(submissionDownloaders) {
+
+        //         $q.all(submissionDownloaders)
+        //             .then(function(results) {
+        //                 msg.hideLoadingWithInfo("Submission downloaded.");
+        //             }, function(e) {
+        //                 msg.hideLoadingWithErr('Unable to download submission.');
+        //             });
+        //     });
     };
 
     var initServerActions =  function() {
@@ -289,7 +266,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var createSubmissions = function(results) {
         var submissions = [];
         angular.forEach(results, function(item) {
-            submissions.push({'date': item[2]});
+            submissions.push({'date': item[2], 'submission_id': item[0]});
         });
         return submissions;
     };
