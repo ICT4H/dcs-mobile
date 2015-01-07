@@ -2,7 +2,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
-
+    $scope.contextService = contextService;
     var getDate = function() {
         return new Date().toJSON();
     };
@@ -74,7 +74,10 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             });
     }
     var onLoad = function() {
-        setParametersForEnketo(submission_id);            
+        if(contextService.isListing)
+            setParametersForEnketo(submission_id); 
+        else
+            setParametersForEnketo();            
     };
     $scope.onNext = function() {
         contextService.submissionIndex = contextService.submissionIndex + 1;

@@ -24,6 +24,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var assignSubmissions = function(submissions){
         $scope.submissions = submissions;
+        contextService.isListing = true;
         contextService.submissions = submissions;
         msg.hideAll();
     };
@@ -194,6 +195,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onNew = function() {
+        contextService.isListing = false;
         $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
     };
 

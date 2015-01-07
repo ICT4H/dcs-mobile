@@ -6,7 +6,7 @@
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
 <div class="scrollable">  
-  <div class="scrollable-content">
+  <div class="scrollable-content" ng-swipe-left="onPrevious()" ng-swipe-right-"onNext()">
   <div class="panel">
   		<div class="main">
 		<article class="paper" >
@@ -27,7 +27,7 @@
 	</div>
   </div>
   <div ui-content-for="bottom">
-  	<div style="text-align:center;">
+  	<div style="text-align:center;" ng-show="contextService.isListing">
 	<span ng-hide="contextService.submissionIndex == 0" ng-click="onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
      <span class="btn">
     	Showing 
