@@ -23,7 +23,7 @@ dcsApp.value('ngI18nConfig', {
 });
 
 dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'store', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, store) {
-    $rootScope.title = 'D Collector';
+    $rootScope.title = 'Garner';
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });

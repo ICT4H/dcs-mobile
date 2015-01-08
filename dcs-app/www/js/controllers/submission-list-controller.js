@@ -25,9 +25,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var assignSubmissions = function(submissions){
         selectedSubmission = [];
         $scope.submissions = submissions;
-        contextService.isListing = true;
-        contextService.submissions = submissions;
         msg.hideAll();
+    };
+
+    $scope.enketolisting = function(submissionId, index) {
+        contextService.initSubmissionListForLocal($scope.project_uuid, $scope.submissions, index,  $rootScope.pageSize.value, paginationService.pagination.totalElement, paginationService.pagination.getFrom(), type, localStore.getSubmissionsByProjectId);
+        $location.path('/project/' + $scope.project_uuid + '/submission/' + submissionId);
     };
 
     var ErrorLoadingSubmissions = function(data, error) {
@@ -40,12 +43,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         initOfflineActions();
 
         if(type == "all") {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
-                    $scope.pagination.totalElement = result.total;
+            localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
+                $scope.pagination.init($rootScope.pageSize.value, result.total, function() {
+                    localStore.getSubmissionsByProjectId($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                        .then(assignSubmissions, ErrorLoadingSubmissions);
                 });
-                localStore.getSubmissionsByProjectId($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignSubmissions, ErrorLoadingSubmissions);
             });
         }
         else if(type == "unsubmitted") {
@@ -138,14 +140,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     //     }
     // };
 
-    $scope.editSurveyResponse = function() {
-        if(selectedCount==1) {
-            $location.path('/project/' + $scope.project_uuid + '/submission/' + selected[0]);
-            return;
-        }
-        msg.displayInfo('you can edit only one submission at a time !');
-    };
-
     var post_selected_submissions = function() {
         var multiplePromises = [];
         selectedSubmission.forEach(function(submissionId) {
@@ -225,7 +219,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission.forEach(function(submission_uuid) {
             localSubmissionPromises.push(loadLocalSubmissionUuid(submission_uuid));
         });
-        
+
         if(selectedSubmission.length == 0) 
             msg.hideLoadingWithInfo("All submissions are downloaded");
 
@@ -272,6 +266,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var assignServerSubmissions = function(response) {
+        selectedSubmission = [];
         msg.hideAll();
         submissions = createSubmissions(response.data);
         $scope.pagination.totalElement = response.total;
