@@ -14,12 +14,6 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         msg.hideAll();
     };
 
-    var exitApp = function() {
-        dialogService.confirmBox('Are you sure want to exit from the App?', function() {
-            navigator.app.exitApp();
-        });
-    };
-
     var loadLocal = function() {
         $scope.serverPage = false;
         (501).showInfo();
@@ -104,7 +98,6 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.actions['delete'] = {'onClick': onDelete, 'label': resourceBundle.delete };
         $scope.actions['update'] = {'onClick': onUpdate, 'label': resourceBundle.update };
         $scope.actions['new'] = {'onClick': loadServer, 'label': resourceBundle.getNewSurvey };
-        document.addEventListener('backbutton', exitApp, false);
         $scope.title = resourceBundle.localProjectTitle;
     };
 
