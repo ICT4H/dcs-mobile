@@ -22,14 +22,14 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'store', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, store) {
+dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'store', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, store) {
     $rootScope.title = 'Garner';
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
 
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-
+        backHandler.onRouteChange($location.path());
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
             $location.path('/');
@@ -72,13 +72,21 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
         msg.removeMessage(index);
     };
 
-    $rootScope.$back = function() {
-        if($location.path() != '/local-project-list')
-            window.history.back();
-    };
-
     $rootScope.createSurveyResponse = function(project_uuid) {
         $location.path('/project/' + project_uuid + '/submission/' + null);
     };
+
+    document.addEventListener('backbutton', function() {
+        var backLocation = backHandler.onBack();
+        //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
+        if (backLocation) {
+            console.log('backbutton clicked: going to: ' + backLocation);
+            $location.path(backLocation);
+            $route.reload();
+        } else {
+            console.log('backbutton clicked: implicit navigation...');
+            return false;
+        }
+    }, false);
 
 }]);

@@ -38,11 +38,11 @@ var app = {
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
-        angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
         fileSystem = new CordovaFileSytem();
         cordovaDeviceHandler = new CordovaDeviceHandler(navigator);
         fileSystem.init();
+        backHandler = new BackHandler(navigatorWrapper);
+        angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
         console.log('app loaded');
     }
 };
-

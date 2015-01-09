@@ -17,6 +17,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.outdateProject = false;
     $scope.deletedProject = false;
     $scope.showSearch = false;
+    backHandler.setToProjects();
 
     $scope.toggleSearch = function() {
         $scope.showSearch = !$scope.showSearch;
@@ -278,6 +279,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var loadServer = function() {
         $scope.serverPage = true;
+        backHandler.setToSubmissions();
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initServerActions();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
