@@ -70,8 +70,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
                 var project_name = project.name;
                 var userEmail = app.user.name;
 
-                fileSystem.setWorkingDir(userEmail, project_name);
-                loadEnketo(options);
+                fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+                    loadEnketo(options);
+                });
             });
     };
   
@@ -89,8 +90,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
                 };
                 var project_name = project.name;
                 var userEmail = app.user.name;
-                fileSystem.setWorkingDir(userEmail, project_name);
-                loadEnketo(options);
+                fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+                    loadEnketo(options);
+                });
             });
     };
 
