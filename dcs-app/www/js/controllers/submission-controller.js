@@ -70,9 +70,14 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
                 var project_name = project.name;
                 var userEmail = app.user.name;
 
-                fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+                if(isEmulator) {
                     loadEnketo(options);
-                });
+                }
+                else {
+                    fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+                        loadEnketo(options);
+                    });
+                }
             });
     };
   
@@ -90,9 +95,15 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
                 };
                 var project_name = project.name;
                 var userEmail = app.user.name;
-                fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+
+                if(isEmulator) {
                     loadEnketo(options);
-                });
+                }
+                else {
+                    fileSystem.setWorkingDir(userEmail, project_name).then(function() {
+                        loadEnketo(options);
+                    });
+                }
             });
     };
 
@@ -102,6 +113,15 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
         else
             setParametersForEnketo();            
     };
+
+    var cache = [];
+    function foo(itemIndex, pageSize) {
+        [1-5] 6
+        [6-10] 
+
+
+
+    }
 
     $scope.onNext = function() {
         contextService.submissionIndex = contextService.submissionIndex + 1;
