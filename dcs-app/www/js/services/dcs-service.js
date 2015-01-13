@@ -19,26 +19,21 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpRequest("/client/auth/", {});
     };
 
-
     this.checkProjectsStatus = function(projects) {
-        return app.httpPostRequest('/client/projects/validate/', 'projects=' + JSON.stringify(projects));
+        return app.httpPostRequest('/client/projects/project_status/', 'projects=' + JSON.stringify(projects));
     };
 
-    this.getAllSubmissions = function(project_uuid) {
-        return app.httpRequest("/client/projects/" + project_uuid + "/submission/");
-    };
-    
     this.getSubmissions = function(project_uuid, start, length){
-        return app.httpRequest('/client/submissions/?uuid='+project_uuid+'&start='+start+'&length='+length);
+        return app.httpRequest('/client/projects/' + project_uuid + '/submissions/?start=' + start + '&length='+length);
     };
 
     this.getSubmissionsFrom = function(project_uuid, last_fetch){
-        return app.httpRequest('/client/delta/submissions/?uuid='+project_uuid+'&last_fetch='+last_fetch);
+        return app.httpRequest('/client/'+project_uuid+'delta/?last_fetch='+last_fetch);
     };
 
     this.getSubmission = function(submission) {
         var deferred = $q.defer();
-        app.httpRequest("/client/projects/" + submission.project_uuid + "/submissions/" + submission.submission_uuid + "/")
+        app.httpRequest("/client/projects/" + submission.project_uuid + "/submissions/" + submission.submission_uuid)
             .then(function(serverSubmission) {
                 serverSubmission.project_uuid = submission.project_uuid;
                 serverSubmission.status = submission.status;
@@ -72,15 +67,6 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
 
         return deferred.promise;
     }
-
-    this.getSubmissionHeaders = function(project_uuid) {
-        var deferred = $q.defer();
-        app.httpRequest('/client/submission-headers/?uuid='+project_uuid).then(function(response) {
-        deferred.resolve(response.data);
-        },deferred.reject);
-
-        return deferred.promise;
-    };
 
     this.getSubmissionById = function(project_uuid, submission_uuid) {
         return app.httpRequest("/client/projects/" + project_uuid + "/submissions/" + submission_uuid);
@@ -128,7 +114,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         fileSystem.setWorkingDir(app.user.name, $rootScope.currentProject.name);
         return getFilesMeta(fileNamesString)
             .then(function(filesMetaData) {
-                console.log('all getFilesMeta promises done, result length: ' + filesMetaData.length);
+                console.log('key: "value",  ' + filesMetaData.length);
 
                 var transferPromises = [];
                 angular.forEach(filesMetaData, function(fileMeta) {
@@ -209,7 +195,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     }
 
     this.checkSubmissionVersions = function(id_versions) {
-        return app.httpPostRequest('/client/project/dummy/submission/check-status', 'id_version_dict=' + JSON.stringify(id_versions));
+        return app.httpPostRequest('/client/project/dummy/submission_status/', 'id_version_dict=' + JSON.stringify(id_versions));
     };
 
 }]);

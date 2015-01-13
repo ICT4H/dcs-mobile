@@ -28,10 +28,6 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
 	};
 
-	this.getSubmissionHeaders = function(project_uuid) {
-        return store.execute('SELECT local_headers as headers from projects WHERE project_uuid = ?',[project_uuid], true);
-    };
-
 	this.getCountOfSubmissions = function(project_uuid) {
 		return store.execute('select count(*) as total FROM submissions where project_uuid = ?',[project_uuid], true);
 	};
