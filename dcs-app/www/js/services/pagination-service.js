@@ -7,10 +7,10 @@ var paginationService = function() {
     this.pagination.pageNumber = 0;
     this.pagination.paginationCallBack;
 
-    this.pagination.init = function(ElementsPerPage, totalElement, callBack) {
+    this.pagination.init = function(ElementsPerPage, totalElement, callBack, index) {
         this.pageSize = ElementsPerPage;
         this.totalElement = totalElement;
-        this.pageNumber = 0;
+        this.pageNumber = index || 0;
         this.paginationCallBack = callBack;
         this.paginationCallBack(this.pageNumber);
     };

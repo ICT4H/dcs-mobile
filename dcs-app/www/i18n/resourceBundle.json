@@ -13,6 +13,8 @@
     "505": "Updated project list",
     "localProjectTitle": "Offline Surveys",
     "serverProjectTitle": "Online Surveys",
+    "localsubmissionTitle": "Offline Data",
+    "serversubmissionTitle": "Online Data",
     "getNewSurvey": "Get new survey",
     "delete": "Delete",
     "update": "Update",

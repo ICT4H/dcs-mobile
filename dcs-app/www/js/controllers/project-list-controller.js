@@ -15,10 +15,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadLocal = function() {
-        $scope.serverPage = false;
-        (501).showInfo();
-        initOfflineActionItems();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            $scope.serverPage = false;
+            (501).showInfo();
+            initOfflineActionItems();
             projectDao.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
                     .then(assignResult, (103).showError);
@@ -26,10 +26,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadServer = function() {
-        $scope.serverPage = true;
-        (501).showInfo();
-        initOnlineActionItems();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            $scope.serverPage = true;
+            (501).showInfo();
+            initOnlineActionItems();
             dcsService.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
                     .then(assignResult, (103).showError);

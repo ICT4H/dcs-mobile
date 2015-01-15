@@ -1,4 +1,4 @@
-dcsApp.service('submissionDao',['store', function(store){
+dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 
 	this.createSubmission = function(submission) {
 		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
@@ -8,15 +8,21 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 	
 	this.updateSubmission = function(submission) {
-		var values = getSubmissionAsValues(submission);
+		var values = getSubmissionAsValuesForEdit(submission);
 		values.push(submission.submission_id);
-		return store.execute('UPDATE submissions SET submission_uuid=?, version=?, status=?, is_modified=?, project_uuid=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_id = ?', 
+		return store.execute('UPDATE submissions SET status=?, is_modified=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_id = ?', 
 			values);
 	};
 
 	var getSubmissionAsValues = function(submission){
 		var values = [submission.submission_uuid, submission.version, submission.status, submission.is_modified, submission.project_uuid,
 			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
+		return values;
+	};
+
+	var getSubmissionAsValuesForEdit = function(submission){
+		var values = [submission.status, submission.is_modified, submission.created, submission.data, submission.xml, 
+			submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
 
@@ -46,7 +52,16 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 
 	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
-		return store.execute('SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ? ', [project_uuid, limit, offset]);
+		var deferred = $q.defer();
+		store.execute('select count(*) as total FROM projects', [], true).then(function(countResultset) {
+			store.execute('SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
+				var result = {};
+				result.total = countResultset.total;
+				result.data = submissions;
+				deferred.resolve(result);
+			}, deferred.reject);
+		}, deferred.reject);
+		return deferred.promise;
 	};
 
 	var getParamHolders = function(paramArray) {

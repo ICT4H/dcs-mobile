@@ -27,16 +27,16 @@
 	</div>
   </div>
   <div ui-content-for="bottom">
-  	<div style="text-align:center;" ng-show="contextService.isListing">
-	<span ng-hide="isFirst()" ng-click="onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
+  	<div style="text-align:center;" ng-show="isListing">
+	<span ng-hide="pagination.isFirstPage()" ng-click="pagination.onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
      <span class="btn">
     	Showing 
     	 
-    	{{ contextService.start + contextService.submissionIndex + 1}} 
+    	{{ pagination.getTo() }} 
     	of 
-    	{{ contextService.total }} 
+    	{{ pagination.getTotal() }} 
      </span>
-   <span ng-hide="isLast()" ng-click="onNext()" class="fa fa-lg fa-chevron-right pull-right btn"></span>
+   <span ng-hide="pagination.isLastPage()" ng-click="pagination.onNext()" class="fa fa-lg fa-chevron-right pull-right btn"></span>
 </div>	
   </div>
   </div>

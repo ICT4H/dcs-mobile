@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, paginationService, contextService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, paginationService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = {};
@@ -25,13 +25,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var assignSubmissions = function(submissions){
         selectedSubmission = [];
-        $scope.submissions = submissions;
+        $scope.submissions = submissions.data;
         msg.hideAll();
-    };
-
-    $scope.enketolisting = function(submissionId, index) {
-        contextService.initSubmissionListForLocal($scope.project_uuid, $scope.submissions, index,  $rootScope.pageSize.value, paginationService.pagination.totalElement, paginationService.pagination.getFrom(), type, localStore.getSubmissionsByProjectId);
-        $location.path('/project/' + $scope.project_uuid + '/submission/' + submissionId);
     };
 
     var ErrorLoadingSubmissions = function(data, error) {
@@ -161,6 +156,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         .then(function(){
             msg.hideLoadingWithInfo('Submitted successfully');
         },function(error){
+            console.log(error);
             msg.hideLoadingWithErr('something went wrong ' + error);
         });
     };
@@ -191,8 +187,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onNew = function() {
-        contextService.isListing = false;
-        $location.path('/project/' + $scope.project_uuid + '/submission/' + null);
+        $location.path('/project/' + $scope.project_uuid + '/submission/new');
     };
 
     function loadLocalSubmissionUuid(submission_uuid) {
@@ -256,6 +251,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var initServerActions =  function() {
         $scope.actions = {};
         $scope.actions['download'] = {'onClick': onDownload, 'label': 'Download'};
+        $scope.title = resourceBundle.serversubmissionTitle;
     };
 
     var createSubmissions = function(results) {
@@ -298,6 +294,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions['new'] = {'onClick': onNew, 'label': 'Make submission'};
         $scope.actions['pull'] = {'onClick': loadServer, 'label': 'Pull Submissions'};
         $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
+        $scope.title = resourceBundle.localsubmissionTitle;
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {
@@ -308,5 +305,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'contextService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', submissionListController]);
 
