@@ -60,12 +60,12 @@ dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messag
         },2000);
     };
     
-    Number.prototype.showError = function(callback) {
+    Number.prototype.showError = function() {
         msg.hideLoadingWithErr($rootScope.resourceBundle[this]);
     };
 
     Number.prototype.showInfo = function() {
-        msg.showLoadingWithInfo(resourceBundle[this]);
+        msg.showLoadingWithInfo($rootScope.resourceBundle[this]);
     };
 
     $rootScope.removeMessage = function(index){
@@ -73,7 +73,7 @@ dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messag
     };
 
     $rootScope.createSurveyResponse = function(project_uuid) {
-        $location.path('/project/' + project_uuid + '/submission/' + null);
+        $location.path('/projects/' + project_uuid + '/submissions/new');
     };
 
     document.addEventListener('backbutton', function() {

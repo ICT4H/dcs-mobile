@@ -58,7 +58,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
         if($scope.offset == getOffset(currentIndex, $scope.limit))
             loadEnketoWith($scope.project_uuid, $scope.submissions[actualIndex].xml, onEdit, "Update");
         else {
-            getSubmissionXml(currentIndex, $scope.limit).then(function(result) {
+            getSubmissionXml(getOffset(currentIndex, $scope.limit), $scope.limit).then(function(result) {
                 msg.hideAll();
                 $scope.submissions = result.data;
                 $scope.offset = getOffset(currentIndex, $scope.limit);

@@ -10,7 +10,7 @@
         <div ng-if="!serverPage">
           <span am-time-ago="item.created" am-preprocess="utc"></span>
           <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-          <a class="pull-right" href='#project/{{project_uuid}}/submission/{{item.submission_id}}?type=all&isListing=true&totalElement={{pagination.totalElement}}&currentIndex={{pagination.pageNumber*($index+1)}}&server=false&limit=2' style="margin-top: -30px;">view</a>
+          <a class="pull-right" ng-click="setPathForView(item.submission_id, false, $index)" style="margin-top: -30px;">view</a>
         </div>
         <div ng-if="serverPage">
           <span am-time-ago="item.date" am-preprocess="utc"></span> 

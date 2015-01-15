@@ -33,6 +33,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         msg.hideLoadingWithErr('Failed to load Submissions');
     };
 
+    $scope.setPathForView = function(submissionId, isFromServer, index) {
+        var actualIndex = ($scope.pagination.pageSize * $scope.pagination.pageNumber) + index ;
+        var queryParams = 'type=all&isListing=true&totalElement=' + $scope.pagination.totalElement +'&currentIndex=' + index + '&server=' + isFromServer + '&limit=' + $scope.pagination.pageSize;
+        $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
+    };
+
     var loadLocal = function() {
         $scope.serverPage = false;
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
@@ -187,7 +193,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onNew = function() {
-        $location.path('/project/' + $scope.project_uuid + '/submission/new');
+        $location.path('/projects/' + $scope.project_uuid + '/submissions/new');
     };
 
     function loadLocalSubmissionUuid(submission_uuid) {

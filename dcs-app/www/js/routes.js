@@ -15,7 +15,7 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
           controller: 'localProjectListController',
           reloadOnSearch: false
         })
-        .when('/project/:project_uuid/submission/:submission_id', {
+        .when('/projects/:project_uuid/submissions/:submission_id', {
           templateUrl: "partials/submission.html",
           controller: 'submissionController',
           reloadOnSearch: false
