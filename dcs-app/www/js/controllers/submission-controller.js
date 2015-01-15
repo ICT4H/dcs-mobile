@@ -3,6 +3,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     $scope.pagination = paginationService.pagination;
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
+    var relationHandler;
 
     var onEdit = function(submission) {
         submission.is_modified = true;
@@ -33,14 +34,29 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     var loadEnketoWith = function(project_uuid, submissionXml, buttonCallback, buttonLabel) {
         localStore.getProjectById(project_uuid).then(function(project) {
             var options = {
-                'submissionXml': submissionXml,
                 'buttonLabel': buttonLabel,
                 'hideButton': buttonLabel? false:true,
-                'onButtonClick': buttonCallback
+                'onButtonClick': buttonCallback,
+                'submissionXml': submissionXml,
+                'xform': project.xform
             };
-            loadEnketo(project.xform, options);
+            if (project.project_type == 'parent') {
+                initChildActions(project);
+            } else if (project.project_type == 'child') {
+                //options.xform = relationHandler.styleXfromParentFields();
+            }
+            loadEnketo(options);
         });
     };  
+
+    var initChildActions =  function(project) {
+        $scope.actions = {};
+        //TODO remove harcoded action label; use value from child project
+        //TODO loop and create as many add as many children
+        $scope.actions['new_child'] = {'onClick': function() {
+            $location.url('/projects/'+project.child_ids+'/submissions/new_child?parent_id='+$routeParams.project_uuid+'&parent_submission_id='+$routeParams.submission_id);
+        }, 'label': 'New Child' };
+    };
 
     $scope.submissions = [];
 
@@ -76,7 +92,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
 
         if($routeParams.submission_id == "new")
             loadEnketoWith($scope.project_uuid, "", onNew, "Save");
-        else {
+        else if ($routeParams.submission_id == 'new_child') {
+            initChildSubmission($routeParams);
+        } else {
             var index = parseInt($routeParams.currentIndex);
             $scope.submission_id = $routeParams.submission_id;
             $scope.isListing = $routeParams.isListing == "true"? true:false;
@@ -92,6 +110,18 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             });
         }        
     };
+
+    var initChildSubmission = function($routeParams) {
+        localStore.getProjectById($routeParams.project_uuid).then(function(project) {
+            localStore.getSubmissionById($routeParams.parent_submission_id).then(function(result) {
+                var parent_submission = JSON.parse(result.data);
+                relationHandler = new SurveyRelation(project, parent_submission);
+                var edit_model_str = relationHandler.getUpdatedModelStr();
+
+                loadEnketoWith($routeParams.project_uuid, edit_model_str, onNew, "Save");
+            });
+        });
+    }
 
     onLoad();
 }]);
