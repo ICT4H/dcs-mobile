@@ -15,6 +15,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadLocal = function() {
+        selectedProject = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
             (501).showInfo();
@@ -26,6 +27,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadServer = function() {
+        selectedProject = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
             (501).showInfo();
@@ -37,17 +39,17 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var onDownloadProject = function() {
-        if(app.areItemSelected(selectedProject)) {
-            (502).showInfo();
-            dcsService.getQuestionnaires(selectedProject)
-            .then(function(projects) {
-                app.mapPromise(projects, projectDao.createProject)
-                    .then( function(response) {
-                        loadLocal();
-                        (504).showInfo();
-                    }, (104).showError);  
-            }, (105).showError);
-        }
+        if(!app.areItemSelected(selectedProject)) return;
+
+        "downloading_projects".showInfo();
+        dcsService.getQuestionnaires(selectedProject)
+        .then(function(projects) {
+            app.mapPromise(projects, projectDao.createProject)
+                .then( function(response) {
+                loadLocal();
+                (504).showInfo();
+            }, (104).showError);  
+        }, (105).showError);
     };
 
     var initOnlineActionItems = function() {
@@ -60,7 +62,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var onDelete = function(){
         if(app.areItemSelected(selectedProject)) {
             dialogService.confirmBox('Do you want to delete selected projects?', function() {
-                projectDao.deleteProject(selectedProject[0])
+                projectDao.deleteProject(selectedProject)
                 .then(function(response) {
                         loadLocal();
                         (504).showInfo();
@@ -70,27 +72,35 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var onUpdate = function() {
-        if(selectedProject.length == 0) {
-            projectDao.getAll().then(function(projects){
-                updateProjects(projects);
-            });
-        } else {
+        if(selectedProject.length != 0) {
             updateProjects(selectedProject);
+        }
+        else {
+            dialogService.confirmBox('Do you want to update all projects?', function() {
+                projectDao.getAll().then(function(projects){
+                  updateProjects(projects);
+                });
+            });
         }
     };
 
     var updateProjects  = function(projects) {
         msg.showLoading();
-        var promises = [];
-        promises.push(dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
+        dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
+            if(outdatedProjects.length == 0) {
+                "no_project_change".showInfo();
+                return;                
+            }
+
+            var promises = [];
             outdatedProjects.forEach(function(outdatedProject) {
                 promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status)); 
             });
-        }));
-        $q.all(promises).then(function() {
-            loadLocal();
-            (505).showInfo();
-        }, (107).showError);
+            $q.all(promises).then(function() {
+                loadLocal();
+                (505).showInfo();
+            }, (107).showError);
+        });
     };
 
     var initOfflineActionItems = function() {
@@ -101,9 +111,17 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.title = resourceBundle.localProjectTitle;
     };
 
+    $scope.disableLink = function(status) {
+        return status=='server-deleted' || status=='outdated';
+    };
+
+    $scope.goInSubmission = function(project) {
+        $location.url('/submission-list/' + project.project_uuid + '?type=all');
+    }
+
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
-        app.flipArrayElement(selectedProject, project.project_uuid);
+        app.flipArrayElement(selectedProject, {"id":project.project_uuid, "rev":project.version});
     };
 
     loadLocal();

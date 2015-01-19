@@ -135,10 +135,6 @@ h1 {
   background-color: #FFAD33 !important;
 }
 
-.outdated {
-  background-color: #FFAD33 !important;
-}
-
 .status-title {
   border-top: solid white 1px;
   padding: 5px 15px 5px 15px;
@@ -291,6 +287,20 @@ h1 {
   background-color: #dff0d8;
 }
 
+.outdated {
+  background-color: #FFAD33 !important;
+}
+
+.link {
+   background:none!important;
+     border:none; 
+     padding:0!important;
+     cursor:pointer;
+}
+
+.strikeout {
+  text-decoration: line-through!important;
+}
 /*.disable {
   color: #ccc !important;
    background-color: #fff !important;
@@ -311,6 +321,11 @@ h1 {
   top: 50%;
   margin-left: -25px;
   margin-top: -25px;
+}
+
+.server-deleted {
+  text-decoration: line-through !important;
+  background-color: #FFAD33 !important;
 }
 
 /*

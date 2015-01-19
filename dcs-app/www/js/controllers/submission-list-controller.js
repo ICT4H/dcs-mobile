@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, localStore, msg, paginationService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = {};
@@ -43,11 +43,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.serverPage = false;
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initOfflineActions();
-
+        selectedSubmission = [];
         if(type == "all") {
-            localStore.getCountOfSubmissions($scope.project_uuid).then(function(result){
+            submissionDao.getCountOfSubmissions($scope.project_uuid).then(function(result){
                 $scope.pagination.init($rootScope.pageSize.value, result.total, function() {
-                    localStore.getSubmissionsByProjectId($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    submissionDao.getSubmissionsByProjectId($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
                         .then(assignSubmissions, ErrorLoadingSubmissions);
                 });
             });
@@ -146,10 +146,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         var multiplePromises = [];
         selectedSubmission.forEach(function(submissionId) {
             multiplePromises.push(
-                localStore.getSubmissionById(submissionId)
+                submissionDao.getSubmissionById(submissionId)
                     .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
                     .then(dcsService.postSubmissionNewMedia)
-                    .then(localStore.updateSubmission));
+                    .then(submissionDao.updateSubmission));
         });
         return multiplePromises;
     };
@@ -169,27 +169,17 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var onDelete = function() {
         if(!app.areItemSelected(selectedSubmission)) return;
-
-        function onConfirm(buttonIndex) {
-            if(buttonIndex==BUTTON_NO) return;
-            msg.showLoading();
-            localStore.deleteSubmissions(selectedSubmission)
+         
+         dialogService.confirmBox('Do you want to delete selected submissions?', function() {
+            submissionDao.deleteSubmissions(selectedSubmission)
             .then(function(){
                 loadLocal();
                 msg.hideLoadingWithInfo("Submission(s) deleted");
             }
             ,function(error){
-                console.log(error);
                 msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
             });
-        };
-
-        navigator.notification.confirm(
-            'Do you want to delete ?',
-            onConfirm,
-            'Delete submission',
-            ['Yes','No']
-        );
+        });
     };
 
     var onNew = function() {
@@ -198,7 +188,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     function loadLocalSubmissionUuid(submission_uuid) {
         var deferred = $q.defer();
-        localStore.getsubmissionUuidByUuid(submission_uuid).then(function(result) {
+        submissionDao.getsubmissionUuidByUuid(submission_uuid).then(function(result) {
             if(result.length != 0)
                 app.flipArrayElement(selectedSubmission, submission_uuid);
             deferred.resolve();
@@ -210,7 +200,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         submission.status = BOTH;
         return dcsService.getSubmission(submission)
             .then(dcsService.getSubmissionMedia)
-            .then(localStore.createSubmission);      
+            .then(submissionDao.createSubmission);      
     };
 
     var onDownload = function() {
@@ -281,6 +271,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var loadServer = function() {
         $scope.serverPage = true;
+        selectedSubmission = [];
         backHandler.setToSubmissions();
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initServerActions();
@@ -291,7 +282,37 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     };
 
-    var onUpdate = function() {};
+    var updateSubmissions = function() {
+        msg.showLoading();
+        dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
+            if(outdatedProjects.length == 0) {
+                "no_project_change".showInfo();
+                return;                
+            }
+
+            var promises = [];
+            outdatedProjects.forEach(function(outdatedProject) {
+                promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status)); 
+            });
+            $q.all(promises).then(function() {
+                loadLocal();
+                (505).showInfo();
+            }, (107).showError);
+        });
+    };
+
+    var onUpdate = function() {
+        if(selectedProject.length != 0) {
+            updateProjects(selectedProject);
+        }
+        else {
+            dialogService.confirmBox('Do you want to update all projects?', function() {
+                projectDao.getAll().then(function(projects){
+                  updateProjects(projects);
+                });
+            });
+        }
+    };
 
     var initOfflineActions =  function() {
         $scope.actions = {};
@@ -311,5 +332,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', submissionListController]);
 

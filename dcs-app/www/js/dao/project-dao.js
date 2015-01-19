@@ -20,10 +20,11 @@ dcsApp.service('projectDao',['$q', 'store', function($q, store){
 		return store.execute('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
 	};				
 
-	this.deleteProject = function(project_uuid) {
-		return store.execute('DELETE FROM submissions where project_uuid=?', [project_uuid])
+	this.deleteProject = function(projects) {
+		var ids = projects.map(function(project) {return project.id});
+		return store.execute('DELETE FROM submissions where project_uuid IN(' + getParamHolders(projects) + ')', ids)
 		.then(function(tx, resp){
-			store.execute('DELETE FROM projects WHERE project_uuid = ? ', [project_uuid]);
+			store.execute('DELETE FROM projects WHERE project_uuid IN(' + getParamHolders(projects) + ')', ids);
 		});
 	};
 
@@ -42,6 +43,10 @@ dcsApp.service('projectDao',['$q', 'store', function($q, store){
 
 	var getProjectValues = function(project){
 		return [project.version, project.status, project.name, project.xform, project.headers];
+	};
+
+	var getParamHolders = function(paramArray) {
+		return paramArray.map(function() { return '?';}).join(',');
 	};
 
 }]);	

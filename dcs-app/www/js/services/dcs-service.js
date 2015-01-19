@@ -8,9 +8,9 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpRequest("/client/projects/", params);
     };
 
-    this.getQuestionnaires = function(project_uuids) {
+    this.getQuestionnaires = function(projects) {
         var params = {
-            'ids': project_uuids
+            'ids': projects.map(function(project) {return project.id;})
         };
         return app.httpRequest("/client/projects/" , params);
     };
@@ -20,7 +20,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.checkProjectsStatus = function(projects) {
-        return app.httpPostRequest('/client/projects/project_status/', 'projects=' + JSON.stringify(projects));
+        return app.httpPostRequest('/client/project_status/', 'projects=' + JSON.stringify(projects));
     };
 
     this.getSubmissions = function(project_uuid, start, length){

@@ -5,10 +5,10 @@
 <div class="scrollable">  
     <div class="scrollable-content">
         <div class="list-group" ng-if="projects.length !=0">
-            <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'selected': selected}">
+            <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted'),'selected':selected }">
                 <div ng-if="!serverPage">
-                    <i class="fa fa-file-o pull-right fa-2x" ng-hide="projectWarning" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;"></i>
-                    <a href="#submission-list/{{project.project_uuid}}?type=all" style="font-weight: bolder;">{{ project.name }}</a>
+                    <button class="fa fa-file-o pull-right fa-2x link" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}"></button>
+                    <button class='link' ng-click="goInSubmission(project)" ng-disabled="disableLink(project.status)" ng-class="{'strikeout': disableLink(project.status)}"> {{ project.name }} </button>
                 </div>
                 <div ng-if="serverPage">
                     <span>{{ project.name }}</span>

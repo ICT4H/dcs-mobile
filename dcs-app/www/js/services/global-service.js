@@ -160,8 +160,11 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
     };
 
     this.flipArrayElement = function(array, element) {
-        if(array.indexOf(element) >= 0)
-            array.splice(array.indexOf(element), 1);
+
+        var ids = array.map(function(item) { return item.id;});
+        var index = ids.indexOf(element.id);
+        if(index >= 0)
+            array.splice(index, 1);
         else
             array.push(element);
     };
