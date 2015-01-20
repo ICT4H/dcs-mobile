@@ -3,7 +3,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     resourceBundle = $rootScope.resourceBundle;
     $scope.pagination = paginationService.pagination;
     $scope.projects = [];
-    $scope.actions = {};
+    $scope.actions = [];
     $scope.title = "";
     // private variable
     var selectedProject = [];
@@ -53,8 +53,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var initOnlineActionItems = function() {
-        $scope.actions = {};
-        $scope.actions['download'] = {'onClick': onDownloadProject, 'label': resourceBundle.download };
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDownloadProject, 'label': resourceBundle.download });
         document.addEventListener('backbutton', loadLocal, false);
         $scope.title = resourceBundle.serverProjectTitle;
     };
@@ -104,10 +104,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var initOfflineActionItems = function() {
-        $scope.actions = {};
-        $scope.actions['delete'] = {'onClick': onDelete, 'label': resourceBundle.delete };
-        $scope.actions['update'] = {'onClick': onUpdate, 'label': resourceBundle.update };
-        $scope.actions['new'] = {'onClick': loadServer, 'label': resourceBundle.getNewSurvey };
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete });
+        $scope.actions.push({'onClick': onUpdate, 'label': resourceBundle.update });
+        $scope.actions.push({'onClick': loadServer, 'label': resourceBundle.getNewSurvey });
         $scope.title = resourceBundle.localProjectTitle;
     };
 

@@ -11,8 +11,8 @@
       ui-state="myDropdown"
       ui-turn-off="myDropdown">
 
-    	<li ng-repeat="(name, options) in actions" ng-click="options.onClick()"> 
-      	<a ng-class="{'disable': options.isDisabled}">{{options.label}}</a>
+    	<li ng-repeat="action in actions" ng-click="action.onClick()"> 
+      	<a ng-class="{'disable': action.isDisabled}">{{action.label}}</a>
       </li>
     </ul>
 </div>

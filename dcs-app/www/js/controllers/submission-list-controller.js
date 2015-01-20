@@ -1,7 +1,7 @@
 var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService){
 
     $scope.pagination = paginationService.pagination;
-    $scope.actions = {};
+    $scope.actions = [];
     
     $scope.searchFields = {all: 'All'};  
 
@@ -245,8 +245,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var initServerActions =  function() {
-        $scope.actions = {};
-        $scope.actions['download'] = {'onClick': onDownload, 'label': 'Download'};
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDownload, 'label': 'Download'}); 
         $scope.title = resourceBundle.serversubmissionTitle;
     };
 
@@ -314,12 +314,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var initOfflineActions =  function() {
-        $scope.actions = {};
-        $scope.actions['delete'] = {'onClick': onDelete, 'label': 'Delete' };
-        $scope.actions['push'] = {'onClick': onPost, 'label': 'Submit Submissions'};
-        $scope.actions['new'] = {'onClick': onNew, 'label': 'Make submission'};
-        $scope.actions['pull'] = {'onClick': loadServer, 'label': 'Pull Submissions'};
-        $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Check Status'};
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDelete, 'label': 'Delete' });
+        $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
+        $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
+        $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
+        $scope.actions.push({'onClick': onUpdate, 'label': 'Check Status'});
         $scope.title = resourceBundle.localsubmissionTitle;
     };
 
