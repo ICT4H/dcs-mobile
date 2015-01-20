@@ -26,6 +26,14 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 		return values;
 	};
 
+	this.getSubmissionForUpdate = function(submissions_ids) {
+		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
+	};
+
+	this.getAllSSubmissionForUpdate = function() {
+		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined"', submissions_ids);
+	};
+
 	this.deleteSubmissions = function(submissions_ids) {
 		return store.execute('DELETE FROM submissions WHERE submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
@@ -41,7 +49,6 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 	this.getSubmissionById = function(submission_id) {
 		return store.execute('SELECT * FROM submissions where submission_id = ?', [submission_id], true);
 	};
-
 
 	this.getSubmissionByuuid = function(submission_id) {
 		return store.execute('SELECT * FROM submissions where submission_uuid = ?', [submission_id]);

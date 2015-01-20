@@ -282,18 +282,15 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     };
 
-    var updateSubmissions = function() {
+    var updateSubmissions = function(submissions) {
         msg.showLoading();
-        dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
-            if(outdatedProjects.length == 0) {
-                "no_project_change".showInfo();
-                return;                
-            }
+        var promises = [];
 
-            var promises = [];
-            outdatedProjects.forEach(function(outdatedProject) {
-                promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status)); 
-            });
+        dcsService.checkSubmissionsStatus($scope.project_uuid, submissions).then(function(response){
+            for (var status in response) {
+                promises.push(submissionDao.updateSubmissionStatus(response[status], status)); 
+            };
+
             $q.all(promises).then(function() {
                 loadLocal();
                 (505).showInfo();
@@ -302,13 +299,15 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onUpdate = function() {
-        if(selectedProject.length != 0) {
-            updateProjects(selectedProject);
+        if(selectedSubmission.length != 0) {
+            submissionDao.getSubmissionForUpdate(selectedSubmission).then(function(submissions) {
+                updateSubmissions(submissions);
+            });
         }
         else {
-            dialogService.confirmBox('Do you want to update all projects?', function() {
-                projectDao.getAll().then(function(projects){
-                  updateProjects(projects);
+            dialogService.confirmBox('Do you want to update all submissions?', function() {
+                submissionDao.getAllSSubmissionForUpdate(project_uuid).then(function(submissions){
+                    updateSubmissions(projects);
                 });
             });
         }
@@ -320,13 +319,13 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions['push'] = {'onClick': onPost, 'label': 'Submit Submissions'};
         $scope.actions['new'] = {'onClick': onNew, 'label': 'Make submission'};
         $scope.actions['pull'] = {'onClick': loadServer, 'label': 'Pull Submissions'};
-        $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Update'};
+        $scope.actions['update'] = {'onClick': onUpdate, 'label': 'Check Status'};
         $scope.title = resourceBundle.localsubmissionTitle;
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {
         submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selectedSubmission, submission.submission_id);
+        app.flipArray(selectedSubmission, submission.submission_id);
     };
 
     loadLocal();

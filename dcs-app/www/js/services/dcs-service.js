@@ -23,6 +23,10 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpPostRequest('/client/project_status/', 'projects=' + JSON.stringify(projects));
     };
 
+    this.checkSubmissionsStatus = function(project_uuid, submissions) {
+        return app.httpPostRequest('/client/projects/'+ project_uuid +'/submission_status/', 'submissions=' + JSON.stringify(submissions));
+    };
+
     this.getSubmissions = function(project_uuid, start, length){
         return app.httpRequest('/client/projects/' + project_uuid + '/submissions/?start=' + start + '&length='+length);
     };

@@ -169,6 +169,13 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
             array.push(element);
     };
 
+    this.flipArray = function(array, element) {
+        if(array.indexOf(element) >= 0)
+           array.splice(array.indexOf(element), 1);
+        else
+            array.push(element);
+    };
+
     this.getSearchFields = function(headers, parent) {
         var self = this;
         var searchFields = {};

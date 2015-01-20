@@ -12,6 +12,7 @@
     "504": "Project Deleted",
     "505": "Updated project list",
     "no_project_change": "No project has been changed",
+    "no_submission_change": "No submission has been changed",
     "localProjectTitle": "Offline Surveys",
     "serverProjectTitle": "Online Surveys",
     "localsubmissionTitle": "Offline Data",
