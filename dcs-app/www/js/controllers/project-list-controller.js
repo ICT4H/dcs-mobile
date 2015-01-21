@@ -73,7 +73,9 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     var onUpdate = function() {
         if(selectedProject.length != 0) {
-            updateProjects(selectedProject);
+            projectDao.getProjectsforUpdate(selectedProject).then(function(projects) {
+                updateProjects(projects);
+            });
         }
         else {
             dialogService.confirmBox('Do you want to update all projects?', function() {
@@ -121,7 +123,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
-        app.flipArrayElement(selectedProject, {"id":project.project_uuid, "rev":project.version});
+        app.flipArrayElement(selectedProject, project.project_uuid);
     };
 
     loadLocal();

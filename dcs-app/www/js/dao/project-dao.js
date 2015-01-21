@@ -18,13 +18,16 @@ dcsApp.service('projectDao',['$q', 'store', function($q, store){
 		var values = getProjectValues(project);
 		values.push(project_uuid);
 		return store.execute('UPDATE projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
-	};				
+	};
+
+	this.getProjectsforUpdate = function(project_uuids) {
+		return store.execute('select project_uuid as id, version as rev from projects where project_uuid IN(' + getParamHolders(project_uuids) +')', project_uuids)
+	};
 
 	this.deleteProject = function(projects) {
-		var ids = projects.map(function(project) {return project.id});
-		return store.execute('DELETE FROM submissions where project_uuid IN(' + getParamHolders(projects) + ')', ids)
+		return store.execute('DELETE FROM submissions where project_uuid IN(' + getParamHolders(projects) + ')', projects)
 		.then(function(tx, resp){
-			store.execute('DELETE FROM projects WHERE project_uuid IN(' + getParamHolders(projects) + ')', ids);
+			store.execute('DELETE FROM projects WHERE project_uuid IN(' + getParamHolders(projects) + ')', projects);
 		});
 	};
 
