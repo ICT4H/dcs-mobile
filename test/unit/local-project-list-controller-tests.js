@@ -4,7 +4,8 @@ describe('local project list controller', function() {
     var scope;
     var locals;
     var mocks;
-    jasmine.getJSONFixtures().fixturesPath = "base/i18n";
+    //TODO remove hardcoding of dcs-app
+    jasmine.getJSONFixtures().fixturesPath = "base/dcs-app/www/i18n/";
     var data = loadJSONFixtures('resourceBundle.json');
 
     beforeEach(angular.mock.module('dcsApp'));
@@ -30,7 +31,16 @@ describe('local project list controller', function() {
         rootScope.resourceBundle = data['resourceBundle.json'];
     }
 
-    it('should list all local projects', function() {
+    it("should behave...", function() {
+        expect(1).toBe(1);
+        jasmine.getFixtures().fixturesPath = "base/test/unit/";
+        var data = jasmine.getFixtures().read('xform_html.html');
+
+        console.log(data);
+
+    });
+
+    xit('should list all local projects', function() {
         mocks.add_project_dao_spy_1_local_project();
         mocks.add_message_service_spy();
         locals = {
@@ -44,7 +54,7 @@ describe('local project list controller', function() {
         expect(scope.projects.length).toEqual(1);
     });
 
-    it('should update local outdated project status and load local project', function() {
+    xit('should update local outdated project status and load local project', function() {
         mocks.add_project_dao_spy_1_local_project();
         mocks.add_message_service_spy();
         mocks.add_dcsService_spy_1_updated_server_project();
