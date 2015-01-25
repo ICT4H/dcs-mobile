@@ -1,0 +1,54 @@
+<root xmlns:xf="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml"
+      xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      xmlns:jr="http://openrosa.org/javarosa">
+    <model>
+        <instance>
+            <repayment id="repayment">
+                <loan_ac_number/>
+                <borrower_id/>
+                <borrower_name/>
+                <amount/>
+                <repayment_date/>
+                <meta>
+                    <instanceID/>
+                </meta>
+                <form_code>001</form_code>
+            </repayment>
+        </instance>
+    </model>
+    <form autocomplete="off" novalidate="novalidate" class="or clearfix"
+          id="repayment"> <!--This form was created by transforming a OpenRosa-flavored (X)Form using an XSLT sheet created by Enketo LLC.-->
+        <section class="form-logo"></section>
+        <h3 id="form-title">Repayment</h3>
+        <label class="question non-select ">
+            <span lang="" class="question-label active">Loan a/c number</span>
+            <span class="required">*</span>
+            <input autocomplete="off" type="text" name="/repayment/loan_ac_number" required="required" data-type-xml="string"/>
+        </label>
+        <label class="question non-select ">
+            <span lang="" class="question-label active">Borrower ID</span>
+            <span class="required">*</span>
+            <input autocomplete="off" type="text" name="/repayment/borrower_id" required="required" data-type-xml="string"/>
+        </label>
+        <label class="question non-select ">
+            <span lang="" class="question-label active">Borrower Name</span>
+            <span class="required">*</span>
+            <input autocomplete="off" type="text" name="/repayment/borrower_name" required="required" data-type-xml="string"/>
+        </label>
+        <label class="question non-select ">
+            <span lang="" class="question-label active">Amount</span>
+            <span class="required">*</span>
+            <input autocomplete="off" type="number" name="/repayment/amount" required="required" data-type-xml="decimal" step="any"/>
+        </label>
+        <label class="question non-select ">
+            <span lang="" class="question-label active">Repayment date</span>
+            <span class="required">*</span>
+            <input autocomplete="off" type="date" name="/repayment/repayment_date" required="required" data-type-xml="date"/>
+        </label>
+        <fieldset id="or-calculated-items" style="display:none;">
+            <label class="calculation non-select ">
+                <input autocomplete="off" type="hidden" name="/repayment/meta/instanceID" data-calculate="concat('uuid:', uuid())" data-type-xml="string"/>
+            </label>
+        </fieldset>
+    </form>
+</root>

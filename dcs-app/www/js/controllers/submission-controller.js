@@ -42,8 +42,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             };
             if (project.project_type == 'parent') {
                 initChildActions(project);
-            } else if (project.project_type == 'child') {
-                //options.xform = relationHandler.styleXfromParentFields();
+            } else if (project.project_type == 'child' && relationHandler != undefined) {
+                //TODO correct the condition and make the parent_fields readonly during edit
+                options.xform = relationHandler.add_note_fields_for_parent_values();
             }
             loadEnketo(options);
         });
