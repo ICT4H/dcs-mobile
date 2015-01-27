@@ -1,4 +1,5 @@
 var loginController = function($scope, $location, userDao, msg, app, dcsService) {
+    $scope.title = "Garner";
     $scope.users = [];
     $scope.user = {};
     var isNewUser;

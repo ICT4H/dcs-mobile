@@ -1,5 +1,16 @@
-<span ui-content-for="title">{{ title }}</span>
+<span ui-content-for="title"><span ng-hide="showSearch">{{ title }}</span></span>
 <div ui-content-for="navbarAction">
+    <div ng-show="showSearch">
+        <div class="input-group">
+            <input class="form-control" placeholder="Search for..." type="text" ng-model="searchStr">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="search(searchStr)">Go!</button>
+                <a class='btn' ng-click="flipSearch()">
+                    <i class="fa fa-search fa-2x"></i>
+                </a>
+            </span>
+        </div>
+    </div>
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
 <div class="scrollable">  
@@ -8,7 +19,8 @@
             <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted'),'selected':selected }">
                 <div ng-if="!serverPage">
                     <button class="fa fa-file-o pull-right fa-2x link" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}"></button>
-                    <button class='link' ng-click="goInSubmission(project)" ng-disabled="disableLink(project.status)" ng-class="{'strikeout': disableLink(project.status)}"> {{ project.name }} </button>
+                    <button class="pull-right link" ng-click="showUnsubmitted(project)" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}">show</button>
+                    <button class='link' ng-click="showAllSubmissions(project)" ng-disabled="disableLink(project.status)" ng-class="{'strikeout': disableLink(project.status)}"> {{ project.name }} </button>
                 </div>
                 <div ng-if="serverPage">
                     <span>{{ project.name }}</span>

@@ -5,10 +5,12 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.projects = [];
     $scope.actions = [];
     $scope.title = "";
+    $scope.showSearch = false;
+
     // private variable
     var selectedProject = [];
 
-    var assignResult = function(result) {
+    var assignResult = function(result) {   
         $scope.projects = result.projects;
         $scope.pagination.totalElement = result.total;
         msg.hideAll();
@@ -113,17 +115,37 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.title = resourceBundle.localProjectTitle;
     };
 
+    $scope.search = function(searchStr) {
+        selectedProject = [];
+        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            $scope.serverPage = false;
+            (501).showInfo();
+            initOfflineActionItems();
+            projectDao.
+                getProjectsListForSearch($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
+                    .then(assignResult, (103).showError);
+        });
+    };
+
+    $scope.flipSearch = function() {
+        $scope.showSearch = !$scope.showSearch;
+    }
+
     $scope.disableLink = function(status) {
         return status=='server-deleted' || status=='outdated';
     };
 
-    $scope.goInSubmission = function(project) {
+    $scope.showAllSubmissions = function(project) {
         $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
         app.flipArrayElement(selectedProject, project.project_uuid);
+    };
+
+    $scope.showUnsubmitted = function(project) {
+        $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
     };
 
     loadLocal();

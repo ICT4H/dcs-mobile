@@ -1,5 +1,16 @@
-<span ui-content-for="title">{{ title }}</span>
+<span ui-content-for="title"><span ng-hide="showSearch">{{ title }}</span></span>
 <div ui-content-for="navbarAction">
+    <div ng-show="showSearch">
+        <div class="input-group">
+            <input class="form-control" placeholder="Search for..." type="text" ng-model="searchStr">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="search(searchStr)">Go!</button>
+                <a class='btn' ng-click="flipSearch()">
+                    <i class="fa fa-search fa-2x"></i>
+                </a>
+            </span>
+        </div>
+    </div>
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
 <div class="scrollable">  

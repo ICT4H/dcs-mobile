@@ -8,6 +8,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     var onEdit = function(submission) {
         submission.is_modified = true;
         submission.submission_id = $scope.submission_id;
+        submission.status = "modified";
         localStore.updateSubmission(submission)
         .then(function() {
             msg.displaySuccess('Updated');
@@ -66,7 +67,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
         if($scope.server)
             return dcsService.getSubmissions($scope.project_uuid, offset, limit);
         else
-            return localStore.getSubmissionsByProjectId($scope.project_uuid, offset, limit);
+            if($scope.type == "all")
+                return localStore.getAllSubmissions($scope.project_uuid, offset, limit, $scope.searchStr || "");
+            return localStore.getUnsubmittedSubmissions($scope.project_uuid, offset, limit, $scope.searchStr || "");
     };
 
     var getPaginatedSubmission = function(currentIndex) {
@@ -102,7 +105,9 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             $scope.server = $routeParams.server == "true"? true:false;
             $scope.limit = parseInt($routeParams.limit);
             $scope.totalElement = parseInt($routeParams.totalElement);
+            $scope.searchStr = $routeParams.searchStr;
             $scope.offset = getOffset(index, $scope.limit);
+            $scope.type = $routeParams.type
 
             getSubmissionXml($scope.offset, $scope.limit).then(function(result) {
                 msg.hideAll();

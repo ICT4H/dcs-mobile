@@ -25,13 +25,39 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 			submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
+	
+	this.getAllSubmissions = function(project_uuid, offset, limit, searchStr) {
+		var deferred = $q.defer();
+		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', [project_uuid], true).then(function(countResultset) {
+			store.execute('SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
+				var result = {};
+				result.total = countResultset.total;
+				result.data = submissions;
+				deferred.resolve(result);
+			}, deferred.reject);
+		}, deferred.reject);
+		return deferred.promise;
+	};
+
+	this.getUnsubmittedSubmissions = function(project_uuid, offset, limit, searchStr) {
+		var deferred = $q.defer();
+		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', [project_uuid], true).then(function(countResultset) {
+			store.execute('SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
+				var result = {};
+				result.total = countResultset.total;
+				result.data = submissions;
+				deferred.resolve(result);
+			}, deferred.reject);
+		}, deferred.reject);
+		return deferred.promise;
+	};
 
 	this.getSubmissionForUpdate = function(submissions_ids) {
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
 
-	this.getAllSSubmissionForUpdate = function() {
-		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined"', submissions_ids);
+	this.getAllSSubmissionForUpdate = function(project_uuid) {
+		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and project_uuid =?', [project_uuid]);
 	};
 
 	this.deleteSubmissions = function(submissions_ids) {
@@ -60,7 +86,7 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 
 	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
 		var deferred = $q.defer();
-		store.execute('select count(*) as total FROM projects', [], true).then(function(countResultset) {
+		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ?', [project_uuid], true).then(function(countResultset) {
 			store.execute('SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
 				var result = {};
 				result.total = countResultset.total;
@@ -80,7 +106,7 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 	};
 
 	this.updateSubmissionStatus = function(submission_uuid, status) {
-		return store.execute('UPDATE submissions SET status=? where submission_uuid = ?', [status, submission_uuid]);
+		return store.execute('UPDATE submissions SET status="' + status + '" where submission_uuid IN(' + getParamHolders(submission_uuid) + ')', submission_uuid);
 	};
 	
 	this.updatelastFetch  = function(project_uuid, last_fetch) {

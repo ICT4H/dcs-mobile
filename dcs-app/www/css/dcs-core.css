@@ -284,7 +284,7 @@ h1 {
 }
 
 .selected {
-  background-color: #dff0d8;
+  background-color: #dff0d8 !important;
 }
 
 .outdated {
@@ -325,7 +325,7 @@ h1 {
 
 .server-deleted {
   text-decoration: line-through !important;
-  background-color: #FFAD33 !important;
+  background-color: #FFAD33 ;
 }
 
 /*

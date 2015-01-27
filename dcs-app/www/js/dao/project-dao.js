@@ -33,7 +33,20 @@ dcsApp.service('projectDao',['$q', 'store', function($q, store){
 		});
 	};
 
-	this.getProjectsList = function(offset,limit) {
+	this.getProjectsListForSearch = function(offset, limit, searchStr) {
+		var deferred = $q.defer();
+		store.execute('select count(*) as total FROM projects where name like "%' + searchStr +'%"', [], true).then(function(countResultset) {
+			store.execute('SELECT * FROM projects where name like "%' + searchStr +'%" limit ? offset ?', [limit, offset]).then(function(projectsResultset) {
+				var result = {};
+				result.total = countResultset.total;
+				result.projects = projectsResultset;
+				deferred.resolve(result);
+			}, deferred.reject);
+		}, deferred.reject);
+		return deferred.promise;
+	};
+
+	this.getProjectsList = function(offset, limit) {
 		var deferred = $q.defer();
 		store.execute('select count(*) as total FROM projects', [], true).then(function(countResultset) {
 			store.execute('SELECT * FROM projects limit ? offset ?', [limit, offset]).then(function(projectsResultset) {

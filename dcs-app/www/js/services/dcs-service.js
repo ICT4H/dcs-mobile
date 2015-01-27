@@ -10,7 +10,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
 
     this.getQuestionnaires = function(projects) {
         var params = {
-            'ids': projects.map(function(project) {return project.id;})
+            'ids': projects
         };
         return app.httpRequest("/client/projects/" , params);
     };

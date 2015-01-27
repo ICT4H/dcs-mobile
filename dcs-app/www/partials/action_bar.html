@@ -1,5 +1,8 @@
-<div class="btn-group pull-right">
-    <a ui-turn-on='myDropdown' class='btn'>
+<div class="btn-group pull-right" ng-hide="showSearch">
+    <a class='btn' ng-click="flipSearch()">
+      <i class="fa fa-search fa-2x"></i>
+    </a>
+    <a ui-turn-on='myDropdown' class='btn' >
       <i class="fa fa-ellipsis-v fa-2x"></i>
     </a>
     <ul 
