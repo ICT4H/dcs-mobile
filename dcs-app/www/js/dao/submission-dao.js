@@ -1,28 +1,22 @@
 dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 
 	this.createSubmission = function(submission) {
-		var query ='INSERT INTO submissions (submission_uuid, version, status, is_modified, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
-		'VALUES (?,?,?,?,?,?,?,?,?,?)';
-		submission.is_modified = false;
+		var query ='INSERT INTO submissions (submission_uuid, version, status, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
+		'VALUES (?,?,?,?,?,?,?,?,?)';
 		return store.execute(query, getSubmissionAsValues(submission));
 	};
 	
 	this.updateSubmission = function(submission) {
-		var values = getSubmissionAsValuesForEdit(submission);
+		var values = getSubmissionAsValues(submission);
 		values.push(submission.submission_id);
-		return store.execute('UPDATE submissions SET status=?, is_modified=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_id = ?', 
+		return store.execute('UPDATE submissions SET ' + 
+			'submission_uuid=?, version=?, status=?, project_uuid=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_id = ?', 
 			values);
 	};
 
 	var getSubmissionAsValues = function(submission){
-		var values = [submission.submission_uuid, submission.version, submission.status, submission.is_modified, submission.project_uuid,
+		var values = [submission.submission_uuid, submission.version, submission.status, submission.project_uuid,
 			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
-		return values;
-	};
-
-	var getSubmissionAsValuesForEdit = function(submission){
-		var values = [submission.status, submission.is_modified, submission.created, submission.data, submission.xml, 
-			submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
 	
@@ -56,7 +50,7 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
 
-	this.getAllSSubmissionForUpdate = function(project_uuid) {
+	this.getAllSubmissionForUpdate = function(project_uuid) {
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and project_uuid =?', [project_uuid]);
 	};
 

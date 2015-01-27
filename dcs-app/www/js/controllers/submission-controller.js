@@ -6,15 +6,19 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     var relationHandler;
 
     var onEdit = function(submission) {
-        submission.is_modified = true;
-        submission.submission_id = $scope.submission_id;
-        submission.status = "modified";
-        localStore.updateSubmission(submission)
-        .then(function() {
-            msg.displaySuccess('Updated');
-            $location.path("/submission-list/" + $routeParams.project_uuid);
-        }, function(error) {
-            console.log(error);
+        localStore.getSubmissionById($scope.submission_id).then(function(oldSubmission) {
+            submission.submission_uuid = oldSubmission.submission_uuid;
+            submission.version = oldSubmission.version;
+            submission.submission_id = $scope.submission_id;
+            submission.status = "modified";
+            submission.project_uuid = oldSubmission.project_uuid;   
+
+            localStore.updateSubmission(submission)
+            .then(function() {
+                msg.displaySuccess('Updated');
+                $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
+                console.log(error);
+            });        
         });
     };
 
@@ -25,7 +29,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             msg.displaySuccess('Saved');  
 
             dialogService.confirmBox("Do you want to create another one?", initializeForm, function() {
-                $location.path("/submission-list/" + $scope.project_uuid);
+                $location.url('/submission-list/' + $scope.project_uuid + '?type=unsubmitted');
             });
         }, function(error) {
             console.log(error);

@@ -314,7 +314,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         }
         else {
             dialogService.confirmBox('Do you want to update all submissions?', function() {
-                submissionDao.getAllSSubmissionForUpdate($scope.project_uuid).then(function(submissions){
+                submissionDao.getAllSubmissionForUpdate($scope.project_uuid).then(function(submissions){
                     updateSubmissions(submissions);
                 });
             });
