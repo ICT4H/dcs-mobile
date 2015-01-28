@@ -61,7 +61,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         }
     };
 
-    $scope.search = function() {
+    $scope.search = function(searchStr) {
+        $scope.searchStr = searchStr;
         loadLocal();
     };
 
@@ -321,6 +322,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             });
         }
     };
+    
+    var showUnsubmitted = function() {
+        type="unsubmitted";
+        loadLocal();
+    };
 
     var initOfflineActions =  function() {
         $scope.actions = [];
@@ -329,6 +335,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
         $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
         $scope.actions.push({'onClick': onUpdate, 'label': 'Check Status'});
+        $scope.actions.push({'onClick': showUnsubmitted, 'label': 'Unsubmitted'});
         $scope.title = resourceBundle.localsubmissionTitle;
     };
 

@@ -8,7 +8,7 @@
             <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted'),'selected':selected }">
                 <div ng-if="!serverPage">
                     <button class="fa fa-file-o pull-right fa-2x link" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}"></button>
-                    <button class="pull-right link" ng-click="showUnsubmitted(project)" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}">show</button>
+    <!--                 <button class="fa fa-pencil-square-o pull-right fa-2x link" ng-click="showUnsubmitted(project)" style="margin-top: -10px;" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}"></button> -->
                     <button class='link' ng-click="showAllSubmissions(project)" ng-disabled="disableLink(project.status)" ng-class="{'strikeout': disableLink(project.status)}"> {{ project.name }} </button>
                 </div>
                 <div ng-if="serverPage">
