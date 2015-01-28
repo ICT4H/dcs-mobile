@@ -86,6 +86,8 @@ dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messag
         $location.path('/projects/' + project_uuid + '/submissions/new');
     };
 
+    $rootScope.showSearchicon = true;
+
     document.addEventListener('backbutton', function() {
         var backLocation = backHandler.onBack();
         //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed

@@ -1,6 +1,7 @@
 dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'app', 'paginationService', 'dialogService', function($scope, $routeParams, $location, localStore, msg, dcsService, app, paginationService, dialogService){
     
     $scope.pagination = paginationService.pagination;
+    $scope.showSearchicon = false;
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
     var relationHandler;

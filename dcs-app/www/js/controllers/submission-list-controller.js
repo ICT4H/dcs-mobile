@@ -169,6 +169,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $q.all(post_selected_submissions())
         .then(function(){
             msg.hideLoadingWithInfo('Submitted successfully');
+            loadLocal();
         },function(error){
             console.log(error);
             msg.hideLoadingWithErr('something went wrong ' + error);
@@ -181,8 +182,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
          dialogService.confirmBox('Do you want to delete selected submissions?', function() {
             submissionDao.deleteSubmissions(selectedSubmission)
             .then(function(){
-                loadLocal();
                 msg.hideLoadingWithInfo("Submission(s) deleted");
+                loadLocal();
             }
             ,function(error){
                 msg.hideLoadingWithErr("Submission(s) deletion failed "+error)

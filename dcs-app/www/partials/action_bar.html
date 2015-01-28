@@ -1,5 +1,5 @@
 <div class="btn-group pull-right" ng-hide="showSearch">
-    <a class='btn' ng-click="flipSearch()">
+    <a class='btn' ng-click="flipSearch()" ng-show="showSearchicon">
       <i class="fa fa-search fa-2x"></i>
     </a>
     <a ui-turn-on='myDropdown' class='btn' >
@@ -19,4 +19,16 @@
       </li>
     </ul>
 </div>
-     
+<div ng-show="showSearch">
+  <div class="input-group">
+    <input class="form-control" placeholder="Search for..." type="text" ng-model="searchStr">
+    <span class="input-group-btn">
+      <a class="btn btn-default" ng-click="search(searchStr)">
+        <i class="fa fa-search fa-2x"></i>
+      </a>
+      <a class='btn' ng-click="flipSearch()">
+        <i class="fa fa-times fa-2x"></i>
+      </a>
+    </span>
+  </div>
+</div>  
