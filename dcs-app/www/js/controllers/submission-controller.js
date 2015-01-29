@@ -59,7 +59,7 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
     var initChildActions =  function(project) {
         $scope.actions = {};
         //TODO remove harcoded action label; use value from child project
-        //TODO loop and create as many add as many children
+        //TODO loop and create as many add as many children by split by ',' on project.child_ids
         $scope.actions['new_child'] = {'onClick': function() {
             $location.url('/projects/'+project.child_ids+'/submissions/new_child?parent_id='+$routeParams.project_uuid+'&parent_submission_id='+$routeParams.submission_id);
         }, 'label': 'New Child' };

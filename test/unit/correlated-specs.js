@@ -54,7 +54,7 @@ describe("Corelated module", function() {
         _assert_form_has_notes(updated_xform_html_str);
     });
 
-    it("should create html markup for note field type", function() {
+    it("should create html markup string for note field type", function() {
         var field_label = 'Some Label';
         var note_name = 'some_parent_field_note';
         var parent_field_name = 'some_parent_field';
@@ -76,8 +76,9 @@ describe("Corelated module", function() {
 
         var children = [];
         $.each($instance_children.children, function(i, item) {
-            children.push(item.localName)
+            children.push(item.tagName);
         });
+        // This still doesn't validates that elemets added were elements rather than just string
         expect(children).toContain('loan_ac_number_note');
         expect(children).toContain('borrower_name_note');
         expect(children).toContain('loan_ac_number_note');
@@ -90,8 +91,8 @@ describe("Corelated module", function() {
         var $borrower_id_note = $xfrom.find('form input[name="/repayment/borrower_id_note"]');
         var $borrower_name_note = $xfrom.find('form input[name="/repayment/borrower_name_note"]');
 
-        expect($loan_ac_note.length).toBe(1);
-        expect($borrower_id_note.length).toBe(1);
-        expect($borrower_name_note.length).toBe(1);
+        expect($loan_ac_note[0].name).toBe("/repayment/loan_ac_number_note");
+        expect($borrower_id_note[0].name).toBe("/repayment/borrower_id_note");
+        expect($borrower_name_note[0].name).toBe("/repayment/borrower_name_note");
     }
 });

@@ -81,7 +81,7 @@ var SurveyRelation = function(child_project, parent_submission) {
 
     this._add_nodes_to_instance = function() {
         for(var i=0;i<this.parent_field_codes.length;i++) {
-            this.model_instance_childrens.append('<'+this.parent_field_codes[i]+'_note/>')
+            this.model_instance_childrens.append( $('<'+this.parent_field_codes[i]+'_note/>') );
         }
     }
 
@@ -91,7 +91,7 @@ var SurveyRelation = function(child_project, parent_submission) {
         for(var i=0;i<this.parent_field_codes.length;i++) {
             var parent_field_code = this.parent_field_codes[i];
             var field_name = '/'+prj_name+'/'+parent_field_code;
-            note_fields.push(SurveyRelation.create_note_field(parent_field_code, field_name+'_note', field_name));
+            note_fields.push( $(SurveyRelation.create_note_field(parent_field_code, field_name+'_note', field_name)) );
         }
         this.$xform_doc.find('form label:eq(0)').before(note_fields);
     }
