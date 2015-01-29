@@ -1,14 +1,11 @@
 /**
 
-Get the model from xform, remove meta and form code.
-update the model with parent values.
+Create the edit model str using xform model. Update the model with parent values.
 
-SurveyRelation | ModelHandler | DisplayHandler
+model/instance/prj -add note to model and bind nodes
+Update correspnding text to be hidden (relevant=false())
 
-model/instance/prj -add note
-     /bind -add note && update text to be readonly
-
-html:body -add note
+in xfrom html:body -add note to display parent values
 
 **/
 
