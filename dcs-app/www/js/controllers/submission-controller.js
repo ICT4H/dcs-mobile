@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'app', 'paginationService', 'dialogService', function($scope, $routeParams, $location, localStore, msg, dcsService, app, paginationService, dialogService){
+dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', '$route', 'submissionDao', 'messageService', 'dcsService', 'app', 'paginationService', 'dialogService', function($scope, $routeParams, $location, $route, localStore, msg, dcsService, app, paginationService, dialogService){
     
     $scope.pagination = paginationService.pagination;
     $scope.showSearchicon = false;
@@ -28,10 +28,13 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
         submission.project_uuid = $scope.project_uuid;
         localStore.createSubmission(submission).then(function() {
             msg.displaySuccess('Saved');  
-
-            dialogService.confirmBox("Do you want to create another one?", initializeForm, function() {
-                $location.url('/submission-list/' + $scope.project_uuid + '?type=unsubmitted');
-            });
+            var goToSubmissionList = function() {
+                $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
+            }
+            var reload = function() {
+                $route.reload();
+            }
+            dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
         }, function(error) {
             console.log(error);
         });
