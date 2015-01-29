@@ -36,6 +36,28 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 		return runOn('userMetaStore', query, values, isSingleRecord);
 	};
 
+	this.executeMultipleQueries = function(queries) {
+		var deferred = $q.defer();
+		var queryPromises = [];
+		var response = {};
+
+		queries.map(function(query) {
+			queryPromises.push(runOn('userStore', query.statement, query.values || [], query.isSingleRecord));
+		});
+
+		$q.all(queryPromises).then(function(results){
+			results.map(function(result, index) {
+				if(result instanceof Array) {
+					var key = queries[index].holder || "item" + index;
+					response[key] = result;
+				} else
+					angular.extend(response, result);
+			});
+			deferred.resolve(response);
+		}, deferred.reject);
+		return deferred.promise;
+	};
+
 	this.changeDBKey = function(user) {
 		var dbName = convertToSlug(user.name) + "Meta";
 		var deferred = $q.defer();

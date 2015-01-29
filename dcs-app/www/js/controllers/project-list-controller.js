@@ -122,7 +122,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             (501).showInfo();
             initOfflineActionItems();
             projectDao.
-                getProjectsListForSearch($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
+                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr)
                     .then(assignResult, (103).showError);
         });
     };
