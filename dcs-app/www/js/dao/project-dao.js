@@ -37,9 +37,8 @@ dcsApp.service('projectDao',['store', function(store){
 	this.getProjectsList = function(offset, limit, searchStr) {
 		var queries = [];
 		var searchString = searchStr || '';
-		queries.push({'statement': 'select count(*) as total FROM projects where name like "%' + searchString +'%"','isSingleRecord':true})
-		queries.push({'statement': 'select * FROM projects where name like "%' + searchString +'%" limit ? offset ?','values':[limit, offset], 'holder': 'projects'})
-
+		queries.push({'statement': 'select count(*) as total from projects where name like "%' + searchString +'%"','isSingleRecord':true})
+		queries.push({'statement': 'SELECT p.*, COUNT(s.project_uuid) AS unsubmitted_count FROM projects p LEFT JOIN (select project_uuid from submissions where status="modified") s ON p.project_uuid = s.project_uuid  where p.name like "%' + searchString +'%" GROUP BY p.project_uuid limit ? offset ?','values':[limit, offset], 'holder': 'projects'})
 		return store.executeMultipleQueries(queries);
 	};
 
@@ -51,4 +50,4 @@ dcsApp.service('projectDao',['store', function(store){
 		return paramArray.map(function() { return '?';}).join(',');
 	};
 
-}]);	
+}]);

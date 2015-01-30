@@ -1,4 +1,22 @@
-<span ui-content-for="title"><span ng-hide="showSearch">{{ title }}</span></span>
+<span ui-content-for="title">
+  <span ng-hide="showSearch">
+      <span style="text-transform:capitalize" ui-turn-on='SubmissionTypes'>{{title}}
+      <i class="fa fa-caret-down"></i>
+      </span>
+      
+      <ul class="dropdown-toggle dropdown-menu dropDown" 
+      ui-outer-click="Ui.turnOff('SubmissionTypes')"
+      ui-outer-click-if="Ui.active('SubmissionTypes')"
+      role="menu"
+      ui-show="SubmissionTypes" 
+      ui-state="SubmissionTypes"
+      ui-turn-off="SubmissionTypes">
+        <li ng-click="ApplyFilterWith('all')"><a >All</a></li>
+        <li ng-click="ApplyFilterWith('unsubmitted')"><a >Unsubmitted</a></li>
+        <li ng-click=""><a >Conflicted</a></li>
+      </ul>
+  </span>
+</span>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
