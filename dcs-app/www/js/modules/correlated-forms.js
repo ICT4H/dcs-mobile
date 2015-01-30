@@ -35,9 +35,9 @@ var EditModelStr = function(model_doc, submission_json, parent_field_codes) {
     }
 }
 
-
 var SurveyRelation = function(child_project, parent_submission) {
-    this.parent_field_codes = child_project.parent_field_codes.split(',');;
+    this.parent_fields_code_label = JSON.parse(child_project.parent_fields_code_label_str);
+    this.parent_field_codes = Object.keys(this.parent_fields_code_label);
     this.submission_json = parent_submission;
     this.xform_doc = $.parseXML( child_project.xform );
 
@@ -47,7 +47,7 @@ var SurveyRelation = function(child_project, parent_submission) {
     this.model_instance_childrens = this.$model.find('instance:eq(0)').children();
 
     this.getUpdatedModelStr = function() {
-        //Clonning to avoid getting values be added to the original xform/model/instance
+        //Clonning to avoid values being getting added to the original xform/model/instance
         var model_doc = this.$xform_doc.find( 'model:eq(0)' )[ 0 ].cloneNode(true);
         var editor = new EditModelStr(model_doc, this.submission_json, this.parent_field_codes);
         return editor.getUpdatedModelStr()
@@ -87,8 +87,9 @@ var SurveyRelation = function(child_project, parent_submission) {
         var note_fields = [];
         for(var i=0;i<this.parent_field_codes.length;i++) {
             var parent_field_code = this.parent_field_codes[i];
+            var note_label = this.parent_fields_code_label[parent_field_code];
             var field_name = '/'+prj_name+'/'+parent_field_code;
-            note_fields.push( $(SurveyRelation.create_note_field(parent_field_code, field_name+'_note', field_name)) );
+            note_fields.push( $(SurveyRelation.create_note_field(note_label, field_name+'_note', field_name)) );
         }
         this.$xform_doc.find('form label:eq(0)').before(note_fields);
     }

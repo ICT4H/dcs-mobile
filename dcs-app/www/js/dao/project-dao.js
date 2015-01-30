@@ -1,11 +1,11 @@
 dcsApp.service('projectDao',['$q', 'store', function($q, store){
 
 	this.createProject = function(project) {
-		console.log('in create project: ' + project.project_type +':'+ project.parent_info.action_label +':'+ project.parent_info.parent_field_codes +':'+ project.child_ids);
+		console.log('in create project; project_type: ' + project.project_type +' action_label: '+ project.parent_info.action_label +' parent_fields_code_label_str: '+ project.parent_info.parent_fields_code_label_str +' child_ids: '+ project.child_ids);
 
 		return store.execute(
-			'INSERT INTO projects (project_uuid, version, status, name, xform, headers, last_fetch, project_type, action_label, parent_field_codes, child_ids) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created, project.project_type, project.parent_info.action_label, project.parent_info.parent_field_codes, project.child_ids]);
+			'INSERT INTO projects (project_uuid, version, status, name, xform, headers, last_fetch, project_type, action_label, parent_fields_code_label_str, child_ids) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created, project.project_type, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids]);
 	};
 
 	this.getAll = function() {
