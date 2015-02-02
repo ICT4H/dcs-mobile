@@ -68,76 +68,59 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type + '&searchStr=' + searchStr);
     };
 
-    // $scope.getChanges = function() {
-    //     $scope.newSubmissions = [];
-    //     $scope.updatedSubmissions = [];
-    //     $scope.conflictSubmissions = [];
-    //     var promises;
-    //     localStore.getLastFetch($scope.project_uuid).then(function(result) {
-    //         msg.hideLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
-    //         dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
-    //             promises = result.submissions.map(function(submission) { 
-    //                                 return localStore.getSubmissionByuuid(submission.submission_uuid).then(function(result) {
-    //                                     getTypeOf(submission, result);
-    //                                 });
-    //                             });
-    //             app.promises(promises, function(results) {
-    //                 var newSubmissionsPro = []; 
-    //                 var updatedSubmissionsPro = []; 
-    //                 var conflictSubmissionsPro = [];
-    //                 localStore.updatelastFetch($scope.project_uuid, result.last_fetch);           
+    var OnDeltaPull = function() {
+        $scope.newSubmissions = [];
+        $scope.updatedSubmissions = [];
+        $scope.conflictSubmissions = [];
+        var promises;
+        submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
+            msg.showLoadingWithInfo("Fetching submissions from " + result.last_fetch + "<br> <span> Refer notification for further details.</span>");
+            dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
+                promises = result.submissions.map(function(submission) { 
+                                    return submissionDao.getSubmissionByuuid(submission.submission_uuid).then(function(result) {
+                                        getTypeOf(submission, result);
+                                    });
+                                });
+                app.promises(promises, function(results) {
+                    var submissionPromises = []; 
+                    submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch);           
 
-    //                 $scope.newSubmissions.forEach(function(submission) {
-    //                     submission.status = "new";
-    //                     newSubmissionsPro.push(localStore.createSubmission(submission));
-    //                 });
+                    $scope.newSubmissions.forEach(function(submission) {
+                        submission.status = "new";
+                        submissionPromises.push(submissionDao.createSubmission(submission));
+                    });
 
-    //                 $scope.updatedSubmissions.forEach(function(submission) {
-    //                     submission.status = "Both";
-    //                     updatedSubmissionsPro.push(localStore.updateSubmission(submission));
-    //                 });
+                    $scope.updatedSubmissions.forEach(function(submission) {
+                        submission.status = "Both";
+                        submissionPromises.push(submissionDao.updateSubmission(submission));
+                    });
 
-    //                 $scope.conflictSubmissions.forEach(function(submission) {
-    //                     conflictSubmissionsPro.push(localStore.updateSubmissionStatus(submission.submission_uuid, "conflict"));
-    //                 });
+                    $scope.conflictSubmissions.forEach(function(submission) {
+                        submissionPromises.push(submissionDao.updateSubmissionStatus(submission.submission_uuid, "conflict"));
+                    });
 
-    //                 app.promises(newSubmissionsPro, function() {
-    //                     if($scope.newSubmissions != 0) {
-    //                         loadSubmissions(0); 
-    //                         msg.addInfo($scope.newSubmissions.length + " submission added.", "#submission-list/" + $scope.project_uuid);
-    //                     }
-    //                 });
+                    app.promises(submissionPromises, function() {
+                        loadLocal(); 
+                        msg.hideLoadingWithInfo("submissions updated.");
+                    });
+                });
+            });
+        }); 
+    };
 
-    //                 app.promises(updatedSubmissionsPro, function() {
-    //                     if($scope.updatedSubmissions != 0) {
-    //                         loadSubmissions(0); 
-    //                         msg.addInfo($scope.updatedSubmissions.length + " submission updated.", "#submission-list/" + $scope.project_uuid);
-    //                     }
-    //                 });
-
-    //                 app.promises(conflictSubmissionsPro, function() {
-    //                     if($scope.conflictSubmissions != 0) 
-    //                         msg.addInfo($scope.conflictSubmissions.length + " submission are in conflict.", "#conflict-submission-list/" + $scope.project_uuid);
-                        
-    //                 });
-    //             });
-    //         });
-    //     }); 
-    // };
-
-    // var getTypeOf = function(submission, result) {
-    //     if(result.length==0) 
-    //         $scope.newSubmissions.push(submission);
-    //     else
-    //     {
-    //         submission.submission_id = result[0].submission_id;
-    //         if(submission.version != result[0].version)
-    //             if(Boolean(result[0].is_modified))
-    //                 $scope.conflictSubmissions.push(submission);
-    //             else
-    //                 $scope.updatedSubmissions.push(submission);
-    //     }
-    // };
+    var getTypeOf = function(submission, result) {
+        if(result.length==0) 
+            $scope.newSubmissions.push(submission);
+        else
+        {
+            submission.submission_id = result[0].submission_id;
+            if(submission.version != result[0].version)
+                if(Boolean(result[0].is_modified))
+                    $scope.conflictSubmissions.push(submission);
+                else
+                    $scope.updatedSubmissions.push(submission);
+        }
+    };
 
     // var setObseleteProjectWarning = function(project) {
     //     delete $scope.projectWarning;
@@ -332,6 +315,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
         $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
         $scope.actions.push({'onClick': onUpdate, 'label': 'Check Status'});
+        $scope.actions.push({'onClick': OnDeltaPull, 'label': 'Delta Pull'});
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {

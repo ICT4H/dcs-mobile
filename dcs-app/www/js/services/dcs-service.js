@@ -32,7 +32,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
     };
 
     this.getSubmissionsFrom = function(project_uuid, last_fetch){
-        return app.httpRequest('/client/'+project_uuid+'delta/?last_fetch='+last_fetch);
+        return app.httpRequest('/client/'+project_uuid+'/delta/?last_fetch='+last_fetch);
     };
 
     this.getSubmission = function(submission) {
