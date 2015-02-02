@@ -1,4 +1,4 @@
-dcsApp.service('submissionDao',['$q', 'store', function($q, store){
+dcsApp.service('submissionDao',['store', function(store){
 
 	this.createSubmission = function(submission) {
 		var query ='INSERT INTO submissions (submission_uuid, version, status, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
@@ -21,29 +21,19 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 	};
 	
 	this.getAllSubmissions = function(project_uuid, offset, limit, searchStr) {
-		var deferred = $q.defer();
-		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', [project_uuid], true).then(function(countResultset) {
-			store.execute('SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
-				var result = {};
-				result.total = countResultset.total;
-				result.data = submissions;
-				deferred.resolve(result);
-			}, deferred.reject);
-		}, deferred.reject);
-		return deferred.promise;
+		var queries = [];
+		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
+		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'});
+
+		return store.executeMultipleQueries(queries);
 	};
 
 	this.getUnsubmittedSubmissions = function(project_uuid, offset, limit, searchStr) {
-		var deferred = $q.defer();
-		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', [project_uuid], true).then(function(countResultset) {
-			store.execute('SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
-				var result = {};
-				result.total = countResultset.total;
-				result.data = submissions;
-				deferred.resolve(result);
-			}, deferred.reject);
-		}, deferred.reject);
-		return deferred.promise;
+		var queries = [];
+		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
+		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'});
+
+		return store.executeMultipleQueries(queries);
 	};
 
 	this.getSubmissionForUpdate = function(submissions_ids) {
@@ -79,16 +69,12 @@ dcsApp.service('submissionDao',['$q', 'store', function($q, store){
 	};
 
 	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
-		var deferred = $q.defer();
-		store.execute('SELECT count(*) as total FROM submissions WHERE project_uuid = ?', [project_uuid], true).then(function(countResultset) {
-			store.execute('SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ? ', [project_uuid, limit, offset]).then(function(submissions) {
-				var result = {};
-				result.total = countResultset.total;
-				result.data = submissions;
-				deferred.resolve(result);
-			}, deferred.reject);
-		}, deferred.reject);
-		return deferred.promise;
+
+		var queries = [];
+		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ?', 'values': [project_uuid], 'isSingleRecord':true});
+		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'});
+
+		return store.executeMultipleQueries(queries);
 	};
 
 	var getParamHolders = function(paramArray) {
