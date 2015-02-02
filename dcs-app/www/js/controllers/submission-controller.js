@@ -77,6 +77,8 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
         else
             if($scope.type == "all")
                 return localStore.getAllSubmissions($scope.project_uuid, offset, limit, $scope.searchStr || "");
+            if($scope.type == "conflicted")
+                return localStore.getConflictSubmissions($scope.project_uuid, offset, limit, $scope.searchStr || "");
             return localStore.getUnsubmittedSubmissions($scope.project_uuid, offset, limit, $scope.searchStr || "");
     };
 

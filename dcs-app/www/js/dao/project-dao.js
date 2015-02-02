@@ -5,7 +5,7 @@ dcsApp.service('projectDao',['store', function(store){
 
 		return store.execute(
 			'insert into projects (project_uuid, version, status, name, xform, headers, last_fetch, project_type, action_label, parent_fields_code_label_str, child_ids) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, project.created, project.project_type, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids]);
+			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, Date.parse(project.created), project.project_type, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids]);
 	};
 
 	this.getAll = function() {

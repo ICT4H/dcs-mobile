@@ -36,6 +36,14 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.executeMultipleQueries(queries);
 	};
 
+	this.getConflictSubmissions = function(project_uuid, offset, limit, searchStr) {
+		var queries = [];
+		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
+		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'});
+
+		return store.executeMultipleQueries(queries);
+	};
+
 	this.getSubmissionForUpdate = function(submissions_ids) {
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
@@ -105,12 +113,17 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('select * from submissions where project_uuid = ? and status = ?' , [project_uuid, status]);
 	};
 
-	this.getSubmissionsByStatus = function(project_uuid, status) {
-		return store.execute('select * from submissions where project_uuid = ? and status = ?' , [project_uuid, status]);
-	};
-
 	this.getSubmissionsByStatusPagination = function(project_uuid, status, offset, limit) {
 		return store.execute('select * from submissions where project_uuid = ? and status = ? limit ? offset ?', [project_uuid, status, limit, offset]);
 	};
+
+	this.getSubmissionForConflictCheck = function(submissions_uuids) {
+		var queries = [];
+
+		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(submissions_uuids) + ') and status="modified"', 'values': submissions_uuids, 'holder': 'conflicted'});
+		queries.push({'statement': 'SELECT submission_id, submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(submissions_uuids) + ') and status="both"', 'values': submissions_uuids, 'holder': 'nonConflicted'});
+
+		return store.executeMultipleQueries(queries);
+	}
 	
 }]);	
