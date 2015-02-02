@@ -8,7 +8,6 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
         .when('/submission-list/:project_uuid',{
           templateUrl: "partials/submission-list.html",
           controller: 'submissionListController',
-          reloadOnSearch: false
         })
         .when('/about',{
           templateUrl: "partials/about.html",

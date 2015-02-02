@@ -4,15 +4,15 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.actions = [];
     
     $scope.searchFields = {all: 'All'};  
-
+    var searchStr = $routeParams.searchStr;
     var MODIFIED = 1;
     var UNMODIFIED = 0;
     var selectedCount = 0;
     var serverSubmissions = [];
     var selectedSubmission = [];
     $scope.conflictSubmissionCount = 0;
-
-    var type = $routeParams.type;
+    
+    var type = $routeParams.type || "all";
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
@@ -36,15 +36,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.setPathForView = function(submissionId, isFromServer, index) {
         var actualIndex = ($scope.pagination.pageSize * $scope.pagination.pageNumber) + index ;
-        var queryParams = 'type=' + type + '&isListing=true&totalElement=' + $scope.pagination.totalElement +'&currentIndex=' + index + '&server=' + isFromServer + '&limit=' + $scope.pagination.pageSize;
-        if($scope.searchStr)
-            queryParams = queryParams + '&searchStr=' + $scope.searchStr;
+        var queryParams = 'type=' + type + '&isListing=true&totalElement=' + $scope.pagination.totalElement +'&currentIndex=' + index + '&server=' + isFromServer + '&limit=' + $scope.pagination.pageSize + '&searchStr=' + (searchStr || "");
         $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
     };
 
     $scope.ApplyFilterWith = function(option) {
-        type = option;
-        loadLocal();
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=' + option);
     };
 
     var loadLocal = function() {
@@ -55,21 +52,20 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission = [];
         if(type == "all") {
             $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.getAllSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, $scope.searchStr || "")
+                submissionDao.getAllSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
                     .then(assignSubmissions, ErrorLoadingSubmissions);
             });
         }
         else if(type == "unsubmitted") {
             $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.getUnsubmittedSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, $scope.searchStr || "")
+                submissionDao.getUnsubmittedSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
                     .then(assignSubmissions, ErrorLoadingSubmissions);
             });
         }
     };
 
     $scope.search = function(searchStr) {
-        $scope.searchStr = searchStr;
-        loadLocal();
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type + '&searchStr=' + searchStr);
     };
 
     // $scope.getChanges = function() {
