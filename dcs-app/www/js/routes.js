@@ -29,11 +29,6 @@ dcsApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $htt
           controller:'changePasswordController',
           reloadOnSearch: false
         })
-        .when('/conflict-submission-list/:project_uuid', {
-          templateUrl: "partials/conflict-submission-list.html",
-          controller: 'submissionConflictController',
-          reloadOnSearch: false
-        })
         .when('/conflict-resolver/:project_uuid/:submission_uuid', {
           templateUrl: "partials/submission-conflict-resolver.html", 
           controller: 'submissionConflictResolverController',

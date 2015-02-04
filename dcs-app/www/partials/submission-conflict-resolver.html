@@ -1,5 +1,6 @@
-<div ng-include="'partials/menu-bar.html'"></div>
-<span content-for="title">{{resourceBundle.conflict_resolver_title}}</span>
+<span ui-content-for="title">{{ title }}</span>
+<div ui-content-for="navbarAction"></div>
+
 <div class="scrollable">  
    <div class="scrollable-content">
     <div class="list-group bg-white">
@@ -11,14 +12,14 @@
           </tr>
           <thead>
           <tr>
-            <th>{resourceBundle.questions}}</th>
-            <th>{resourceBundle.server_data}}</th>
-            <th>{resourceBundle.mobile_data}}</th>
+            <th>{{resourceBundle.questions}}</th>
+            <th>{{resourceBundle.server_data}}</th>
+            <th>{{resourceBundle.mobile_data}}</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="submission" ng-repeat="(header, value) in conflictDict" 
-          ng-bind-html="formatSubmission(header, value)">
+          <tr class="submission" ng-repeat="item in conflictView" 
+          ng-bind-html="item">
           </tr>
          </tbody>
       </table>

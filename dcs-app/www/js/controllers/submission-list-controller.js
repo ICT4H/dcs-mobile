@@ -319,6 +319,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         app.flipArrayElement(selectedSubmission, submission.submission_id);
     };
 
+    $scope.resolveConflict = function(submission_uuid) {
+        $location.url('/conflict-resolver/' + $scope.project_uuid + "/" + submission_uuid);
+    };
     loadLocal();
 };
 

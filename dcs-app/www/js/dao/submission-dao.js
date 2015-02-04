@@ -69,7 +69,7 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 
 	this.getSubmissionByuuid = function(submission_id) {
-		return store.execute('SELECT * FROM submissions where submission_uuid = ?', [submission_id]);
+		return store.execute('SELECT * FROM submissions where submission_uuid = ?', [submission_id], true);
 	};
 
 	this.getsubmissionUuidByUuid = function(submission_uuid) {

@@ -17,6 +17,7 @@
     "serverProjectTitle": "Online Surveys",
     "localsubmissionTitle": "Offline Data",
     "serversubmissionTitle": "Online Data",
+    "conflict_resolver_title": "Conflict Resolver",
     "getNewSurvey": "Get new survey",
     "delete": "Delete",
     "update": "Update Status",
@@ -55,5 +56,8 @@
     "server_data": "Server Data",
     "mobile_data": "Mobile Data",
     "apply": "Take This",
-    "createSubmission": "Fill the Form"
+    "createSubmission": "Fill the Form",
+    "applied_server": "Applied server changes.",
+    "applied_local": "Applied local changes.",
+    "applying_changes": "Appling Changes"
 }

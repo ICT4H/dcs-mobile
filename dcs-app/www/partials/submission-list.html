@@ -28,7 +28,13 @@
         <div ng-if="!serverPage">
           <span am-time-ago="item.created" am-preprocess="utc"></span>
           <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-          <button class="pull-right link" ng-click="setPathForView(item.submission_id, false, $index)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+
+          <div ng-if="item.status == 'conflicted'">
+            <button class="pull-right link" ng-click="resolveConflict(item.submission_uuid)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+          </div>
+          <div ng-if="item.status != 'conflicted'">
+            <button class="pull-right link" ng-click="setPathForView(item.submission_id, false, $index)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+          </div>
         </div>
         <div ng-if="serverPage">
           <span am-time-ago="item.date" am-preprocess="utc"></span> 
