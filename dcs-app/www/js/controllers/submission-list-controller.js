@@ -68,6 +68,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                     .then(assignSubmissions, ErrorLoadingSubmissions);
             });
         }
+        else if(type == "server") {
+            loadServer();
+        }
     };
 
     $scope.search = function(searchStr) {
@@ -238,7 +241,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var initServerActions =  function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDownload, 'label': 'Download'}); 
-        
     };
 
     var createSubmissions = function(results) {
@@ -262,12 +264,14 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var loadServer = function() {
         $scope.serverPage = true;
+        type = "server";
+        $scope.title =  type + " data";
         selectedSubmission = [];
         backHandler.setToSubmissions();
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initServerActions();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-            dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+            dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
             .then(assignServerSubmissions, ErrorLoadingSubmissions);
         });
 

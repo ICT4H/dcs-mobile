@@ -27,8 +27,8 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
         return app.httpPostRequest('/client/projects/'+ project_uuid +'/submission_status/', 'submissions=' + JSON.stringify(submissions));
     };
 
-    this.getSubmissions = function(project_uuid, start, length){
-        return app.httpRequest('/client/projects/' + project_uuid + '/submissions/?start=' + start + '&length='+length);
+    this.getSubmissions = function(project_uuid, start, length, searchStr){
+        return app.httpRequest('/client/projects/' + project_uuid + '/submissions/?start=' + start + '&length='+ length + '&search_str=' + searchStr);
     };
 
     this.getSubmissionsFrom = function(project_uuid, last_fetch){
