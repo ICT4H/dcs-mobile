@@ -91,7 +91,7 @@ var SurveyRelation = function(child_project, parent_submission) {
             var field_name = '/'+prj_name+'/'+parent_field_code;
             note_fields.push( $(SurveyRelation.create_note_field(note_label, field_name+'_note', field_name)) );
         }
-        this.$xform_doc.find('form label:eq(0)').before(note_fields);
+        this.$xform_doc.find('form h3:eq(0)').after(note_fields);
     }
 }
 

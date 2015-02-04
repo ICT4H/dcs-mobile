@@ -16,7 +16,7 @@ describe("Corelated module", function() {
         relationHandler = new SurveyRelation(child_project, parent_submission);
     });
 
-    xit("should create child submission edit model xml with selected parent submission reference values", function() {
+    it("should create child submission edit model xml with selected parent submission reference values", function() {
         var edit_model_instance_child_str = relationHandler.getUpdatedModelStr();
 
         var $model_children = $($.parseXML(edit_model_instance_child_str));
@@ -27,7 +27,7 @@ describe("Corelated module", function() {
         expect($model_children.find('borrower_id')[0].textContent).toBe('bid1');
     });
 
-    xit("should hide the parents fields in child form", function() {
+    it("should hide the parents fields in child form", function() {
         var updated_xform_html_doc = relationHandler.add_note_fields_for_parent_values();
 
         var $xfrom_html = $($.parseXML(updated_xform_html_doc));
@@ -41,7 +41,7 @@ describe("Corelated module", function() {
 
     });
 
-    xit("should add note field types to model_instance with common parent fields value", function() {
+    it("should add note field types to model_instance with common parent fields value", function() {
         var updated_xform_html_doc = relationHandler.add_note_fields_for_parent_values();
 
         _assert_instance_has_relation_fields(updated_xform_html_doc);
@@ -54,7 +54,7 @@ describe("Corelated module", function() {
         _assert_form_has_notes(updated_xform_html_str);
     });
 
-    xit("should create html markup string for note field type", function() {
+    it("should create html markup string for note field type", function() {
         var field_label = 'Some Label';
         var note_name = 'some_parent_field_note';
         var parent_field_name = 'some_parent_field';
