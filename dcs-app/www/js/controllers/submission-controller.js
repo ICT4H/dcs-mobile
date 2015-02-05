@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', '$route', 'submissionDao', 'messageService', 'dcsService', 'app', 'paginationService', 'dialogService', function($scope, $routeParams, $location, $route, localStore, msg, dcsService, app, paginationService, dialogService){
+dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'paginationService', 'dialogService', function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService, dialogService){
     
     $scope.pagination = paginationService.pagination;
     $scope.showSearchicon = false;
