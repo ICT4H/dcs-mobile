@@ -32,17 +32,17 @@
 	</div>
   </div>
   <div ui-content-for="bottom">
-    <div style="text-align:center;" ng-show="page.showPagination()">
-    <span ng-hide="page.isFirstPage()" ng-click="page.onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
+  	<div style="text-align:center;" ng-show="isListing">
+	<span ng-hide="pagination.isFirstPage()" ng-click="pagination.onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>
      <span class="btn">
-        Showing 
-         
-        {{ page.getTo() }} 
-        of 
-        {{ page.getTotal() }} 
+    	Showing 
+    	 
+    	{{ pagination.getTo() }} 
+    	of 
+    	{{ pagination.getTotal() }} 
      </span>
-   <span ng-hide="page.isLastPage()" ng-click="page.onNext()" class="fa fa-lg fa-chevron-right pull-right btn"></span>
-    </div>
+   <span ng-hide="pagination.isLastPage()" ng-click="pagination.onNext()" class="fa fa-lg fa-chevron-right pull-right btn"></span>
+</div>	
   </div>
   </div>
 </div>	

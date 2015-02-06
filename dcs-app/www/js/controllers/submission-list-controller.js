@@ -35,7 +35,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.setPathForView = function(submissionId, isFromServer, index) {
         var actualIndex = ($scope.pagination.pageSize * $scope.pagination.pageNumber) + index ;
-        var queryParams = 'type=' + type + '&isListing=true&totalElement=' + $scope.pagination.totalElement +'&currentIndex=' + index + '&server=' + isFromServer + '&limit=' + $scope.pagination.pageSize + '&searchStr=' + (searchStr || "");
+        var queryParams = 'type=' + type + '&currentIndex=' + index + '&server=' + isFromServer + '&searchStr=' + (searchStr || "");
         $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
     };
 
@@ -49,26 +49,13 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initOfflineActions();
         selectedSubmission = [];
-        if(type == "all") {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.getAllSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
-                    .then(assignSubmissions, ErrorLoadingSubmissions);
-            });
-        }
-        else if(type == "unsubmitted") {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.getUnsubmittedSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
-                    .then(assignSubmissions, ErrorLoadingSubmissions);
-            });
-        }
-        else if(type == "conflicted") {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.getConflictSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
-                    .then(assignSubmissions, ErrorLoadingSubmissions);
-            });
-        }
-        else if(type == "server") {
+        if(type == "server") {
             loadServer();
+        } else {
+            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                submissionDao.searchSubmissionsByType($scope.project_uuid, type, searchStr, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    .then(assignSubmissions, ErrorLoadingSubmissions);
+            });
         }
     };
 

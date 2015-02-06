@@ -27,28 +27,25 @@ dcsApp.service('submissionDao',['store', function(store){
 			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
 		return values;
 	};
-	
-	this.getAllSubmissions = function(project_uuid, offset, limit, searchStr) {
-		var queries = [];
-		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
-		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'});
 
-		return store.executeMultipleQueries(queries);
-	};
+	var getQueriesFor = function(project_uuid, type, searchStr, offset, limit){
+		var queries = {
+		'all': [
+			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+		'unsubmitted': [
+			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+		'conflicted': [
+			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}]
+		};
 
-	this.getUnsubmittedSubmissions = function(project_uuid, offset, limit, searchStr) {
-		var queries = [];
-		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
-		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'});
+		return queries[type];
+	}
 
-		return store.executeMultipleQueries(queries);
-	};
-
-	this.getConflictSubmissions = function(project_uuid, offset, limit, searchStr) {
-		var queries = [];
-		queries.push({'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true});
-		queries.push({'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'});
-
+	this.searchSubmissionsByType = function(project_uuid, type, searchStr, offset, limit) {
+		var queries = getQueriesFor(project_uuid, type, searchStr || "", offset, limit);
 		return store.executeMultipleQueries(queries);
 	};
 
