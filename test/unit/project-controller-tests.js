@@ -33,12 +33,13 @@ describe('local project list controller', function() {
 
     it("should behave...", function() {
         expect(1).toBe(1);
-        jasmine.getFixtures().fixturesPath = "base/test/unit/";
-        var data = jasmine.getFixtures().read('xform_html.html');
+        // jasmine.getFixtures().fixturesPath = "base/test/unit/";
+        // var data = jasmine.getFixtures().read('xform_html.html');
 
-        console.log(data);
+        // console.log(data);
 
     });
+
 
     xit('should list all local projects', function() {
         mocks.add_project_dao_spy_1_local_project();
