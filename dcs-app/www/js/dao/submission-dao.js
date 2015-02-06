@@ -14,6 +14,14 @@ dcsApp.service('submissionDao',['store', function(store){
 			values);
 	};
 
+	this.updateSubmissionUsingUuid = function(submission) {
+		var values = getSubmissionAsValues(submission);
+		values.push(submission.submission_uuid);
+		return store.execute('UPDATE submissions SET ' + 
+			'submission_uuid=?, version=?, status=?, project_uuid=?, created=?, data=?, xml=?, new_files_added=?, un_changed_files=? where submission_uuid = ?', 
+			values);
+	};
+
 	var getSubmissionAsValues = function(submission){
 		var values = [submission.submission_uuid, submission.version, submission.status, submission.project_uuid,
 			submission.created, submission.data, submission.xml, submission.new_files_added, submission.un_changed_files];
@@ -46,10 +54,6 @@ dcsApp.service('submissionDao',['store', function(store){
 
 	this.getSubmissionForUpdate = function(submissions_ids) {
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
-	};
-
-	this.getAllSubmissionForUpdate = function(project_uuid) {
-		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and project_uuid =?', [project_uuid]);
 	};
 
 	this.deleteSubmissions = function(submissions_ids) {
@@ -117,11 +121,10 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('select * from submissions where project_uuid = ? and status = ? limit ? offset ?', [project_uuid, status, limit, offset]);
 	};
 
-	this.getSubmissionForConflictCheck = function(submissions_uuids) {
+	this.getModifiedAndUnModifiedUuids = function(uuids) {
 		var queries = [];
-
-		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(submissions_uuids) + ') and status="modified"', 'values': submissions_uuids, 'holder': 'conflicted'});
-		queries.push({'statement': 'SELECT submission_id, submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(submissions_uuids) + ') and status="both"', 'values': submissions_uuids, 'holder': 'nonConflicted'});
+		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="modified"' , 'values': uuids, 'holder': 'modifiedUuids'});
+		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="both"', 'values': uuids, 'holder': 'unModifiedUuids'});
 
 		return store.executeMultipleQueries(queries);
 	}

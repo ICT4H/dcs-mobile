@@ -1,8 +1,7 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, locationService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, locationService, underscore){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
-    
     $scope.searchFields = {all: 'All'};  
     var searchStr = $routeParams.searchStr;
     var MODIFIED = 1;
@@ -85,28 +84,25 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             msg.showLoadingWithInfo("Fetching submissions.....");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 
-                var newSubmissionsPro = result.new_submissions.map(function(submission) {
-                    submission.status = "both";
-                    return submissionDao.createSubmission(submission);
-                });
+                var allIdsFromServer = underscore.pluck(result.submissions, 'submission_uuid');
+                
+                submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
 
-                var updatedSubmissionUuids = {};
-                result.updated_submissions.forEach(function(submission) {
-                    updatedSubmissionUuids[submission.submission_uuid] = submission;
-                });
-                
-                var ids = Object.keys(updatedSubmissionUuids);
-                
-                submissionDao.getSubmissionForConflictCheck(ids).then(function(submissions) {
+                    var conflictUuids = underscore.pluck(localResult.modifiedUuids, 'submission_uuid'); 
+                    var updateUuids = underscore.pluck(localResult.unModifiedUuids, 'submission_uuid');
+
+                    var newUuids = underscore.difference(underscore.difference(allIdsFromServer, conflictUuids), updateUuids);
                     
-                    conflictSubmissionsPro = submissions.conflicted.map(function(submission) {
-                        return submissionDao.updateSubmissionStatus([submission.submission_uuid], 'conflicted');
+                    var newSubmissionsPro = newUuids.map(function(newUuid) {
+                        submission = result.submissions[newUuid];
+                        submission.status = "both";
+                        return submissionDao.createSubmission(submission);
                     });
 
-                    updateSubmissionsPro = submissions.nonConflicted.map(function(localSubmission) {
-                        var submission = updatedSubmissionUuids[localSubmission.submission_uuid];
-                        submission.submission_id = localSubmission.submission_id;
-                        return submissionDao.updateSubmission(submission);
+                    var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+                    
+                    var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
+                        return submissionDao.updateSubmissionUsingUuid(result.submissions[updateUuid]);
                     });
 
                     promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
@@ -223,19 +219,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                 msg.hideLoadingWithErr('Unable to download submission.');
             });
         });
-
-        // console.log('localSubmissionPromises.length: ' + localSubmissionPromises.length);
-
-        // downloadNonLocalSubmissions(localSubmissionPromises)
-        //     .then(function(submissionDownloaders) {
-
-        //         $q.all(submissionDownloaders)
-        //             .then(function(results) {
-        //                 msg.hideLoadingWithInfo("Submission downloaded.");
-        //             }, function(e) {
-        //                 msg.hideLoadingWithErr('Unable to download submission.');
-        //             });
-        //     });
     };
 
     var initServerActions =  function() {
@@ -302,5 +285,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'locationService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'locationService', 'underscore', submissionListController]);
 
