@@ -9,6 +9,8 @@ dcsApp.service('dataProvider', ['$q', function($q) {
     };
 
     this.getSubmission = function(currentIndex, searchStr) {
+        if (isNaN(currentIndex)) return $.when();
+
         if (this.isServer) {
 
         } else {
@@ -47,11 +49,31 @@ dcsApp.service('enketoService', ['$location', 'submissionDao', 'messageService',
         });
     };
 
-    this.loadEnketo = function(xform, submissionXml, loadedSubmission) {
-        var submitCallback = onEdit,
-            submitLabel = 'Update';
-            dbSubmission = loadedSubmission;
+    var onNew = function(submission) {
+        submission.status = "modified";
+        submission.project_uuid = projectUuid;
+        submissionDao.createSubmission(submission).then(function() {
+            msg.displaySuccess('Saved');
             
+            $location.url('/submission-list/' + projectUuid + '?type=all');
+            // var goToSubmissionList = function() {
+            // }
+            // var reload = function() {
+            //     $route.reload();
+            // }
+            //dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
+        }, function(error) {
+            console.log(error);
+        });
+    };
+
+    this.loadEnketo = function(xform, submissionXml, loadedSubmission, currentProjectUuid) {
+        var submitCallback = loadedSubmission? onEdit: onNew,
+            submitLabel = loadedSubmission? 'Update': 'Save';
+
+        dbSubmission = loadedSubmission;
+        projectUuid = currentProjectUuid;
+
         loadEnketo({
             'buttonLabel': submitLabel,
             'hideButton': submitLabel? false:true,
@@ -67,6 +89,7 @@ dcsApp.service('submissionRelationService', [function() {
     var that = this;
 
     this.setProjectAndSubmission = function(project, submission) {
+
         this.project = project;// this should be set first
         this._setSubmission(submission);
         if (this.isParentProject())
@@ -102,11 +125,14 @@ dcsApp.service('submissionRelationService', [function() {
     this.getModelStr = function() {
         if (this.isChildProject())
             return relationHandler.getUpdatedModelStr();
-        return this.submission.xml;
+        return this.submission? this.submission.xml : '';
     }
 
     this.getAddChildrenNavigateUrls =  function(onClick) {
-        if (! this.isParentProject()) return;
+        var isNewParent = !this.submission;
+        var isNotParent = !this.isParentProject();
+        if (isNewParent || isNotParent) return;
+
         var navigateToUrl = '#/projects/'+this.project.child_ids+
                     '/submissions/new_child?parent_id='+this.project.project_uuid+
                     '&parent_submission_id='+this.parentSubmission.submission_id;
@@ -135,20 +161,20 @@ dcsApp.controller('submissionController',
     var searchStr = $scope.searchStr || "";
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
-    var index = parseInt($routeParams.currentIndex) || 0;
+    var index = parseInt($routeParams.currentIndex);
 
     dataProvider.init($scope.project_uuid, localStore, null);
 
     dataProvider.getProject().then(function(project) {
         dataProvider.getSubmission(index, searchStr).then(function(submission) {
             submissionRelationService.setProjectAndSubmission(project, submission);
-            $scope.submission = submission;
             // TODO Add action to delete the displayed submission
             $scope.navigateUrls = submissionRelationService.getAddChildrenNavigateUrls($location.url);
             enketoService.loadEnketo(
                 submissionRelationService.getXform(),
                 submissionRelationService.getModelStr(),
-                submission);
+                submission,
+                $scope.project_uuid);
         });
     });
 
