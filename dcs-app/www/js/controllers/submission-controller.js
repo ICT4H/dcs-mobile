@@ -1,23 +1,38 @@
-var SubmissionDataProvider = function(projectUuid, localStore, serverService) {
 
-    this.getSubmission = function(currentIndex, isServer, searchStr) {
-        if (isServer) {
+dcsApp.service('dataProvider', ['$q', function($q) {
+
+    this.init = function(projectUuid, localStore, serverService, isServer) {
+        this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
+        this.projectUuid = projectUuid;
+        this.localStore = localStore;
+        this.serverService = serverService;
+    };
+
+    this.getSubmission = function(currentIndex, searchStr) {
+        if (this.isServer) {
 
         } else {
-            return localStore.getAllSubmissions(projectUuid, currentIndex, 1, searchStr || "").then(function(result) {
+            return this.localStore.getAllSubmissions(this.projectUuid, currentIndex, 1, searchStr || "").then(function(result) {
                 return result.data[0];
             })
         }
     }
 
-    this.getProject = function(projectUuid, isServer) {
-        if (isServer) {
+    var cachedProject;
+    var setProjectInCache = function(project) {
+        cachedProject = project;
+        return $.when(project);
+    }
 
+    this.getProject = function() {
+        if (this.takeCachedProject) {
+            return $q.when(cachedProject);
         } else {
-            return localStore.getProjectById(projectUuid);
+            return this.localStore.getProjectById(this.projectUuid).then(setProjectInCache);
         }
     }
-}
+}]);
+
 var EnketoService = function() {
     this.loadEnketo = function(xform, submissionXml, submitCallback, submitLabel) {
         loadEnketo({
@@ -30,66 +45,101 @@ var EnketoService = function() {
     };
 };
 
+
 dcsApp.service('enketoService', [EnketoService]);
+
+dcsApp.service('submissionRelationService', [function() {
+    var relationHandler;
+    var that = this;
+
+    this.setProjectAndSubmission = function(project, submission) {
+        this.project = project;// this should be set first
+        this._setSubmission(submission);
+        if (this.isParentProject())
+            this.parentProject = project;
+        delete this.parentProject;
+    }
+
+    this._setSubmission = function(submission) {
+        this.submission = submission;
+        if (this.isParentProject())
+            this.parentSubmission = submission;
+
+        if (this.isChildProject())
+            relationHandler = new SurveyRelation(this.project, JSON.parse(this.parentSubmission.data));
+        //TODO commenting as this wont allow to navigate across child submissions
+        //delete this.parentSubmission;
+    }
+
+    this.isChildProject = function() {
+        return this.project.project_type == 'child';
+    }
+
+    this.isParentProject = function() {
+        return this.project.project_type == 'parent';
+    }
+
+    this.getXform = function() {
+        if (this.isChildProject())
+            return relationHandler.add_note_fields_for_parent_values();
+        return this.project.xform;
+    }
+
+    this.getModelStr = function() {
+        if (this.isChildProject())
+            return relationHandler.getUpdatedModelStr();
+        return this.submission.xml;
+    }
+
+    this.getNewChildrenActionItems = function() {
+        if (this.project.project_type == 'child')
+            return {'bla': 'bla'};
+        return;
+    }
+}]);
+
 
 dcsApp.controller('submissionController',
     ['$scope', '$routeParams', '$location', 'submissionDao','messageService', 'dcsService', 'paginationService',
-    'dialogService', 'locationService', 'enketoService',
+    'dialogService', 'locationService', 'submissionRelationService', 'enketoService', 'dataProvider',
     function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService,
-        dialogService, locationService, enketoService){
+        dialogService, locationService, submissionRelationService, enketoService, dataProvider){
     
     $scope.showSearchicon = false;
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.server = $routeParams.server == "true"? true:false;
 
+    var searchStr = $scope.searchStr || "";
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
-    var index = parseInt($routeParams.currentIndex);
-    var dataProvider = new SubmissionDataProvider($scope.project_uuid, localStore, null);        
+    var index = parseInt($routeParams.currentIndex) || 0;
 
-/* 
+    dataProvider.init($scope.project_uuid, localStore, null);
 
-
-
-[edit_child, edit, new_child, new].each as handler
-if handler.isApplicable()
- handler.loadView()
-
-base.init_handlers(rootParams) {
-    this.submissionId = rootParams.submission_id
-    this.project = rootParams.project;
-}
-
-edit_child.isApplicable() {
-    return this.project.is_child_project and this.submissionId;
-}
-edit_child.initViewOptions() {
-    this.options = {'buttonLabel': buttonLabel,...
-     'onButtonClick' = Base.onUpdate
-    }
-}
-base.loadView() {
-    this.initViewOptions();
-    dataProvider.getSubmission().then(function(submission) {
-        enketoService.loadEnketo(options);
-    })
-}
-
-Base.onUpdate() {
-    localStore.updateSubmission
-}
-Base.onSave() {
-    localStore.createSubmission
-}
-*/
-
-    dataProvider.getSubmission(index, $scope.server).then(function(submission) {
-        msg.hideAll();
-        $scope.submission = submission;
-        dataProvider.getProject($scope.project_uuid, false).then(function(project) {
-            enketoService.loadEnketo(project.xform, submission.xml, onEdit, "Update");
-        })
+    dataProvider.getProject().then(function(project) {
+        dataProvider.getSubmission(index, searchStr).then(function(submission) {
+            submissionRelationService.setProjectAndSubmission(project, submission);
+            $scope.submission = submission;
+            initChildActions(project);
+            enketoService.loadEnketo(
+                submissionRelationService.getXform(),
+                submissionRelationService.getModelStr(),
+                onEdit,
+                "Update");
+        });
     });
+
+    var initChildActions =  function(project) {
+        if (project.project_type != 'parent')
+            return;
+
+        $scope.actions = {};
+        //TODO remove harcoded action label; use value from child project
+        //TODO loop and create as many add as many children by split by ',' on project.child_ids
+        $scope.actions['new_child'] = {'onClick': function() {
+            $location.url('/projects/'+project.child_ids+'/submissions/new_child?parent_id='+$routeParams.project_uuid+'&parent_submission_id='+$routeParams.submission_id);
+        }, 'label': 'New Child' };
+    };
 
     var onEdit = function(submission) {
         var oldSubmission = $scope.submission;
