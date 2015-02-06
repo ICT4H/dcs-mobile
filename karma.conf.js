@@ -19,12 +19,12 @@ module.exports = function(config){
       JS+'modules/*.js',
 
       SPECS+'mocks.js',
-      //SPECS+'media-test.js',
-      // SPECS+'file-handler-test.js',
-      // SPECS+'device-back-handler-specs.js',
-      // SPECS+'local-project-list-controller-tests.js',
-      SPECS+'correlated-specs.js',
-      //SPECS+'fake-ctrl-test.js',
+      SPECS+'button-factory-specs.js',
+      SPECS+'correlated-forms-specs.js',
+      SPECS+'device-back-handler-specs.js',
+      SPECS+'file-handler-specs.js',
+      SPECS+'project-controller-tests.js',
+
       { pattern: APP+'www/i18n/resourceBundle.json',
           watched: true,
           served:  true,
