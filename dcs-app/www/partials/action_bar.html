@@ -1,3 +1,4 @@
+<!-- to display action callbacks -->
 <div class="btn-group pull-right" ng-hide="showSearch || ! actions">
     <a class='btn' ng-click="flipSearch()" ng-show="showSearchicon">
       <i class="fa fa-search fa-2x"></i>
@@ -16,6 +17,28 @@
 
     	<li ng-repeat="action in actions" ng-click="action.onClick()"> 
       	<a ng-class="{'disable': action.isDisabled}">{{action.label}}</a>
+      </li>
+    </ul>
+</div>
+<!-- to display url links -->
+<div class="btn-group pull-right" ng-hide="showSearch || actions">
+    <a class='btn' ng-click="flipSearch()" ng-show="showSearchicon">
+      <i class="fa fa-search fa-2x"></i>
+    </a>
+    <a ui-turn-on='myDropdown' class='btn' >
+      <i class="fa fa-ellipsis-v fa-2x"></i>
+    </a>
+    <ul 
+      class="dropdown-menu"
+      ui-outer-click="Ui.turnOff('myDropdown')"
+      ui-outer-click-if="Ui.active('myDropdown')"
+      role="menu"
+      ui-show="myDropdown" 
+      ui-state="myDropdown"
+      ui-turn-off="myDropdown">
+
+      <li ng-repeat="navigateUrl in navigateUrls"> 
+        <a ng-href="{{navigateUrl.url}}">{{navigateUrl.label}}</a>
       </li>
     </ul>
 </div>

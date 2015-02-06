@@ -105,11 +105,20 @@ dcsApp.service('submissionRelationService', [function() {
         return this.submission.xml;
     }
 
-    this.getNewChildrenActionItems = function() {
-        if (this.project.project_type == 'child')
-            return {'bla': 'bla'};
-        return;
-    }
+    this.getAddChildrenNavigateUrls =  function(onClick) {
+        if (! this.isParentProject()) return;
+        var navigateToUrl = '#/projects/'+this.project.child_ids+
+                    '/submissions/new_child?parent_id='+this.project.project_uuid+
+                    '&parent_submission_id='+this.parentSubmission.submission_id;
+        var navigateUrls = {};
+        //TODO remove harcoded action label; use value from child project.
+        //TODO loop and create as many add as many children by split by ',' on project.child_ids
+        navigateUrls['new_child'] = {
+            'label': 'New Child',
+            'url': navigateToUrl
+        };
+        return navigateUrls;
+    };
 }]);
 
 
@@ -134,28 +143,14 @@ dcsApp.controller('submissionController',
         dataProvider.getSubmission(index, searchStr).then(function(submission) {
             submissionRelationService.setProjectAndSubmission(project, submission);
             $scope.submission = submission;
-            initChildActions(project);
+            // TODO Add action to delete the displayed submission
+            $scope.navigateUrls = submissionRelationService.getAddChildrenNavigateUrls($location.url);
             enketoService.loadEnketo(
                 submissionRelationService.getXform(),
                 submissionRelationService.getModelStr(),
                 submission);
         });
     });
-
-    var initChildActions =  function(project) {
-        if (project.project_type != 'parent')
-            return;
-
-        $scope.actions = {};
-        //TODO remove harcoded action label; use value from child project
-        //TODO loop and create as many add as many children by split by ',' on project.child_ids
-        $scope.actions['new_child'] = {'onClick': function() {
-            $location.url('/projects/'+project.child_ids+'/submissions/new_child?parent_id='+$routeParams.project_uuid+'&parent_submission_id='+$routeParams.submission_id);
-        }, 'label': 'New Child' };
-    };
-
-
- 
 
     $scope.goBack = function() {
         locationService.goBack();
