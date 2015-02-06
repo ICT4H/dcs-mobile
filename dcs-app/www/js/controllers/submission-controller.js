@@ -35,7 +35,8 @@ dcsApp.service('dataProvider', ['$q', function($q) {
     }
 }]);
 
-dcsApp.service('enketoService', ['$location', 'submissionDao', 'messageService', function($location, submissionDao, msg) {
+dcsApp.service('enketoService', ['$location', '$route', 'submissionDao', 'messageService', 'dialogService',
+                        function($location, $route, submissionDao, msg, dialogService) {
     var dbSubmission;
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
@@ -54,14 +55,13 @@ dcsApp.service('enketoService', ['$location', 'submissionDao', 'messageService',
         submission.project_uuid = projectUuid;
         submissionDao.createSubmission(submission).then(function() {
             msg.displaySuccess('Saved');
-            
-            $location.url('/submission-list/' + projectUuid + '?type=all');
-            // var goToSubmissionList = function() {
-            // }
-            // var reload = function() {
-            //     $route.reload();
-            // }
-            //dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
+            var goToSubmissionList = function() {
+                $location.url('/submission-list/' + projectUuid + '?type=all');
+            }
+            var reload = function() {
+                $route.reload();
+            }
+            dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
         }, function(error) {
             console.log(error);
         });
@@ -102,8 +102,10 @@ dcsApp.service('submissionRelationService', [function() {
         if (this.isParentProject())
             this.parentSubmission = submission;
 
-        if (this.isChildProject())
-            relationHandler = new SurveyRelation(this.project, JSON.parse(this.parentSubmission.data));
+        if (this.isChildProject()) {
+            //TODO fixme when editing child submission, parentSubmission wont hv been loaded.
+            relationHandler = new SurveyRelation(this.project, this.parentSubmission? JSON.parse(this.parentSubmission.data): JSON.parse(this.submission.data));
+        }
         //TODO commenting as this wont allow to navigate across child submissions
         //delete this.parentSubmission;
     }
@@ -123,15 +125,15 @@ dcsApp.service('submissionRelationService', [function() {
     }
 
     this.getModelStr = function() {
-        if (this.isChildProject())
+        var is_child_and_is_not_edit_of_child = this.isChildProject() && !this.submission;
+        if (is_child_and_is_not_edit_of_child)
             return relationHandler.getUpdatedModelStr();
         return this.submission? this.submission.xml : '';
     }
 
     this.getAddChildrenNavigateUrls =  function(onClick) {
-        var isNewParent = !this.submission;
-        var isNotParent = !this.isParentProject();
-        if (isNewParent || isNotParent) return;
+        var is_new_parent_or_is_not_parent = !this.submission || !this.isParentProject()
+        if (is_new_parent_or_is_not_parent) return;
 
         var navigateToUrl = '#/projects/'+this.project.child_ids+
                     '/submissions/new_child?parent_id='+this.project.project_uuid+
