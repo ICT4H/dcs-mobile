@@ -277,44 +277,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     };
 
-    var updateSubmissions = function(submissions) {
-        msg.showLoading();
-        var promises = [];
-
-        dcsService.checkSubmissionsStatus($scope.project_uuid, submissions).then(function(response){
-            for (var status in response) {
-                promises.push(submissionDao.updateSubmissionStatus(response[status], status)); 
-            };
-
-            $q.all(promises).then(function() {
-                loadLocal();
-                (505).showInfo();
-            }, (107).showError);
-        });
-    };
-
-    var onUpdate = function() {
-        if(selectedSubmission.length != 0) {
-            submissionDao.getSubmissionForUpdate(selectedSubmission).then(function(submissions) {
-                updateSubmissions(submissions);
-            });
-        }
-        else {
-            dialogService.confirmBox('Do you want to update all submissions?', function() {
-                submissionDao.getAllSubmissionForUpdate($scope.project_uuid).then(function(submissions){
-                    updateSubmissions(submissions);
-                });
-            });
-        }
-    };
-
     var initOfflineActions =  function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDelete, 'label': 'Delete' });
         $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
         $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
-        $scope.actions.push({'onClick': onUpdate, 'label': 'Check Status'});
         $scope.actions.push({'onClick': OnDeltaPull, 'label': 'Delta Pull'});
     };
 
