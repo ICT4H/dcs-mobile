@@ -22,13 +22,17 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'store', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, store) {
+dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'locationService', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, locationService) {
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
 
+    $rootScope.$on('$locationChangeSuccess', function(event, currentUrl, previousUrl) {
+        locationService.setUrl(previousUrl, currentUrl);
+    });
+    
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-        backHandler.onRouteChange($location.path());
+        locationService.setKey(current, next);
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
             $location.path('/');
@@ -88,17 +92,8 @@ dcsApp.run(['$route','$rootScope', '$location', '$interval', '$timeout', 'messag
 
     $rootScope.showSearchicon = true;
 
-    document.addEventListener('backbutton', function() {
-        var backLocation = backHandler.onBack();
-        //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
-        if (backLocation) {
-            console.log('backbutton clicked: going to: ' + backLocation);
-            $location.path(backLocation);
-            $route.reload();
-        } else {
-            console.log('backbutton clicked: implicit navigation...');
-            return false;
-        }
+    document.addEventListener('backbutton', function(event, next, current) {
+        locationService.goBack();
     }, false);
 
 }]);

@@ -1,4 +1,4 @@
-dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'paginationService', 'dialogService', function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService, dialogService){
+dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location', 'submissionDao', 'messageService', 'dcsService', 'paginationService', 'dialogService', 'locationService', function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService, dialogService, locationService){
     
     $scope.pagination = paginationService.pagination;
     $scope.showSearchicon = false;
@@ -138,6 +138,10 @@ dcsApp.controller('submissionController', ['$scope', '$routeParams', '$location'
             });
         });
     }
+
+    $scope.goBack = function() {
+        locationService.goBack();
+    };
 
     onLoad();
 }]);

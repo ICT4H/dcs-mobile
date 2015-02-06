@@ -5,6 +5,11 @@
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
+<div ui-content-for="sideBar">
+  <div class="btn" ng-click="goBack()">
+    <i class="fa fa-arrow-left fa-2x"></i> 
+  </div>
+</div>
 <div class="scrollable">  
   <div class="scrollable-content" ng-swipe-left="onPrevious()" ng-swipe-right-"onNext()">
   <div class="panel">

@@ -3,7 +3,6 @@
       <span style="text-transform:capitalize" ui-turn-on='SubmissionTypes'>{{title}}
       <i class="fa fa-caret-down"></i>
       </span>
-      <div ui-content-for="sideBar"></div>
       <ul class="dropdown-toggle dropdown-menu dropDown" 
       ui-outer-click="Ui.turnOff('SubmissionTypes')"
       ui-outer-click-if="Ui.active('SubmissionTypes')"
@@ -17,6 +16,11 @@
       </ul>
   </span>
 </span>
+<div ui-content-for="sideBar">
+  <div class="btn" ng-click="goBack()">
+    <i class="fa fa-arrow-left fa-2x"></i> 
+  </div>
+</div>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
