@@ -1,10 +1,10 @@
 
 dcsApp.service('dataProvider', ['$q', function($q) {
 
-    this.init = function(projectUuid, localStore, serverService, isServer) {
+    this.init = function(projectUuid, submissionDao, serverService, isServer) {
         this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
         this.projectUuid = projectUuid;
-        this.localStore = localStore;
+        this.submissionDao = submissionDao;
         this.serverService = serverService;
     };
 
@@ -12,9 +12,9 @@ dcsApp.service('dataProvider', ['$q', function($q) {
         if (this.isServer) {
 
         } else {
-            return this.localStore.getAllSubmissions(this.projectUuid, currentIndex, 1, searchStr || "").then(function(result) {
+            return this.submissionDao.getAllSubmissions(this.projectUuid, currentIndex, 1, searchStr || "").then(function(result) {
                 return result.data[0];
-            })
+            });
         }
     }
 
@@ -28,13 +28,30 @@ dcsApp.service('dataProvider', ['$q', function($q) {
         if (this.takeCachedProject) {
             return $q.when(cachedProject);
         } else {
-            return this.localStore.getProjectById(this.projectUuid).then(setProjectInCache);
+            return this.submissionDao.getProjectById(this.projectUuid).then(setProjectInCache);
         }
     }
 }]);
 
-var EnketoService = function() {
-    this.loadEnketo = function(xform, submissionXml, submitCallback, submitLabel) {
+dcsApp.service('enketoService', ['$location', 'submissionDao', 'messageService', function($location, submissionDao, msg) {
+    var dbSubmission;
+    var onEdit = function(submission) {
+        submission.submission_id = dbSubmission.submission_id;
+        submission.submission_uuid = dbSubmission.submission_uuid;
+        submission.version = dbSubmission.version;
+        submission.status = "modified";
+        submission.project_uuid = dbSubmission.project_uuid;   
+        msg.displaySuccess('Updating submission');
+        submissionDao.updateSubmission(submission).then(function() {
+            $location.url('/submission-list/' + dbSubmission.project_uuid + '?type=all');
+        });
+    };
+
+    this.loadEnketo = function(xform, submissionXml, loadedSubmission) {
+        var submitCallback = onEdit,
+            submitLabel = 'Update';
+            dbSubmission = loadedSubmission;
+            
         loadEnketo({
             'buttonLabel': submitLabel,
             'hideButton': submitLabel? false:true,
@@ -43,10 +60,7 @@ var EnketoService = function() {
             'xform': xform
         });
     };
-};
-
-
-dcsApp.service('enketoService', [EnketoService]);
+}]);
 
 dcsApp.service('submissionRelationService', [function() {
     var relationHandler;
@@ -124,8 +138,7 @@ dcsApp.controller('submissionController',
             enketoService.loadEnketo(
                 submissionRelationService.getXform(),
                 submissionRelationService.getModelStr(),
-                onEdit,
-                "Update");
+                submission);
         });
     });
 
@@ -141,19 +154,6 @@ dcsApp.controller('submissionController',
         }, 'label': 'New Child' };
     };
 
-    var onEdit = function(submission) {
-        var oldSubmission = $scope.submission;
-        submission.submission_id = oldSubmission.submission_id;
-        submission.submission_uuid = oldSubmission.submission_uuid;
-        submission.version = oldSubmission.version;
-        submission.status = "modified";
-        submission.project_uuid = oldSubmission.project_uuid;   
-        console.log(': ' + JSON.stringify(submission));
-        localStore.updateSubmission(submission).then(function() {
-            msg.displaySuccess('Updated');
-            $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
-        });
-    };
 
  
 
