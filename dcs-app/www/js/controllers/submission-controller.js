@@ -1,6 +1,8 @@
 
 dcsApp.service('dataProvider', ['$q', function($q) {
-
+/*
+Provides abstraction over local store and server service.
+*/
     this.init = function(projectUuid, submissionDao, serverService, isServer) {
         this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
         this.projectUuid = projectUuid;
@@ -8,14 +10,14 @@ dcsApp.service('dataProvider', ['$q', function($q) {
         this.serverService = serverService;
     };
 
-    this.getSubmission = function(currentIndex, searchStr) {
+    this.getSubmission = function(currentIndex, searchStr, type) {
         if (isNaN(currentIndex)) return $.when();
 
         if (this.isServer) {
 
         } else {
-            return this.submissionDao.getAllSubmissions(this.projectUuid, currentIndex, 1, searchStr || "").then(function(result) {
-                return result.data[0];
+            return this.submissionDao.searchSubmissionsByType(this.projectUuid, type, searchStr, currentIndex, 1).then(function(result) {
+                return result;
             });
         }
     }
@@ -37,6 +39,9 @@ dcsApp.service('dataProvider', ['$q', function($q) {
 
 dcsApp.service('enketoService', ['$location', '$route', 'submissionDao', 'messageService', 'dialogService',
                         function($location, $route, submissionDao, msg, dialogService) {
+/*
+Provides submission create and update using enketo. Uses local store for persistence.
+*/
     var dbSubmission;
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
@@ -84,13 +89,21 @@ dcsApp.service('enketoService', ['$location', '$route', 'submissionDao', 'messag
     };
 }]);
 
-dcsApp.service('submissionRelationService', [function() {
+dcsApp.service('submissionXformService', [function() {
+/*
+This service provides the xform html and model string. For Correlated project,
+it uses SurveyRelation to provide xform html and model string.
+For parent edit/view, url links to create children are provided.
+
+The assumption is for new child submission, parent submission will be accessed first.
+This service holds the latest accessed parent data.
+*/
+
     var relationHandler;
-    var that = this;
 
     this.setProjectAndSubmission = function(project, submission) {
-
-        this.project = project;// this should be set first
+        //TODO if (!this.project) throw Error
+        this.project = project;// project should be set first
         this._setSubmission(submission);
         if (this.isParentProject())
             this.parentProject = project;
@@ -127,34 +140,67 @@ dcsApp.service('submissionRelationService', [function() {
     this.getModelStr = function() {
         var is_child_and_is_not_edit_of_child = this.isChildProject() && !this.submission;
         if (is_child_and_is_not_edit_of_child)
+            // getUpdatedModelStr rename to getModelStrWithParentValues
             return relationHandler.getUpdatedModelStr();
         return this.submission? this.submission.xml : '';
     }
 
-    this.getAddChildrenNavigateUrls =  function(onClick) {
+    this.getUrlsToAddChildren =  function(onClick) {
         var is_new_parent_or_is_not_parent = !this.submission || !this.isParentProject()
         if (is_new_parent_or_is_not_parent) return;
 
-        var navigateToUrl = '#/projects/'+this.project.child_ids+
+        var urlToAddChild = '#/projects/'+this.project.child_ids+
                     '/submissions/new_child?parent_id='+this.project.project_uuid+
                     '&parent_submission_id='+this.parentSubmission.submission_id;
-        var navigateUrls = {};
+        var urlsToAddChildren = {};
         //TODO remove harcoded action label; use value from child project.
         //TODO loop and create as many add as many children by split by ',' on project.child_ids
-        navigateUrls['new_child'] = {
+        urlsToAddChildren['new_child'] = {
             'label': 'New Child',
-            'url': navigateToUrl
+            'url': urlToAddChild
         };
-        return navigateUrls;
+        return urlsToAddChildren;
     };
 }]);
 
 
+var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
+
+    this.getTotal = function() {
+        return totalRecords;
+    }
+
+    this.showPagination = function() {
+        //dont show for create submission
+        return !isNaN(currentIndex);
+    }
+
+    this.getTo = function() {
+        return currentIndex + 1;
+    }
+
+    this.isFirstPage = function() {
+        return currentIndex === 0;
+    }
+
+    this.isLastPage = function() {
+        return currentIndex + 1 === totalRecords;
+    }
+
+    this.onNext = function() {
+        $location.url(baseUrl + '?type='+type+'&currentIndex=' + (currentIndex+1));
+    }
+
+    this.onPrevious = function() {
+        $location.url(baseUrl + '?type='+type+'&currentIndex=' + (currentIndex-1));
+    }
+}
+
 dcsApp.controller('submissionController',
     ['$scope', '$routeParams', '$location', 'submissionDao','messageService', 'dcsService', 'paginationService',
-    'dialogService', 'locationService', 'submissionRelationService', 'enketoService', 'dataProvider',
+    'dialogService', 'locationService', 'submissionXformService', 'enketoService', 'dataProvider',
     function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService,
-        dialogService, locationService, submissionRelationService, enketoService, dataProvider){
+        dialogService, locationService, submissionXformService, enketoService, dataProvider){
     
     $scope.showSearchicon = false;
     $scope.project_uuid = $routeParams.project_uuid;
@@ -163,22 +209,31 @@ dcsApp.controller('submissionController',
     var searchStr = $scope.searchStr || "";
     var submission_id = $routeParams.submission_id;
     var buttonLabel = submission_id == "null" ?'Save':'Update';
-    var index = parseInt($routeParams.currentIndex);
+    var currentIndex = parseInt($routeParams.currentIndex);
+    var type = $routeParams.type || 'all';
 
     dataProvider.init($scope.project_uuid, localStore, null);
 
     dataProvider.getProject().then(function(project) {
-        dataProvider.getSubmission(index, searchStr).then(function(submission) {
-            submissionRelationService.setProjectAndSubmission(project, submission);
+        dataProvider.getSubmission(currentIndex, searchStr, type).then(function(result) {
+            var submission = result && result.data[0];
+            addPagination(type, currentIndex, result && result.total);
+            // xfomr & editModel- SubmissionXformService
+            submissionXformService.setProjectAndSubmission(project, submission);
             // TODO Add action to delete the displayed submission
-            $scope.navigateUrls = submissionRelationService.getAddChildrenNavigateUrls($location.url);
+            $scope.urlsToAddChildren = submissionXformService.getUrlsToAddChildren($location.url);
             enketoService.loadEnketo(
-                submissionRelationService.getXform(),
-                submissionRelationService.getModelStr(),
+                submissionXformService.getXform(),
+                submissionXformService.getModelStr(),
                 submission,
                 $scope.project_uuid);
         });
     });
+
+    var addPagination = function(type, currentIndex, total) {
+        var baseUrl = '/projects/'+$scope.project_uuid+'/submissions/'+currentIndex+'/';
+        $scope.page = new Page($location, baseUrl, type, currentIndex, total);
+    }
 
     $scope.goBack = function() {
         locationService.goBack();
