@@ -40,19 +40,40 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
 
+    var onError = function() {
+        (104).showError();
+    }
+
     var onDownloadProject = function() {
         if(!app.areItemSelected(selectedProject)) return;
 
         "downloading_projects".showInfoWithLoading();
-        dcsService.getQuestionnaires(selectedProject)
-        .then(function(projects) {
+        _onDownloadProject(selectedProject, onError);
+    };
+
+    var _onDownloadProject = function(projectUuids, errorCallback) {
+        dcsService.getQuestionnaires(projectUuids).then(function(projects) {
+            downloadParent(projects);
             app.mapPromise(projects, projectDao.createProject)
                 .then( function(response) {
                 loadLocal();
                 (504).showInfo();
-            }, (104).showError);  
+            }, errorCallback);
         }, (105).showError);
     };
+
+    var downloadParent = function(projects) {
+        var parentUuids = []
+        angular.forEach(projects, function(project) {
+            if (project.project_type == 'child') {
+                parentUuids.push(project.parent_info.parent_uuid);
+            }
+        });
+        if (parentUuids.length > 0)
+            _onDownloadProject(parentUuids, function() {
+                // do nothing on error, possibly we tried to create the existing parent project again
+            });
+    }
 
     var initOnlineActionItems = function() {
         $scope.actions = [];
