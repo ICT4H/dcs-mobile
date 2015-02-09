@@ -1,5 +1,5 @@
 <span ui-content-for="title">
-  <span ng-hide="showSearch">
+  <span ng-hide="showSearch" ng-if="title != 'server data'">
       <span style="text-transform:capitalize" ui-turn-on='SubmissionTypes'>{{title}}
       <i class="fa fa-caret-down"></i>
       </span>
@@ -14,6 +14,9 @@
         <li ng-click="ApplyFilterWith('unsubmitted')"><a >Unsubmitted</a></li>
         <li ng-click="ApplyFilterWith('conflicted')"><a >Conflicted</a></li>
       </ul>
+  </span>
+  <span ng-hide="showSearch" ng-if="title == 'server data'">
+      <span style="text-transform:capitalize">{{title}}</span>
   </span>
 </span>
 <div ui-content-for="sideBar">
