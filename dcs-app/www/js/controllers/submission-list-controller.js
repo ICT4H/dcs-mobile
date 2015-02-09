@@ -76,7 +76,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type + '&searchStr=' + searchStr);
     };
 
-    var OnDeltaPull = function() {
+    var onDeltaPull = function() {
        
         var promises = [];
         
@@ -84,14 +84,14 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             msg.showLoadingWithInfo("Fetching submissions.....");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 
-                var allIdsFromServer = $scope._().pluck(result.submissions, 'submission_uuid');
+                var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
                 
                 submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
 
-                    var conflictUuids = $scope._().pluck(localResult.modifiedUuids, 'submission_uuid'); 
-                    var updateUuids = $scope._().pluck(localResult.unModifiedUuids, 'submission_uuid');
+                    var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid'); 
+                    var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
 
-                    var newUuids = $scope._().difference($scope._().difference(allIdsFromServer, conflictUuids), updateUuids);
+                    var newUuids = $scope.difference($scope.difference(allIdsFromServer, conflictUuids), updateUuids);
                     
                     var newSubmissionsPro = newUuids.map(function(newUuid) {
                         submission = result.submissions[newUuid];
@@ -102,7 +102,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                     var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
                     
                     var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
-                        return submissionDao.updateSubmissionUsingUuid(result.submissions[updateUuid]);
+                        var submission = result.submissions[updateUuid];
+                        submission.status = "both"
+                        return submissionDao.updateSubmissionUsingUuid(submission);
                     });
 
                     promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
@@ -266,7 +268,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
         $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
-        $scope.actions.push({'onClick': OnDeltaPull, 'label': 'Delta Pull'});
+        $scope.actions.push({'onClick': onDeltaPull, 'label': 'Delta Pull'});
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {

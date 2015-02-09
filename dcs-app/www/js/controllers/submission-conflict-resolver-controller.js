@@ -36,6 +36,7 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
         $scope.serverSubmission.data = JSON.stringify($scope.serverSubmission.data);
         submissionDao.updateSubmission($scope.serverSubmission).then(function(response) {
             msg.hideLoadingWithInfo(resourceBundle.applied_server);
+            $location.url('/submission-list/' + project_uuid + '?type=all');
         });
     };  
 
@@ -44,6 +45,7 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
         submissionDao.updateSubmissionStatus([submission_uuid], "modified").then(function() {
            submissionDao.updateVersion(submission_uuid, $scope.serverSubmission.version).then(function() {
                 msg.hideLoadingWithInfo(resourceBundle.applied_local);
+                $location.url('/submission-list/' + project_uuid + '?type=all');
            });
         });
     };

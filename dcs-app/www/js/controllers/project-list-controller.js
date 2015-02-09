@@ -43,7 +43,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var onDownloadProject = function() {
         if(!app.areItemSelected(selectedProject)) return;
 
-        "downloading_projects".showInfo();
+        "downloading_projects".showInfoWithLoading();
         dcsService.getQuestionnaires(selectedProject)
         .then(function(projects) {
             app.mapPromise(projects, projectDao.createProject)
