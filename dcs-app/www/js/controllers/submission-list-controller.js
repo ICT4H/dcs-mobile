@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, locationService, underscore){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, locationService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
@@ -84,14 +84,14 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             msg.showLoadingWithInfo("Fetching submissions.....");
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 
-                var allIdsFromServer = underscore.pluck(result.submissions, 'submission_uuid');
+                var allIdsFromServer = $scope._().pluck(result.submissions, 'submission_uuid');
                 
                 submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
 
-                    var conflictUuids = underscore.pluck(localResult.modifiedUuids, 'submission_uuid'); 
-                    var updateUuids = underscore.pluck(localResult.unModifiedUuids, 'submission_uuid');
+                    var conflictUuids = $scope._().pluck(localResult.modifiedUuids, 'submission_uuid'); 
+                    var updateUuids = $scope._().pluck(localResult.unModifiedUuids, 'submission_uuid');
 
-                    var newUuids = underscore.difference(underscore.difference(allIdsFromServer, conflictUuids), updateUuids);
+                    var newUuids = $scope._().difference($scope._().difference(allIdsFromServer, conflictUuids), updateUuids);
                     
                     var newSubmissionsPro = newUuids.map(function(newUuid) {
                         submission = result.submissions[newUuid];
@@ -285,5 +285,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'locationService', 'underscore', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'locationService', submissionListController]);
 

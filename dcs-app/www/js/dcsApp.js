@@ -4,7 +4,7 @@ var dcsApp = angular.module('dcsApp', ['ngRoute',
     "ngI18n",
     "angucomplete-alt",
     "angularMoment",
-    "ngUnderscore"
+    "angular-underscore"
 ]);
 
 var isEmulator = false;
