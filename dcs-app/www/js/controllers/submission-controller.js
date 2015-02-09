@@ -42,7 +42,24 @@ dcsApp.service('enketoService', ['$location', '$route', 'submissionDao', 'messag
 /*
 Provides submission create and update using enketo. Uses local store for persistence.
 */
-    var dbSubmission;
+    var dbSubmission, projectUuid;
+
+    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid) {
+        var submitCallback = submissionToEdit? onEdit: onNew,
+            submitLabel = submissionToEdit? 'Update': 'Save';
+
+        dbSubmission = submissionToEdit;
+        projectUuid = currentProjectUuid;
+
+        loadEnketo({
+            'buttonLabel': submitLabel,
+            'hideButton': submitLabel? false:true,
+            'onButtonClick': submitCallback,
+            'submissionXml': submissionXml,
+            'xform': xform
+        });
+    };
+
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
         submission.submission_uuid = dbSubmission.submission_uuid;
@@ -69,22 +86,6 @@ Provides submission create and update using enketo. Uses local store for persist
             dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
         }, function(error) {
             console.log(error);
-        });
-    };
-
-    this.loadEnketo = function(xform, submissionXml, loadedSubmission, currentProjectUuid) {
-        var submitCallback = loadedSubmission? onEdit: onNew,
-            submitLabel = loadedSubmission? 'Update': 'Save';
-
-        dbSubmission = loadedSubmission;
-        projectUuid = currentProjectUuid;
-
-        loadEnketo({
-            'buttonLabel': submitLabel,
-            'hideButton': submitLabel? false:true,
-            'onButtonClick': submitCallback,
-            'submissionXml': submissionXml,
-            'xform': xform
         });
     };
 }]);
@@ -218,7 +219,6 @@ dcsApp.controller('submissionController',
         dataProvider.getSubmission(currentIndex, searchStr, type).then(function(result) {
             var submission = result && result.data[0];
             addPagination(type, currentIndex, result && result.total);
-            // xfomr & editModel- SubmissionXformService
             submissionXformService.setProjectAndSubmission(project, submission);
             // TODO Add action to delete the displayed submission
             $scope.urlsToAddChildren = submissionXformService.getUrlsToAddChildren($location.url);
