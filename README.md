@@ -1,3 +1,5 @@
+[![Build Status](https://snap-ci.com/ICT4H/dcs-mobile/branch/develop/build_image)](https://snap-ci.com/ICT4H/dcs-mobile/branch/develop)
+
 ## Dev box setup for dcs-app
 
 If you are going to change enketo-core the see section "Making changes to enketo-core".
