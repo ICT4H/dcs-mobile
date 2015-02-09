@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, locationService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
@@ -267,12 +267,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/conflict-resolver/' + $scope.project_uuid + "/" + submission_uuid);
     };
 
-    $scope.goBack = function() {
-        locationService.goBack();
-    };
-
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'locationService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', submissionListController]);
 

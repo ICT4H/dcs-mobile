@@ -23,17 +23,17 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'locationService', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, locationService) {
+dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
 
     $rootScope.$on('$locationChangeSuccess', function(event, currentUrl, previousUrl) {
-        locationService.setUrl(previousUrl, currentUrl);
+        //locationService.setUrl(previousUrl, currentUrl);
     });
     
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-        locationService.setKey(current, next);
+        backHandler.onRouteChange($location.path());
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
             $location.path('/');
@@ -93,8 +93,21 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
 
     $rootScope.showSearchicon = true;
 
-    document.addEventListener('backbutton', function(event, next, current) {
-        locationService.goBack();
-    }, false);
+    // back link in app page
+    $rootScope.goBack = function() {
+        var backLocation = backHandler.onBack();
+       //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
+       if (backLocation) {
+           console.log('backbutton clicked: going to: ' + backLocation);
+           $location.path(backLocation);
+       } else {
+           console.log('backbutton clicked: implicit navigation...');
+           return false;
+       }
+    }
 
+    // device back button
+    document.addEventListener('backbutton', function() {
+       return $rootScope.goBack();
+    }, false);
 }]);

@@ -49,6 +49,7 @@ var BackHandler;
         };
 
         this.setToSubmissions = function() {
+            console.log('BackHandler: setting to sumissions');
             this.callback = this.goToSubmissions;
         };
 
