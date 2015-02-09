@@ -7,6 +7,7 @@ module.exports = function(config){
 
     files : [
       JS+'lib/angular.js',
+      JS+'lib/underscore-min.js',
       JS+'lib/*.js',
 
       JS+'dcsApp.js',
