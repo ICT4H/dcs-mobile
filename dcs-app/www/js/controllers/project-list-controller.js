@@ -33,49 +33,80 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
             (501).showInfo();
-            initOnlineActionItems();
+            $scope.initOnlineActionItems();
             dcsService.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
                     .then(assignResult, (103).showError);
         });
     };
 
-    var onError = function() {
-        (104).showError();
-    }
-
     var onDownloadProject = function() {
         if(!app.areItemSelected(selectedProject)) return;
 
         "downloading_projects".showInfoWithLoading();
-        _onDownloadProject(selectedProject, onError);
+        _getNonExistingProjectUuids(selectedProject)
+            .then(_downloadServerProject)
+            .then(_downloadNonExistingParent)
+            .then(_createLocalProjects);
     };
 
-    var _onDownloadProject = function(projectUuids, errorCallback) {
-        dcsService.getQuestionnaires(projectUuids).then(function(projects) {
-            downloadParent(projects);
-            app.mapPromise(projects, projectDao.createProject)
-                .then( function(response) {
-                loadLocal();
-                (504).showInfo();
-            }, errorCallback);
-        }, (105).showError);
-    };
-
-    var downloadParent = function(projects) {
-        var parentUuids = []
-        angular.forEach(projects, function(project) {
-            if (project.project_type == 'child') {
-                parentUuids.push(project.parent_info.parent_uuid);
-            }
+    var _getNonExistingProjectUuids = function(projectUuids) {
+        var deferred = $q.defer();
+        projectDao.getProjectByUuids(projectUuids).then(function(projects) {
+            var existingProjectUuids = $scope.pluck(projects, 'project_uuid');
+            var nonExisingProjectUuids = $scope.difference(projectUuids, existingProjectUuids);
+            deferred.resolve(nonExisingProjectUuids);
         });
-        if (parentUuids.length > 0)
-            _onDownloadProject(parentUuids, function() {
-                // do nothing on error, possibly we tried to create the existing parent project again
-            });
+        return deferred.promise;
     }
 
-    var initOnlineActionItems = function() {
+    /*
+    Failure is handled by reporting to UI and by rejecting promise
+    */
+    var _downloadServerProject = function(projectUuids) {
+        if (projectUuids.length < 1) return $q.when([]);
+        var deferred = $q.defer();
+        dcsService.getQuestionnaires(projectUuids).then(function(serverProjects) {
+            deferred.resolve(serverProjects);
+        }, function(serverError) {
+            'error_downloading_projects'.showError();
+            deferred.reject();
+        });
+        return deferred.promise;
+    };
+
+    var _downloadNonExistingParent = function(serverProjects) {
+        var parentUuids = getParentProjectUuids(serverProjects);
+        if (parentUuids.length === 0) return $q.when(serverProjects);
+
+        var deferred = $q.defer();
+        projectDao.getProjectByUuids(parentUuids).then(function(projects) {
+            var existingProjectUuids = $scope.pluck(projects, 'project_uuid');
+            var nonExisingProjectUuids = $scope.difference(parentUuids, existingProjectUuids);
+
+            _downloadServerProject(nonExisingProjectUuids).then(function(serverParentProjects) {
+                deferred.resolve(serverProjects.concat(serverParentProjects));
+            });
+        });
+        return deferred.promise;
+    }
+
+    var _createLocalProjects = function(projects) {
+        app.mapPromise(projects, projectDao.createProject).then( function(response) {
+            loadLocal();
+            'project_downloaded'.showInfo();
+        }, ''.showError.bind('error_saving_project'));
+    }
+
+
+    var getParentProjectUuids = function(projects) {
+        return $scope.chain(projects)
+            .where({'project_type': 'child'})
+            .pluck('parent_info')
+            .pluck('parent_uuid').value();
+    }
+
+    $scope.initOnlineActionItems = function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDownloadProject, 'label': resourceBundle.download });
         document.addEventListener('backbutton', loadLocal, false);

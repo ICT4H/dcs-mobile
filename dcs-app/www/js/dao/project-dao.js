@@ -8,6 +8,10 @@ dcsApp.service('projectDao',['store', function(store){
 			[project.project_uuid, project.version, 'updated', project.name, project.xform, project.headers, Date.parse(project.created), project.project_type, project.parent_info.parent_uuid, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids]);
 	};
 
+	this.getProjectByUuids = function(projectUuids) {
+		return store.execute('select * from projects where project_uuid IN(' +getParamHolders(projectUuids) +')',  projectUuids);
+	};
+
 	this.getAll = function() {
 		return store.execute('select project_uuid as id, version as rev from projects', []);
 	};
