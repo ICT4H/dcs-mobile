@@ -26,6 +26,8 @@ var paginationService = function() {
     };
 
     this.pagination.isLastPage = function() {
+        if(this.totalElement == 0)
+            return true;
         return window.Math.ceil(this.totalElement/this.pageSize) == this.pageNumber + 1;
     };
 
