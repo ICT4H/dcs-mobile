@@ -44,12 +44,13 @@ Provides submission create and update using enketo. Uses local store for persist
 */
     var dbSubmission, projectUuid;
 
-    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid) {
+    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid, currentParentUuid) {
         var submitCallback = submissionToEdit? onEdit: onNew,
             submitLabel = submissionToEdit? 'Update': 'Save';
 
         dbSubmission = submissionToEdit;
         projectUuid = currentProjectUuid;
+        parentUuid = currentParentUuid;
 
         loadEnketo({
             'buttonLabel': submitLabel,
@@ -78,7 +79,7 @@ Provides submission create and update using enketo. Uses local store for persist
         submissionDao.createSubmission(submission).then(function() {
             msg.displaySuccess('Saved');
             var goToSubmissionList = function() {
-                $location.url('/submission-list/' + projectUuid + '?type=all');
+                $location.url('/submission-list/' + (parentUuid?parentUuid:projectUuid) + '?type=all');
             }
             var reload = function() {
                 $route.reload();
@@ -106,9 +107,10 @@ This service holds the latest accessed parent data.
         //TODO if (!this.project) throw Error
         this.project = project;// project should be set first
         this._setSubmission(submission);
+        if(!this.isChildProject())
+            delete this.parentProject;
         if (this.isParentProject())
             this.parentProject = project;
-        delete this.parentProject;
     }
 
     this._setSubmission = function(submission) {
@@ -126,6 +128,10 @@ This service holds the latest accessed parent data.
 
     this.isChildProject = function() {
         return this.project.project_type == 'child';
+    }
+
+    this.getParentUuid = function() {
+        return this.parentProject? this.parentProject.project_uuid: undefined;
     }
 
     this.isParentProject = function() {
@@ -227,7 +233,8 @@ dcsApp.controller('submissionController',
                 submissionXformService.getXform(),
                 submissionXformService.getModelStr(),
                 submission,
-                $scope.project_uuid);
+                $scope.project_uuid,
+                submissionXformService.getParentUuid());
         });
     });
 
