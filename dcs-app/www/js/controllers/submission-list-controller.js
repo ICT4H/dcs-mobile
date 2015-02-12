@@ -162,7 +162,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onNew = function() {
-        $location.path('/projects/' + $scope.project_uuid + '/submissions/new');
+        $location.url('/projects/' + $scope.project_uuid + '/submissions/new');
     };
 
     function loadLocalSubmissionUuid(submission_uuid) {
