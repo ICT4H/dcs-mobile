@@ -23,7 +23,7 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
+dcsApp.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
@@ -96,14 +96,17 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
     // back link in app page
     $rootScope.goBack = function() {
         var backLocation = backHandler.onBack();
-       //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
-       if (backLocation) {
-           console.log('backbutton clicked: going to: ' + backLocation);
-           $location.path(backLocation);
-       } else {
-           console.log('backbutton clicked: implicit navigation...');
-           return false;
-       }
+        //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
+        if (backLocation) {
+            console.log('backbutton clicked: going to: ' + backLocation);
+            $location.path(backLocation);
+            $route.reload();
+        } else {
+            console.log('backbutton clicked: implicit navigation...');
+            $location.path('/local-project-list');
+            $route.reload();
+            return false;
+        }
     }
 
     // device back button
