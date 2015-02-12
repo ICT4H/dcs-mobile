@@ -47,7 +47,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         _getNonExistingProjectUuids(selectedProject)
             .then(_downloadServerProject)
             .then(_downloadNonExistingParent)
-            .then(_createLocalProjects);
+            .then(_createUniqueLocalProjects);
     };
 
     var _getNonExistingProjectUuids = function(projectUuids) {
@@ -55,7 +55,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         projectDao.getProjectByUuids(projectUuids).then(function(projects) {
             var existingProjectUuids = $scope.pluck(projects, 'project_uuid');
             var nonExisingProjectUuids = $scope.difference(projectUuids, existingProjectUuids);
-            deferred.resolve(nonExisingProjectUuids);
+            if (nonExisingProjectUuids.length > 0)
+                deferred.resolve(nonExisingProjectUuids);
+            else
+                'project_exists_locally'.showInfo();
+                deferred.reject();
         });
         return deferred.promise;
     }
@@ -91,8 +95,15 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         return deferred.promise;
     }
 
-    var _createLocalProjects = function(projects) {
-        app.mapPromise(projects, projectDao.createProject).then( function(response) {
+    var _excludeDuplicateParents = function(serverProjects, parentUuids) {
+        return $scope.chain(serverProjects)
+                    .pluck('project_uuid')
+                    .uniq(parentUuids).value();
+    }
+
+    var _createUniqueLocalProjects = function(projects) {
+        var uniqueProjects = $scope.uniq(projects, $scope.iteratee('project_uuid'));
+        app.mapPromise(uniqueProjects, projectDao.createProject).then( function(response) {
             loadLocal();
             'project_downloaded'.showInfo();
         }, ''.showError.bind('error_saving_project'));
