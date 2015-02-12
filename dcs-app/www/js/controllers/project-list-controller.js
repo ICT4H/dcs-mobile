@@ -17,6 +17,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadLocal = function() {
+        $scope.showBack = false;
         selectedProject = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
@@ -29,6 +30,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     var loadServer = function() {
+        $scope.showBack = true;
         selectedProject = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
