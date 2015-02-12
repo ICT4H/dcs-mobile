@@ -6,7 +6,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.actions = [];
     $scope.title = "";
     $scope.showSearch = false;
-
+    $scope.serverPage = false;
     // private variable
     var selectedProject = [];
 
@@ -19,6 +19,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var loadLocal = function() {
         $scope.showBack = false;
         selectedProject = [];
+        $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
             (501).showInfo();
@@ -32,6 +33,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var loadServer = function() {
         $scope.showBack = true;
         selectedProject = [];
+        $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
             (501).showInfo();
@@ -122,7 +124,6 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.initOnlineActionItems = function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDownloadProject, 'label': resourceBundle.download });
-        document.addEventListener('backbutton', loadLocal, false);
         $scope.title = resourceBundle.serverProjectTitle;
     };
 
@@ -211,6 +212,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.showUnsubmitted = function(project) {
         $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
+    };
+
+    $scope.goBack = function() {
+        loadLocal();
     };
 
     loadLocal();

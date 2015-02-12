@@ -1,4 +1,18 @@
 <span ui-content-for="title"><span ng-hide="showSearch">{{ title }}</span></span>
+<div ng-if="serverPage">
+    <div ui-content-for="sideBar">
+        <div class="btn" ng-click="goBack()">
+            <i class="fa fa-arrow-left fa-2x"></i> 
+        </div>
+    </div>
+</div>
+<div ng-if="!serverPage">
+    <div ui-content-for="sideBar">
+        <div ui-toggle="uiSidebarLeft" class="btn sidebar-toggle">
+            <i class="fa fa-bars fa-2x"></i> 
+        </div>
+    </div>
+</div>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>

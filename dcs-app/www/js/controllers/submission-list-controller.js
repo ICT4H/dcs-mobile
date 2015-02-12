@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, backButtonService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
@@ -16,7 +16,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.outdateProject = false;
     $scope.deletedProject = false;
     $scope.showSearch = false;
-    backHandler.setToProjects();
 
     $scope.flipSearch = function() {
         $scope.showSearch = !$scope.showSearch;
@@ -236,10 +235,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var loadServer = function() {
         $scope.serverPage = true;
-        type = "server";
-        $scope.title =  type + " data";
+        $scope.title =  "server data";
         selectedSubmission = [];
-        backHandler.setToSubmissions();
+        backButtonService.add('server', '/submission-list/' + $scope.project_uuid + '?type=all');
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initServerActions();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
@@ -249,12 +247,16 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     };
 
+    var onPull = function() {
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=server');
+    };
+
     var initOfflineActions =  function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDelete, 'label': 'Delete' });
         $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
-        $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
+        $scope.actions.push({'onClick': onPull, 'label': 'Pull Submissions'});
         $scope.actions.push({'onClick': onDeltaPull, 'label': 'Delta Pull'});
     };
 
@@ -270,5 +272,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'backButtonService', submissionListController]);
 

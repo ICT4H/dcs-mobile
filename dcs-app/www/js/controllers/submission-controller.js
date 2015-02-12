@@ -218,7 +218,6 @@ dcsApp.controller('submissionController',
     var buttonLabel = submission_id == "null" ?'Save':'Update';
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
-    backHandler.setToSubmissions();
 
     dataProvider.init($scope.project_uuid, localStore, null);
 
