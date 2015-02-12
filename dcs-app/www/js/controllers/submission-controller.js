@@ -157,7 +157,7 @@ This service holds the latest accessed parent data.
         //TODO remove harcoded action label; use value from child project.
         //TODO loop and create as many add as many children by split by ',' on project.child_ids
         urlsToAddChildren['new_child'] = {
-            'label': 'New Child',
+            'label': 'New Entry',
             'url': urlToAddChild
         };
         return urlsToAddChildren;
