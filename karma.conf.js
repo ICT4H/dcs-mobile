@@ -25,7 +25,6 @@ module.exports = function(config){
       SPECS+'device-back-handler-specs.js',
       SPECS+'file-handler-specs.js',
       SPECS+'project-controller-tests.js',
-      SPECS+'backButton-service-specs.js',
       //SPECS+'submission-controller-specs.js',
 
       { pattern: APP+'www/i18n/resourceBundle.json',
@@ -41,7 +40,7 @@ module.exports = function(config){
     ],
 
     frameworks: ['jasmine-jquery', 'jasmine'],
-    reporters: ['progress', 'html'],
+
     browsers : ['Chrome'],
 
     plugins : [

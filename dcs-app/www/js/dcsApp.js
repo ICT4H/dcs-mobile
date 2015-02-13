@@ -23,17 +23,17 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', 'backButtonService', function($rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app, backButtonService) {
+dcsApp.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
 
     $rootScope.$on('$locationChangeSuccess', function(event, currentUrl, previousUrl) {
-        backButtonService.setUrl(previousUrl, currentUrl);
+        //locationService.setUrl(previousUrl, currentUrl);
     });
     
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-        backButtonService.setController(current, next);
+        backHandler.onRouteChange($location.path());
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
             $location.path('/');
@@ -93,11 +93,24 @@ dcsApp.run(['$rootScope', '$location', '$interval', '$timeout', 'messageService'
 
     $rootScope.showSearchicon = true;
 
+    // back link in app page
     $rootScope.goBack = function() {
-        $location.url(backButtonService.goBack());
-    };
+        var backLocation = backHandler.onBack();
+        //TODO fix- since onBack on server project is asyn, else is executed & local projects are listed
+        if (backLocation) {
+            console.log('backbutton clicked: going to: ' + backLocation);
+            $location.path(backLocation);
+            $route.reload();
+        } else {
+            console.log('backbutton clicked: implicit navigation...');
+            $location.path('/local-project-list');
+            $route.reload();
+            return false;
+        }
+    }
 
+    // device back button
     document.addEventListener('backbutton', function() {
-        $location.url(backButtonService.goBack());
+       return $rootScope.goBack();
     }, false);
 }]);
