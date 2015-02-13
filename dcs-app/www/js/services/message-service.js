@@ -1,5 +1,5 @@
 dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
-
+    this.isErrorMessage = false;
     $rootScope.messages = {};
     $rootScope.notificationLength = 0;
     var message = function(backUrl, css) {
@@ -64,8 +64,10 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     };
 
     this.hideMessage = function() {
-        $rootScope.showMessage = false;
-        apply();
+        if(!this.isErrorMessage) {
+            $rootScope.showMessage = false;
+            apply();
+        }
     };
 
     this.showLoading = function() {
@@ -79,15 +81,17 @@ dcsApp.service('messageService', ['$rootScope', function ($rootScope) {
     };
 
     this.displaySuccess = function(msg) {
-        console.log($rootScope.messages);
+        this.isErrorMessage = false;
         enableMessage("alert-success", msg);
     };
 
     this.displayInfo = function(message) {
+        this.isErrorMessage = false;
         enableMessage("alert-info", message);
     };
 
     this.displayError = function(msg) {
+        this.isErrorMessage = true;
         enableMessage("alert-danger", msg);
     };
 
