@@ -60,5 +60,6 @@
     "createSubmission": "Fill the Form",
     "applied_server": "Applied server changes.",
     "applied_local": "Applied local changes.",
-    "applying_changes": "Appling Changes"
+    "applying_changes": "Appling Changes",
+    "error_in_connecting": "Unable to connect server."
 }

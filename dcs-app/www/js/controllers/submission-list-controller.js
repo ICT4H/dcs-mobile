@@ -101,7 +101,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                         });
                     });
                 });
-            });
+            }, function() {msg.hideLoadingWithErr(resourceBundle.error_in_connecting);});
         }); 
     };
 
@@ -140,8 +140,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             msg.hideLoadingWithInfo('Submitted successfully');
             loadLocal();
         },function(error){
-            console.log(error);
-            msg.hideLoadingWithErr('something went wrong ' + error);
+            msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
         });
     };
 

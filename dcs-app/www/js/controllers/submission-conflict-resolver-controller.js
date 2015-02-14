@@ -15,7 +15,7 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
                 $scope.localSubmission = localSubmission;
                 getConflictDict($scope.serverSubmission, localSubmission);
             });
-        });
+        }, function() {msg.hideLoadingWithErr(resourceBundle.error_in_connecting);});
     };
 
     var getConflictDict = function(serverSubmission, localSubmission) {

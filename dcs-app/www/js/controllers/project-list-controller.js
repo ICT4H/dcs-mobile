@@ -19,6 +19,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var loadLocal = function() {
         $scope.showBack = false;
         selectedProject = [];
+        $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
             (501).showInfo();
@@ -32,13 +33,16 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var loadServer = function() {
         $scope.showBack = true;
         selectedProject = [];
+        $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
             (501).showInfo();
             $scope.initOnlineActionItems();
             dcsService.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignResult, (103).showError);
+                    .then(assignResult, function() {
+                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+                    });
         });
     };
 
@@ -169,6 +173,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
                 loadLocal();
                 (505).showInfo();
             }, (107).showError);
+        }, function(error, status) {
+            msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
         });
     };
 
