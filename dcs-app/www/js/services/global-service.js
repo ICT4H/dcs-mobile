@@ -190,6 +190,8 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
         return $q.all(array.map(callBack));
     };
 
+    this.goBack = function() {};
+
     this.areItemSelected = function(selectedProject) {
         if(selectedProject.length ==0) {
             navigator.notification.alert('You need to select atleast one item.', function() {}, "Garner");

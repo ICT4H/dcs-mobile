@@ -41,7 +41,6 @@ var app = {
         fileSystem = new CordovaFileSytem();
         cordovaDeviceHandler = new CordovaDeviceHandler(navigator);
         fileSystem.init();
-        backHandler = new BackHandler(navigatorWrapper);
         angular.bootstrap( document.getElementsByTagName("body")[0], [ 'dcsApp' ]);
         console.log('app loaded');
     }

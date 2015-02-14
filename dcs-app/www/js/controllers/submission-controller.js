@@ -205,9 +205,9 @@ var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
 
 dcsApp.controller('submissionController',
     ['$scope', '$routeParams', '$location', 'submissionDao','messageService', 'dcsService', 'paginationService',
-    'dialogService', 'submissionXformService', 'enketoService', 'dataProvider',
+    'dialogService', 'submissionXformService', 'enketoService', 'dataProvider', 'app',
     function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService,
-        dialogService, submissionXformService, enketoService, dataProvider){
+        dialogService, submissionXformService, enketoService, dataProvider, app){
     
     $scope.showSearchicon = false;
     $scope.project_uuid = $routeParams.project_uuid;
@@ -218,7 +218,6 @@ dcsApp.controller('submissionController',
     var buttonLabel = submission_id == "null" ?'Save':'Update';
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
-    backHandler.setToSubmissions();
 
     dataProvider.init($scope.project_uuid, localStore, null);
 
@@ -237,6 +236,10 @@ dcsApp.controller('submissionController',
                 submissionXformService.getParentUuid());
         });
     });
+
+    app.goBack = function() {
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type);
+    };
 
     var addPagination = function(type, currentIndex, total) {
         var baseUrl = '/projects/'+$scope.project_uuid+'/submissions/'+currentIndex+'/';

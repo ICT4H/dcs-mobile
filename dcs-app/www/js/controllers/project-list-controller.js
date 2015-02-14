@@ -213,6 +213,15 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
     };
 
+    app.goBack = function() {
+        if($scope.serverPage)
+            loadLocal();
+        else
+            dialogService.confirmBox("Do you want to exit?", function() {
+                    navigator.app.exitApp();
+            }, function() {});
+    };
+
     loadLocal();
 };
 

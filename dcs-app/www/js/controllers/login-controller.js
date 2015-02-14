@@ -1,4 +1,4 @@
-var loginController = function($scope, $location, userDao, msg, app, dcsService) {
+var loginController = function($scope, $location, userDao, msg, app, dcsService, dialogService) {
     $scope.title = "Garner";
     $scope.users = [];
     $scope.user = {};
@@ -55,7 +55,13 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService)
         }));
     };
 
+    app.goBack = function() {
+        dialogService.confirmBox("Do you want to exit?", function() {
+            navigator.app.exitApp();
+        }, function() {});
+    };
+
     onLoad();
 
 };
-dcsApp.controller('loginController', ['$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', loginController]);
+dcsApp.controller('loginController', ['$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', 'dialogService', loginController]);

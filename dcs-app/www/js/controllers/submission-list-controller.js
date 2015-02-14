@@ -16,7 +16,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.outdateProject = false;
     $scope.deletedProject = false;
     $scope.showSearch = false;
-    backHandler.setToProjects();
 
     $scope.flipSearch = function() {
         $scope.showSearch = !$scope.showSearch;
@@ -236,25 +235,22 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var loadServer = function() {
         $scope.serverPage = true;
-        type = "server";
         $scope.title =  type + " data";
         selectedSubmission = [];
-        backHandler.setToSubmissions();
         msg.showLoadingWithInfo(resourceBundle.loading_submissions);
         initServerActions();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
             .then(assignServerSubmissions, ErrorLoadingSubmissions);
         });
-
     };
 
     var initOfflineActions =  function() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onDelete, 'label': 'Delete' });
+        $scope.actions.push({'onClick': onDelete, 'label': 'Delete'});
         $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
         $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
-        $scope.actions.push({'onClick': loadServer, 'label': 'Pull Submissions'});
+        $scope.actions.push({'onClick': goToServerSubmissions, 'label': 'Pull Submissions'});
         $scope.actions.push({'onClick': onDeltaPull, 'label': 'Delta Pull'});
     };
 
@@ -263,8 +259,19 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         app.flipArrayElement(selectedSubmission, submission.submission_id);
     };
 
+    var goToServerSubmissions = function() {
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=server');
+    };
+
     $scope.resolveConflict = function(submission_uuid) {
         $location.url('/conflict-resolver/' + $scope.project_uuid + "/" + submission_uuid);
+    };
+
+    app.goBack = function() {
+        if($scope.serverPage)
+            $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
+        else
+            $location.url('/local-project-list');
     };
 
     loadLocal();
