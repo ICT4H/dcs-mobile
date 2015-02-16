@@ -1,13 +1,11 @@
 
-dcsApp.service('dataProvider', ['$q', function($q) {
+dcsApp.service('dataProvider', ['$q' ,'submissionDao', function($q, submissionDao) {
 /*
 Provides abstraction over local store and server service.
 */
-    this.init = function(projectUuid, submissionDao, serverService, isServer) {
+    this.init = function(projectUuid, isServer) {
         this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
         this.projectUuid = projectUuid;
-        this.submissionDao = submissionDao;
-        this.serverService = serverService;
     };
 
     this.getSubmission = function(currentIndex, searchStr, type) {
@@ -16,7 +14,7 @@ Provides abstraction over local store and server service.
         if (this.isServer) {
 
         } else {
-            return this.submissionDao.searchSubmissionsByType(this.projectUuid, type, searchStr, currentIndex, 1).then(function(result) {
+            return submissionDao.searchSubmissionsByType(this.projectUuid, type, searchStr, currentIndex, 1).then(function(result) {
                 return result;
             });
         }
@@ -32,7 +30,7 @@ Provides abstraction over local store and server service.
         if (this.takeCachedProject) {
             return $q.when(cachedProject);
         } else {
-            return this.submissionDao.getProjectById(this.projectUuid).then(setProjectInCache);
+            return submissionDao.getProjectById(this.projectUuid).then(setProjectInCache);
         }
     }
 }]);
@@ -204,10 +202,8 @@ var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
 }
 
 dcsApp.controller('submissionController',
-    ['$scope', '$routeParams', '$location', 'submissionDao','messageService', 'dcsService', 'paginationService',
-    'dialogService', 'submissionXformService', 'enketoService', 'dataProvider', 'app',
-    function($scope, $routeParams, $location, localStore, msg, dcsService, paginationService,
-        dialogService, submissionXformService, enketoService, dataProvider, app){
+    ['$scope', '$routeParams', '$location', 'submissionXformService', 'enketoService', 'dataProvider', 'app',
+    function($scope, $routeParams, $location, submissionXformService, enketoService, dataProvider, app){
     
     $scope.showSearchicon = false;
     $scope.project_uuid = $routeParams.project_uuid;
@@ -219,7 +215,7 @@ dcsApp.controller('submissionController',
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
 
-    dataProvider.init($scope.project_uuid, localStore, null);
+    dataProvider.init($scope.project_uuid, $scope.server);
 
     dataProvider.getProject().then(function(project) {
         dataProvider.getSubmission(currentIndex, searchStr, type).then(function(result) {
