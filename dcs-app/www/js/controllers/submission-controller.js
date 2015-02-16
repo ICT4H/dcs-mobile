@@ -44,7 +44,7 @@ Provides submission create and update using enketo. Uses local store for persist
 */
     var dbSubmission, projectUuid;
 
-    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid, currentParentUuid) {
+    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid, currentParentUuid, isParentProject) {
         var submitCallback = submissionToEdit? onEdit: onNew,
             submitLabel = submissionToEdit? 'Update': 'Save';
 
@@ -54,7 +54,7 @@ Provides submission create and update using enketo. Uses local store for persist
 
         loadEnketo({
             'buttonLabel': submitLabel,
-            'hideButton': submitLabel? false:true,
+            'hideButton': isParentProject? true:false,
             'onButtonClick': submitCallback,
             'submissionXml': submissionXml,
             'xform': xform
@@ -226,14 +226,15 @@ dcsApp.controller('submissionController',
             var submission = result && result.data[0];
             addPagination(type, currentIndex, result && result.total);
             submissionXformService.setProjectAndSubmission(project, submission);
-            // TODO Add action to delete the displayed submission
             $scope.urlsToAddChildren = submissionXformService.getUrlsToAddChildren($location.url);
+
             enketoService.loadEnketo(
                 submissionXformService.getXform(),
                 submissionXformService.getModelStr(),
                 submission,
                 $scope.project_uuid,
-                submissionXformService.getParentUuid());
+                submissionXformService.getParentUuid(), 
+                submissionXformService.isParentProject());
         });
     });
 
