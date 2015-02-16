@@ -35,29 +35,33 @@ Provides abstraction over local store and server service.
     }
 }]);
 
-dcsApp.service('enketoService', ['$location', '$route', 'submissionDao', 'messageService', 'dialogService',
-                        function($location, $route, submissionDao, msg, dialogService) {
+dcsApp.service('enketoService', ['$location', '$route', 'submissionXformService' ,'submissionDao', 'messageService', 'dialogService',
+                        function($location, $route, submissionXformService, submissionDao, msg, dialogService) {
 /*
 Provides submission create and update using enketo. Uses local store for persistence.
 */
-    var dbSubmission, projectUuid;
+    var dbSubmission, parentUuid, projectUuid;
 
-    this.loadEnketo = function(xform, submissionXml, submissionToEdit, currentProjectUuid, currentParentUuid, isParentProject) {
-        var submitCallback = submissionToEdit? onEdit: onNew,
-            submitLabel = submissionToEdit? 'Update': 'Save';
+    this.loadEnketo = function(project, submissionToEdit) {
 
+        projectUuid = project.project_uuid;
         dbSubmission = submissionToEdit;
-        projectUuid = currentProjectUuid;
-        parentUuid = currentParentUuid;
+
+        submissionXformService.setProjectAndSubmission(project, submissionToEdit);
+        parentUuid = submissionXformService.getParentUuid();
 
         loadEnketo({
-            'buttonLabel': submitLabel,
-            'hideButton': isParentProject? true:false,
-            'onButtonClick': submitCallback,
-            'submissionXml': submissionXml,
-            'xform': xform
+            'buttonLabel': submissionToEdit? 'Update': 'Save',
+            'hideButton': submissionXformService.isParentProject()? true:false,
+            'onButtonClick': submissionToEdit? onEdit: onNew,
+            'submissionXml': submissionXformService.getModelStr(),
+            'xform': submissionXformService.getXform()
         });
     };
+
+    this.getUrlsToAddChildren = function() {
+        return submissionXformService.getUrlsToAddChildren();;
+    }
 
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
@@ -77,7 +81,7 @@ Provides submission create and update using enketo. Uses local store for persist
         submissionDao.createSubmission(submission).then(function() {
             msg.displaySuccess('Saved');
             var goToSubmissionList = function() {
-                $location.url('/submission-list/' + (parentUuid?parentUuid:projectUuid) + '?type=all');
+                $location.url('/submission-list/' + (parentUuid? parentUuid : projectUuid) + '?type=all');
             }
             var reload = function() {
                 $route.reload();
@@ -150,7 +154,7 @@ This service holds the latest accessed parent data.
         return this.submission? this.submission.xml : '';
     }
 
-    this.getUrlsToAddChildren =  function(onClick) {
+    this.getUrlsToAddChildren =  function() {
         var is_new_parent_or_is_not_parent = !this.submission || !this.isParentProject()
         if (is_new_parent_or_is_not_parent) return;
 
@@ -202,44 +206,32 @@ var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
 }
 
 dcsApp.controller('submissionController',
-    ['$scope', '$routeParams', '$location', 'submissionXformService', 'enketoService', 'dataProvider', 'app',
-    function($scope, $routeParams, $location, submissionXformService, enketoService, dataProvider, app){
+    ['$scope', '$routeParams', '$location', 'enketoService', 'dataProvider', 'app',
+    function($scope, $routeParams, $location, enketoService, dataProvider, app){
     
     $scope.showSearchicon = false;
-    $scope.project_uuid = $routeParams.project_uuid;
     $scope.server = $routeParams.server == "true"? true:false;
 
-    var searchStr = $scope.searchStr || "";
-    var submission_id = $routeParams.submission_id;
-    var buttonLabel = submission_id == "null" ?'Save':'Update';
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
 
-    dataProvider.init($scope.project_uuid, $scope.server);
+    dataProvider.init($routeParams.project_uuid, $scope.server);
 
     dataProvider.getProject().then(function(project) {
-        dataProvider.getSubmission(currentIndex, searchStr, type).then(function(result) {
+        dataProvider.getSubmission(currentIndex, $scope.searchStr, type).then(function(result) {
             var submission = result && result.data[0];
             addPagination(type, currentIndex, result && result.total);
-            submissionXformService.setProjectAndSubmission(project, submission);
-            $scope.urlsToAddChildren = submissionXformService.getUrlsToAddChildren($location.url);
-
-            enketoService.loadEnketo(
-                submissionXformService.getXform(),
-                submissionXformService.getModelStr(),
-                submission,
-                $scope.project_uuid,
-                submissionXformService.getParentUuid(), 
-                submissionXformService.isParentProject());
+            enketoService.loadEnketo(project, submission);
+            $scope.urlsToAddChildren = enketoService.getUrlsToAddChildren();
         });
     });
 
     app.goBack = function() {
-        $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type);
+        $location.url('/submission-list/' + $routeParams.project_uuid + '?type=' + type);
     };
 
     var addPagination = function(type, currentIndex, total) {
-        var baseUrl = '/projects/'+$scope.project_uuid+'/submissions/'+currentIndex+'/';
+        var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
         $scope.page = new Page($location, baseUrl, type, currentIndex, total);
     }
 }]);
