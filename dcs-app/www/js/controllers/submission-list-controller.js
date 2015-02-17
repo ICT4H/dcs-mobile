@@ -119,9 +119,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     //     }
     // };
 
-    var post_selected_submissions = function() {
+    var post_selected_submissions = function(submission_ids) {
         var multiplePromises = [];
-        selectedSubmission.forEach(function(submissionId) {
+        submission_ids.forEach(function(submissionId) {
             multiplePromises.push(
                 submissionDao.getSubmissionById(submissionId)
                     .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
@@ -131,17 +131,34 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return multiplePromises;
     };
 
-    var onPost = function() {
+    var onSubmit = function() {
         if(!app.areItemSelected(selectedSubmission)) return;
 
-        msg.showLoading();
-        $q.all(post_selected_submissions()) .then(function() {
-            "data_submitted".showInfo();
+        "data_submit_msg".showInfoWithLoading();
+        $q.all(post_selected_submissions(selectedSubmission)).then(function() {
             loadLocal();
         },function(error){
             msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
         });
     };
+
+    var onSubmitAllChanges = function() {
+        //TODO remove the 100 magic number
+        submissionDao.searchSubmissionsByType($scope.project_uuid, 'unsubmitted', '', 0, 100).then(function(result) {
+            if (result.total < 1) {
+                "no_changes_to_submit".showError();
+                return    
+            }
+            
+            var unsubmitted_ids = $scope.pluck(result.data, 'submission_id');
+            "submitting_changes_msg".showInfoWithLoading();
+            $q.all(post_selected_submissions(unsubmitted_ids)).then(function() {
+                loadLocal();
+            },function(error){
+                msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+            });
+        });
+    }
 
     var onDelete = function() {
         if(!app.areItemSelected(selectedSubmission)) return;
@@ -243,7 +260,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var initOfflineActions =  function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
-        $scope.actions.push({'onClick': onPost, 'label': resourceBundle.submit});
+        $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+        $scope.actions.push({'onClick': onSubmitAllChanges, 'label': resourceBundle.submit_changes});
         $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
         $scope.actions.push({'onClick': goToServerSubmissions, 'label': resourceBundle.download});
         $scope.actions.push({'onClick': onDeltaPull, 'label': resourceBundle.download_delta});
