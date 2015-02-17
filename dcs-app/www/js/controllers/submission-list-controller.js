@@ -246,11 +246,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var initOfflineActions =  function() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onDelete, 'label': 'Delete'});
-        $scope.actions.push({'onClick': onPost, 'label': 'Submit Submissions'});
-        $scope.actions.push({'onClick': onNew, 'label': 'Make submission'});
-        $scope.actions.push({'onClick': goToServerSubmissions, 'label': 'Pull Submissions'});
-        $scope.actions.push({'onClick': onDeltaPull, 'label': 'Delta Pull'});
+        $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
+        $scope.actions.push({'onClick': onPost, 'label': resourceBundle.submit});
+        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
+        $scope.actions.push({'onClick': goToServerSubmissions, 'label': resourceBundle.download});
+        $scope.actions.push({'onClick': onDeltaPull, 'label': resourceBundle.download_delta});
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {
