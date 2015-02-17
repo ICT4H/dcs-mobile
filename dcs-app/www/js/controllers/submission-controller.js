@@ -37,8 +37,8 @@ Provides abstraction over local store and server service.
     }
 }]);
 
-dcsApp.service('enketoService', ['$location', '$route', 'submissionXformService' ,'submissionDao', 'messageService', 'dialogService',
-                        function($location, $route, submissionXformService, submissionDao, msg, dialogService) {
+dcsApp.service('enketoService', ['$location', '$route', 'contextService' ,'submissionDao', 'messageService', 'dialogService',
+                        function($location, $route, contextService, submissionDao, msg, dialogService) {
 /*
 Provides submission create and update using enketo. Uses local store for persistence.
 */
@@ -49,20 +49,20 @@ Provides submission create and update using enketo. Uses local store for persist
         projectUuid = project.project_uuid;
         dbSubmission = submissionToEdit;
 
-        submissionXformService.setProjectAndSubmission(project, submissionToEdit);
-        parentUuid = submissionXformService.getParentUuid();
+        contextService.setProjectAndSubmission(project, submissionToEdit);
+        parentUuid = contextService.getParentUuid();
 
         loadEnketo({
             'buttonLabel': submissionToEdit? 'Update': 'Save',
-            'hideButton': submissionXformService.isParentProject()? true:false,
+            'hideButton': contextService.isParentProject()? true:false,
             'onButtonClick': submissionToEdit? onEdit: onNew,
-            'submissionXml': submissionXformService.getModelStr(),
-            'xform': submissionXformService.getXform()
+            'submissionXml': contextService.getModelStr(),
+            'xform': contextService.getXform()
         });
     };
 
     this.getUrlsToAddChildren = function() {
-        return submissionXformService.getUrlsToAddChildren();;
+        return contextService.getUrlsToAddChildren();;
     }
 
     var onEdit = function(submission) {
@@ -94,86 +94,6 @@ Provides submission create and update using enketo. Uses local store for persist
         });
     };
 }]);
-
-dcsApp.service('submissionXformService', [function() {
-/*
-This service provides the xform html and model string. For Correlated project,
-it uses SurveyRelation to provide xform html and model string.
-For parent edit/view, url links to create children are provided.
-
-The assumption is for new child submission, parent submission will be accessed first.
-This service holds the latest accessed parent data.
-*/
-
-    var relationHandler;
-
-    this.setProjectAndSubmission = function(project, submission) {
-        //TODO if (!this.project) throw Error
-        this.project = project;// project should be set first
-        this._setSubmission(submission);
-        if(!this.isChildProject())
-            delete this.parentProject;
-        if (this.isParentProject())
-            this.parentProject = project;
-    }
-
-    this._setSubmission = function(submission) {
-        this.submission = submission;
-        if (this.isParentProject())
-            this.parentSubmission = submission;
-
-        if (this.isChildProject()) {
-            //TODO fixme when editing child submission, parentSubmission wont hv been loaded.
-            relationHandler = new SurveyRelation(this.project, this.parentSubmission? JSON.parse(this.parentSubmission.data): JSON.parse(this.submission.data));
-        }
-        //TODO commenting as this wont allow to navigate across child submissions
-        //delete this.parentSubmission;
-    }
-
-    this.isChildProject = function() {
-        return this.project.project_type == 'child';
-    }
-
-    this.getParentUuid = function() {
-        return this.parentProject? this.parentProject.project_uuid: undefined;
-    }
-
-    this.isParentProject = function() {
-        return this.project.project_type == 'parent';
-    }
-
-    this.getXform = function() {
-        if (this.isChildProject())
-            return relationHandler.add_note_fields_for_parent_values();
-        return this.project.xform;
-    }
-
-    this.getModelStr = function() {
-        var is_child_and_is_not_edit_of_child = this.isChildProject() && !this.submission;
-        if (is_child_and_is_not_edit_of_child)
-            // getUpdatedModelStr rename to getModelStrWithParentValues
-            return relationHandler.getUpdatedModelStr();
-        return this.submission? this.submission.xml : '';
-    }
-
-    this.getUrlsToAddChildren =  function() {
-        var is_new_parent_or_is_not_parent = !this.submission || !this.isParentProject()
-        if (is_new_parent_or_is_not_parent) return;
-
-        var urlToAddChild = '#/projects/'+this.project.child_ids+
-                    '/submissions/new_child?parent_id='+this.project.project_uuid+
-                    '&parent_submission_id='+this.parentSubmission.submission_id;
-        var urlsToAddChildren = {};
-        //TODO remove harcoded action label; use value from child project.
-        //TODO loop and create as many add as many children by split by ',' on project.child_ids
-        urlsToAddChildren['new_child'] = {
-            'label': 'New Entry',
-            'url': urlToAddChild
-        };
-        return urlsToAddChildren;
-    };
-}]);
-
 
 var Page = function($location, baseUrl, type, searchStr, currentIndex, totalRecords) {
 
