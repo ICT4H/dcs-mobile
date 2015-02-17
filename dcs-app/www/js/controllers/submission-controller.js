@@ -3,18 +3,20 @@ dcsApp.service('dataProvider', ['$q' ,'submissionDao', function($q, submissionDa
 /*
 Provides abstraction over local store and server service.
 */
-    this.init = function(projectUuid, isServer) {
+    this.init = function(projectUuid, type, searchStr, isServer) {
         this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
         this.projectUuid = projectUuid;
+        this.type = type;
+        this.searchStr = searchStr;
     };
 
-    this.getSubmission = function(currentIndex, searchStr, type) {
+    this.getSubmission = function(currentIndex) {
         if (isNaN(currentIndex)) return $.when();
 
         if (this.isServer) {
 
         } else {
-            return submissionDao.searchSubmissionsByType(this.projectUuid, type, searchStr, currentIndex, 1).then(function(result) {
+            return submissionDao.searchSubmissionsByType(this.projectUuid, this.type, this.searchStr, currentIndex, 1).then(function(result) {
                 return result;
             });
         }
@@ -173,7 +175,7 @@ This service holds the latest accessed parent data.
 }]);
 
 
-var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
+var Page = function($location, baseUrl, type, searchStr, currentIndex, totalRecords) {
 
     this.getTotal = function() {
         return totalRecords;
@@ -197,11 +199,11 @@ var Page = function($location, baseUrl, type, currentIndex, totalRecords) {
     }
 
     this.onNext = function() {
-        $location.url(baseUrl + '?type='+type+'&currentIndex=' + (currentIndex+1));
+        $location.url(baseUrl + '?type='+type+'&searchStr='+searchStr+'&currentIndex=' + (currentIndex+1));
     }
 
     this.onPrevious = function() {
-        $location.url(baseUrl + '?type='+type+'&currentIndex=' + (currentIndex-1));
+        $location.url(baseUrl + '?type='+type+'&searchStr='+searchStr+'&currentIndex=' + (currentIndex-1));
     }
 }
 
@@ -214,13 +216,14 @@ dcsApp.controller('submissionController',
 
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
+    var searchStr = $routeParams.searchStr || '';
 
-    dataProvider.init($routeParams.project_uuid, $scope.server);
+    dataProvider.init($routeParams.project_uuid, type, searchStr, $scope.server);
 
     dataProvider.getProject().then(function(project) {
-        dataProvider.getSubmission(currentIndex, $scope.searchStr, type).then(function(result) {
+        dataProvider.getSubmission(currentIndex).then(function(result) {
             var submission = result && result.data[0];
-            addPagination(type, currentIndex, result && result.total);
+            addPagination(type, searchStr, currentIndex, result && result.total);
             enketoService.loadEnketo(project, submission);
             $scope.urlsToAddChildren = enketoService.getUrlsToAddChildren();
         });
@@ -230,8 +233,8 @@ dcsApp.controller('submissionController',
         $location.url('/submission-list/' + $routeParams.project_uuid + '?type=' + type);
     };
 
-    var addPagination = function(type, currentIndex, total) {
+    var addPagination = function(type, searchStr, currentIndex, total) {
         var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
-        $scope.page = new Page($location, baseUrl, type, currentIndex, total);
+        $scope.page = new Page($location, baseUrl, type, searchStr, currentIndex, total);
     }
 }]);
