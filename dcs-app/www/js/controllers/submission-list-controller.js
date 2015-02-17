@@ -29,7 +29,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var ErrorLoadingSubmissions = function(data, error) {
-        msg.hideLoadingWithErr('Failed to load Submissions');
+        msg.hideLoadingWithErr(resourceBundle.failed_to_load_data);
     };
 
     $scope.setPathForView = function(submissionId, isFromServer, index) {
@@ -45,7 +45,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var loadLocal = function() {
         $scope.serverPage = false;
         $scope.title =  type + " data";
-        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        msg.showLoadingWithInfo(resourceBundle.loading_data);
         initOfflineActions();
         selectedSubmission = [];
         if(type == "server") {
@@ -67,7 +67,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         var promises = [];
         
         submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
-            msg.showLoadingWithInfo("Fetching submissions.....");
+            "downloading_delta".showInfoWithLoading();
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 
                 var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
@@ -96,8 +96,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                     promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
                     app.promises(promises, function() {
                         submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
-                            loadLocal(); 
-                            msg.hideLoadingWithInfo("submissions updated.");
+                            loadLocal();
+                            "done".showInfo()
                         });
                     });
                 });
@@ -135,9 +135,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         if(!app.areItemSelected(selectedSubmission)) return;
 
         msg.showLoading();
-        $q.all(post_selected_submissions())
-        .then(function(){
-            msg.hideLoadingWithInfo('Submitted successfully');
+        $q.all(post_selected_submissions()) .then(function() {
+            "data_submitted".showInfo();
             loadLocal();
         },function(error){
             msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
@@ -147,14 +146,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var onDelete = function() {
         if(!app.areItemSelected(selectedSubmission)) return;
          
-         dialogService.confirmBox('Do you want to delete selected submissions?', function() {
-            submissionDao.deleteSubmissions(selectedSubmission)
-            .then(function(){
-                msg.hideLoadingWithInfo("Submission(s) deleted");
+         dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
+            submissionDao.deleteSubmissions(selectedSubmission).then(function(){
+                "data_deleted".showInfo();
                 loadLocal();
-            }
-            ,function(error){
-                msg.hideLoadingWithErr("Submission(s) deletion failed "+error)
+            }, function(error){
+                "failed_data_deletion".showError();
             });
         });
     };
@@ -181,6 +178,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onDownload = function() {
+        if(!app.areItemSelected(selectedSubmission)) return;
+
         msg.showLoading();
         var localSubmissionPromises = [];
         var downloadSubmissionPromises = [];
@@ -188,9 +187,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission.forEach(function(submission_uuid) {
             localSubmissionPromises.push(loadLocalSubmissionUuid(submission_uuid));
         });
-
-        if(selectedSubmission.length == 0) 
-            msg.hideLoadingWithInfo("All submissions are downloaded");
 
         $q.all(localSubmissionPromises).then(function() {
             
@@ -201,9 +197,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             });
 
             $q.all(downloadSubmissionPromises).then(function(){
-                msg.hideLoadingWithInfo("Submission downloaded.");
+                "data_downloaded".showInfo();
             }, function(error) {
-                msg.hideLoadingWithErr('Unable to download submission.');
+                "download_data_failed".showError();
             });
         });
     };
@@ -236,7 +232,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.serverPage = true;
         $scope.title =  type + " data";
         selectedSubmission = [];
-        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        msg.showLoadingWithInfo(resourceBundle.loading_data);
         initServerActions();
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")

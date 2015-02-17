@@ -6,7 +6,7 @@ var submissionConflictResolverController = function($scope, $routeParams, $locat
     $scope.title = resourceBundle.conflict_resolver_title;
 
     var onload = function() {
-        msg.showLoadingWithInfo(resourceBundle.loading_submissions);
+        msg.showLoadingWithInfo(resourceBundle.loading_data);
         dcsService.getSubmissionById(project_uuid, submission_uuid).then(function(serverSubmission) {
             serverSubmission.data = JSON.parse(serverSubmission.data);
             $scope.serverSubmission = serverSubmission;
