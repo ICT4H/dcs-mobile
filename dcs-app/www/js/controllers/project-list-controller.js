@@ -22,11 +22,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
-            (501).showInfo();
+            "loading_forms".showInfo();
             initOfflineActionItems();
             projectDao.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignResult, (103).showError);
+                    .then(assignResult, "error_loading_forms".showError);
         });
     };
 
@@ -36,7 +36,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.projects = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = true;
-            (501).showInfo();
+            "loading_forms".showInfoWithLoading();
             $scope.initOnlineActionItems();
             dcsService.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
@@ -132,7 +132,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     var onDelete = function(){
         if(app.areItemSelected(selectedProject)) {
-            dialogService.confirmBox('Do you want to delete selected projects?', function() {
+            dialogService.confirmBox('Delete Selected Forms?', function() {
                 projectDao.deleteProject(selectedProject)
                 .then(function(response) {
                         loadLocal();
@@ -149,7 +149,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             });
         }
         else {
-            dialogService.confirmBox('Do you want to update all projects?', function() {
+            dialogService.confirmBox('Refresh Status of all Forms?', function() {
                 projectDao.getAll().then(function(projects){
                   updateProjects(projects);
                 });
@@ -180,9 +180,9 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     var initOfflineActionItems = function() {
         $scope.actions = [];
+        $scope.actions.push({'onClick': loadServer, 'label': resourceBundle.download_forms });
         $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete });
-        $scope.actions.push({'onClick': onUpdate, 'label': resourceBundle.update });
-        $scope.actions.push({'onClick': loadServer, 'label': resourceBundle.getNewSurvey });
+        $scope.actions.push({'onClick': onUpdate, 'label': resourceBundle.refresh_status });
         $scope.title = resourceBundle.localProjectTitle;
     };
 
@@ -190,11 +190,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         selectedProject = [];
         $scope.pagination.init($rootScope.pageSize.value, 0, function() {
             $scope.serverPage = false;
-            (501).showInfo();
+            "loading_forms".showInfo();
             initOfflineActionItems();
             projectDao.
                 getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr)
-                    .then(assignResult, (103).showError);
+                    .then(assignResult, "error_loading_forms".showError);
         });
     };
 
