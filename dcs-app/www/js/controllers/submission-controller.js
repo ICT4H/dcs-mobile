@@ -45,11 +45,11 @@ Provides submission create and update using enketo. Uses local store for persist
     var dbSubmission, parentUuid, projectUuid;
 
     this.loadEnketo = function(project, submissionToEdit) {
+        contextService.setProject(project);
+        contextService.setSubmission(submissionToEdit);
 
         projectUuid = project.project_uuid;
         dbSubmission = submissionToEdit;
-
-        contextService.setProjectAndSubmission(project, submissionToEdit);
         parentUuid = contextService.getParentUuid();
 
         loadEnketo({
@@ -138,6 +138,11 @@ dcsApp.controller('submissionController',
     var type = $routeParams.type || 'all';
     var searchStr = $routeParams.searchStr || '';
 
+    var addPagination = function(type, searchStr, currentIndex, total) {
+        var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
+        $scope.page = new Page($location, baseUrl, type, searchStr, currentIndex, total);
+    }
+
     dataProvider.init($routeParams.project_uuid, type, searchStr, $scope.server);
 
     dataProvider.getProject().then(function(project) {
@@ -152,9 +157,4 @@ dcsApp.controller('submissionController',
     app.goBack = function() {
         $location.url('/submission-list/' + $routeParams.project_uuid + '?type=' + type);
     };
-
-    var addPagination = function(type, searchStr, currentIndex, total) {
-        var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
-        $scope.page = new Page($location, baseUrl, type, searchStr, currentIndex, total);
-    }
 }]);

@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, contextService){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
@@ -16,6 +16,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.outdateProject = false;
     $scope.deletedProject = false;
     $scope.showSearch = false;
+    $scope.project_name = contextService.getProject().name;
 
     $scope.flipSearch = function() {
         $scope.showSearch = !$scope.showSearch;
@@ -290,5 +291,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     loadLocal();
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'contextService', submissionListController]);
 

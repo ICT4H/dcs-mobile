@@ -10,17 +10,21 @@ This service holds the latest accessed parent data.
 
     var relationHandler;
 
-    this.setProjectAndSubmission = function(project, submission) {
+    this.setProject = function(project) {
         //TODO if (!this.project) throw Error
-        this.project = project;// project should be set first
-        this._setSubmission(submission);
+        console.log('Setting up project to context: ' + project.name);
+        this.project = project;// project should be set before submission
         if(!this.isChildProject())
             delete this.parentProject;
         if (this.isParentProject())
             this.parentProject = project;
     }
 
-    this._setSubmission = function(submission) {
+    this.getProject = function() {
+        return this.project;
+    }
+
+    this.setSubmission = function(submission) {
         this.submission = submission;
         if (this.isParentProject())
             this.parentSubmission = submission;

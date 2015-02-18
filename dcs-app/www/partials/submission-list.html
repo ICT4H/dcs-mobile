@@ -29,6 +29,7 @@
 </div>
 <div class="scrollable">  
   <div class="scrollable-content">
+    <div class="well-custom well-sm">{{project_name}}</div>
     <div class="list-group" ng-if="submissions.length !=0">
         <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected, 'outdated':(item.status=='conflicted')}"
       ng-click="onSubmissionSelect(this, item)">

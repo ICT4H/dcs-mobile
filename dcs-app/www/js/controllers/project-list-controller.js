@@ -1,4 +1,4 @@
-var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg, dialogService) {
+var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg, dialogService, contextService) {
 
     resourceBundle = $rootScope.resourceBundle;
     $scope.pagination = paginationService.pagination;
@@ -207,6 +207,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     $scope.showAllSubmissions = function(project) {
+        contextService.setProject(project);
         $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
@@ -231,4 +232,4 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     loadLocal();
 };
 
-dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', localProjectListController]);
+dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', 'contextService', localProjectListController]);
