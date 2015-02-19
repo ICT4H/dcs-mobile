@@ -30,13 +30,13 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('select project_uuid as id, version as rev from projects where project_uuid IN(' + getParamHolders(project_uuids) +')', project_uuids)
 	};
 
-	this.deleteProject = function(projectUuids) {
-		return store.execute('delete FROM projects where project_uuid IN(' + getParamHolders(projectUuids) + ')', projectUuids);
-	};
+	this.deleteProject = function(projects) {
+		var queries = [];
+		queries.push({'statement': 'delete FROM submissions where project_uuid IN(' + getParamHolders(projects) + ')', 'values': projects});
+		queries.push({'statement': 'delete FROM projects WHERE project_uuid IN(' + getParamHolders(projects) + ')', 'values': projects});
 
-	this.deleteSub = function(projectUuids) {
-		return store.execute('delete FROM submissions where project_uuid IN(' + getParamHolders(projectUuids) + ')', projectUuids);
-	}
+		return store.executeMultipleQueries(queries);
+	};
 
 	this.getProjectsList = function(offset, limit, searchStr) {
 		var queries = [];

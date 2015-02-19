@@ -133,12 +133,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var onDelete = function(){
         if(app.areItemSelected(selectedProject)) {
             dialogService.confirmBox('Delete Selected Forms?', function() {
-                projectDao.deleteSub(selectedProject).then(function(response) {
-                    projectDao.deleteProject(selectedProject).then(function(response) {
+                projectDao.deleteProject(selectedProject)
+                .then(function(response) {
                         loadLocal();
                         (504).showInfo();
                     }, (106).showError);
-                }, (106).showError);
             });
         }
     };
