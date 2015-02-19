@@ -15,12 +15,13 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 
 	this.createUserSpace = function(response){
 		return createOrOpen('userStore', convertToSlug(user.name), response)
+		.then(enableForeignKey)
 		.then(this.execute('CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,'+
 						'version text, status text, name text, xform text, headers text, local_headers text, last_fetch openDatabase,'+
 						'project_type text, parent_uuid text, action_label text, parent_fields_code_label_str text, child_ids text)', [], false))
 		.then(this.execute('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
-						 'version text, status text, project_uuid integer, created text, data text, xml text,'+
-						 'new_files_added text, un_changed_files text)', [], false))
+						 'version text, status text, project_uuid text, created text, data text, xml text,'+
+						 'new_files_added text, un_changed_files text, FOREIGN KEY(project_uuid) REFERENCES projects(project_uuid) ON DELETE CASCADE)', [], false))
 		.then(this.execute('CREATE INDEX IF NOT EXISTS project_uuid_index ON submissions (project_uuid)', [], false));
 	};
 
@@ -92,6 +93,15 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 		return deferred.promise;
 	}; 
 	
+	var enableForeignKey = function() {
+		var deferred = $q.defer();
+		stores['userStore'].executeSql("PRAGMA foreign_keys = ON;", [], function() {
+			console.log("PRAGMA fk turned on");
+			deferred.resolve(user);
+	    });
+		return deferred.promise;
+	}
+
 	var convertToSlug = function(text) {
     	return text
     	    .toLowerCase()
