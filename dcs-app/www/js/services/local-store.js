@@ -1,4 +1,6 @@
 dcsApp.service('store',['$q', 'app', function($q, app){
+
+
 	var stores = {'userMetaStore': undefined, 'usersStore': undefined, 'userStore': undefined};
 	var isSingleRecord = false;
 	var user;
@@ -96,6 +98,11 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 	
 	var enableForeignKey = function() {
 		var deferred = $q.defer();
+		if (isEmulator) {
+			deferred.resolve(user);
+			return deferred.promise;
+		}
+
 		stores['userStore'].executeSql("PRAGMA foreign_keys = ON;", [], function() {
 			console.log("PRAGMA fk turned on");
 			deferred.resolve(user);
