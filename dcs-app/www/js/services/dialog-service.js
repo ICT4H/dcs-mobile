@@ -1,11 +1,11 @@
 var dialogService = function() {
-    var onNo = function() {};
+    var doNothing = function() {};
     this.confirmBox = function(message, onYes, onNo) {
         function onConfirm(buttonIndex) {
             if(buttonIndex!=BUTTON_NO)
                 onYes();
             else 
-                onNo();
+                onNo? onNo(): doNothing();
         }; 
         navigator.notification.confirm(
             message,
