@@ -68,14 +68,15 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 			deferred.resolve(user);
 			return deferred.promise;
 		}
-		status = window.sqlitePlugin.deleteDatabase(dbName);
-		if(status) {
+
+		window.sqlitePlugin.deleteDatabase(dbName, function() {
 			createOrOpen("userMetaStore",  convertToSlug(user.name)+"Meta", user.password).then(function() {
 				deferred.resolve(user);
 			}, deferred.reject);
-		}
-		else 
-			deferred.reject('sorry');
+
+		}, function() {
+			deferred.reject();
+		});
 		return deferred.promise;
 	};
 
