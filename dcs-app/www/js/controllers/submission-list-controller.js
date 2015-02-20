@@ -80,27 +80,71 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
                     var newUuids = $scope.difference($scope.difference(allIdsFromServer, conflictUuids), updateUuids);
                     
-                    var newSubmissionsPro = newUuids.map(function(newUuid) {
+                    var prevPromise = $.when();
+
+                    newUuids.reduce(function(initVal, newUuid) {
                         submission = result.submissions[newUuid];
                         submission.status = "both";
-                        return submissionDao.createSubmission(submission);
+                        return initVal.then(submissionDao.createSubmission(submission));
+                    }, $q.when()).then(function() {
+                        loadLocal();
+                        "done".showInfo()
                     });
 
-                    var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+                    // newUuids.forEach(function(newUuid1) {
+                    //     prevPromise = prevPromise.then(function() {
+                    //         submission = result.submissions[newUuid1];
+                    //         submission.status = "both";
+                    //         return submissionDao.createSubmission(submission)
+                    //     }).then(function() {
+                    //         loadLocal();
+                    //         "done".showInfo()
+                    //     });
+
+                    // });
+
+                    // var newSubmissionsPro = newUuids.map(function(newUuid) {
+                    //     submission = result.submissions[newUuid];
+                    //     submission.status = "both";
+
+                    //     var p = [];
+                    //     p.push(submissionDao.createSubmission(submission));
+                    //     return $q.all(p);
+                    // });
+
+                    // var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
                     
-                    var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
-                        var submission = result.submissions[updateUuid];
-                        submission.status = "both"
-                        return submissionDao.updateSubmissionUsingUuid(submission);
-                    });
+                    // var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
+                    //     var submission = result.submissions[updateUuid];
+                    //     submission.status = "both"
+                    //     return submissionDao.updateSubmissionUsingUuid(submission);
+                    // });
 
-                    promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
-                    app.promises(promises, function() {
-                        submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
-                            loadLocal();
-                            "done".showInfo()
-                        });
-                    });
+                    // $q.when(newSubmissionsPro).then(function() {
+                    //     var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+                    //     $q.when(conflictSubmissionsPro).then(function() {
+                    //         var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
+                    //             var submission = result.submissions[updateUuid];
+                    //             submission.status = "both"
+                    //             return submissionDao.updateSubmissionUsingUuid(submission);
+                    //         });
+                    //         $q.when(updateSubmissionsPro).then(function() {
+                    //             submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
+                    //                 loadLocal();
+                    //                 "done".showInfo()
+                    //             });
+                    //         });
+
+                    //     });
+                    // })
+
+                    // promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
+                    // app.promises(promises, function() {
+                    //     submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
+                    //         loadLocal();
+                    //         "done".showInfo()
+                    //     });
+                    // });
                 });
             }, function() {msg.hideLoadingWithErr(resourceBundle.error_in_connecting);});
         }); 

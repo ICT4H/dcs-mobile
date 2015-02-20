@@ -1,4 +1,4 @@
-dcsApp.service('submissionDao',['store', function(store){
+dcsApp.service('submissionDao',['store', '$q', function(store, $q){
 
 	this.createSubmission = function(submission) {
 		var query ='INSERT INTO submissions (submission_uuid, version, status, project_uuid, created, data, xml, new_files_added, un_changed_files)'+
@@ -95,6 +95,7 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 
 	this.updateSubmissionStatus = function(submission_uuid, status) {
+		if (!submission_uuid || submission_uuid.length == 0) return $q.when([]);
 		return store.execute('UPDATE submissions SET status="' + status + '" where submission_uuid IN(' + getParamHolders(submission_uuid) + ')', submission_uuid);
 	};
 	
