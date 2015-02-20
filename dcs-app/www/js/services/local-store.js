@@ -15,8 +15,8 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 
 	this.createUserSpace = function(response){
 		return createOrOpen('userStore', convertToSlug(user.name), response)
-		.then(this.execute('CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,'+
-						'version text, status text, name text, xform text, headers text, local_headers text, last_fetch openDatabase,'+
+		.then(this.execute('CREATE TABLE IF NOT EXISTS projects (project_uuid text primary key,version text,'+
+						'created text, status text, name text, xform text, headers text, local_headers text, last_fetch openDatabase,'+
 						'project_type text, parent_uuid text, action_label text, parent_fields_code_label_str text, child_ids text)', [], false))
 		.then(this.execute('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
 						 'version text, status text, project_uuid integer, created text, data text, xml text,'+
