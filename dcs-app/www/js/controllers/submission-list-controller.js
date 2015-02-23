@@ -12,6 +12,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.conflictSubmissionCount = 0;
     
     var type = $routeParams.type || "all";
+    $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
+
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.outdateProject = false;
     $scope.deletedProject = false;
