@@ -1,6 +1,8 @@
 dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope, app) {
 
-    this.getProjectsList = function(start,length) {
+    this.getProjectsList = function(start,length, searchStr) {
+        //TODO: add searchStr to the request.
+
         var params = {
             'start': start,
             'length': length

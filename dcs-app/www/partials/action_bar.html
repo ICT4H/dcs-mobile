@@ -1,6 +1,6 @@
 <!-- to display menu actions of controller -->
 <div class="btn-group pull-right" ng-hide="showSearch || ! actions">
-    <a class='btn' ng-click="flipSearch()" ng-show="showSearchicon">
+    <a class='btn' ng-click="flipSearch();searchString=''" ng-show="showSearchicon">
       <i class="fa fa-search fa-2x"></i>
     </a>
     <a ui-turn-on='myDropdown' class='btn' >
@@ -44,12 +44,11 @@
 </div>
 <div ng-show="showSearch">
   <div class="input-group">
-    <input class="searchBox form-control" placeholder="Search for..." type="text" ng-model="searchStr">
+    <form ng-submit="search(searchString);">
+      <input id="searchText" class="searchBox form-control" placeholder="Search for..." type="search" ng-model="searchString">
+    </form>
     <span class="input-group-btn">
-      <a class="btn btn-default" ng-click="search(searchStr)">
-        <i class="fa fa-search fa-2x"></i>
-      </a>
-      <a class='btn' ng-click="flipSearch()">
+      <a class='btn' ng-click="flipSearch(); onSearchClose(searchString)">
         <i class="fa fa-times fa-2x"></i>
       </a>
     </span>

@@ -189,14 +189,24 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.search = function(searchStr) {
         selectedProject = [];
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-            $scope.serverPage = false;
-            "loading_forms".showInfo();
-            initOfflineActionItems();
-            projectDao.
-                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr)
-                    .then(assignResult, "error_loading_forms".showError);
-        });
+        if($scope.serverPage) 
+            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                $scope.serverPage = false;
+                "loading_forms".showInfo();
+                initOfflineActionItems();
+                dcsService.
+                    getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr)
+                        .then(assignResult, "error_loading_forms".showError);
+            });
+        else
+            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                $scope.serverPage = false;
+                "loading_forms".showInfo();
+                initOfflineActionItems();
+                projectDao.
+                    getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr)
+                        .then(assignResult, "error_loading_forms".showError);
+            });
     };
 
     $scope.flipSearch = function() {
@@ -220,9 +230,17 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.showUnsubmitted = function(project) {
         $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
     };
+    
+    $scope.onSearchClose = function(searchStr) {
+        $scope.search('');
+    };
 
     app.goBack = function() {
-        if($scope.serverPage)
+        if($scope.showSearch) {
+            $scope.showSearch = false;
+            $scope.search('');
+        }
+        else if($scope.serverPage)
             loadLocal();
         else
             dialogService.confirmBox("Do you want to exit?", function() {

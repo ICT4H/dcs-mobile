@@ -61,8 +61,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         }
     };
 
-    $scope.search = function(searchStr) {
-        $location.url('/submission-list/' + $scope.project_uuid + '?type=' + type + '&searchStr=' + searchStr);
+    $scope.search = function(searchString) {
+        searchStr = searchString;
+        loadLocal();
     };
 
     var onDeltaPull = function() {
@@ -283,8 +284,16 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/conflict-resolver/' + $scope.project_uuid + "/" + submission_uuid);
     };
 
+    $scope.onSearchClose = function(searchStr) {
+        $scope.search('');
+    };
+
     app.goBack = function() {
-        if($scope.serverPage)
+        if($scope.showSearch) {
+            $scope.showSearch = false;
+            $scope.search('');
+        }
+        else if($scope.serverPage)
             $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
         else
             $location.url('/local-project-list');
