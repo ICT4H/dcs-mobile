@@ -69,39 +69,39 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var onDeltaPull = function() {
        
         var promises = [];
-        
+        "downloading_delta".showInfoWithLoading();
+
         submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
-            "downloading_delta".showInfoWithLoading();
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
-                
-                var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
-                
-                submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
+                submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
+                    var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
+                    submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
 
-                    var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid'); 
-                    var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
+                        var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid');
+                        var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
+                        var alreadyInConflictUuids = $scope.pluck(localResult.conflictedUuids, 'submission_uuid');
 
-                    var newUuids = $scope.difference($scope.difference(allIdsFromServer, conflictUuids), updateUuids);
-                    
-                    var newSubmissionsPro = newUuids.map(function(newUuid) {
-                        submission = result.submissions[newUuid];
-                        submission.status = "both";
-                        return submissionDao.createSubmission(submission);
-                    });
+                        var idsWithoutlocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
+                        var newUuids = $scope.difference($scope.difference(idsWithoutlocalConflicts, conflictUuids), updateUuids);
 
-                    var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
-                    
-                    var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
-                        var submission = result.submissions[updateUuid];
-                        submission.status = "both"
-                        return submissionDao.updateSubmissionUsingUuid(submission);
-                    });
+                        var newSubmissionsPro = newUuids.map(function(newUuid) {
+                            submission = result.submissions[newUuid];
+                            submission.status = "both";
+                            return submissionDao.createSubmission(submission);
+                        });
 
-                    promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
-                    app.promises(promises, function() {
-                        submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
+                        var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+
+                        var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
+                            var submission = result.submissions[updateUuid];
+                            submission.status = "both"
+                            return submissionDao.updateSubmissionUsingUuid(submission);
+                        });
+
+                        promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
+                        app.promises(promises, function() {
                             loadLocal();
-                            "done".showInfo()
+                            "done".showInfo();
                         });
                     });
                 });

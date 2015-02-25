@@ -120,8 +120,9 @@ dcsApp.service('submissionDao',['store', function(store){
 
 	this.getModifiedAndUnModifiedUuids = function(uuids) {
 		var queries = [];
-		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="modified"' , 'values': uuids, 'holder': 'modifiedUuids'});
+		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="modified"', 'values': uuids, 'holder': 'modifiedUuids'});
 		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="both"', 'values': uuids, 'holder': 'unModifiedUuids'});
+		queries.push({'statement': 'SELECT submission_uuid FROM submissions where submission_uuid IN (' + getParamHolders(uuids) + ') and status="conflicted"', 'values': uuids, 'holder': 'conflictedUuids'});
 
 		return store.executeMultipleQueries(queries);
 	}
