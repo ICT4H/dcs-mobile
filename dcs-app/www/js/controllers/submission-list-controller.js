@@ -219,6 +219,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             });
 
             $q.all(downloadSubmissionPromises).then(function(){
+                type="all";
+                loadLocal();
                 "data_downloaded".showInfo();
             }, function(error) {
                 "download_data_failed".showError();
