@@ -39,7 +39,7 @@
     "data_submit_msg": "Submitted selected data",
     "submitting_changes_msg": "Submitting all changes",
     "no_changes_to_submit": "No changes found to be submitted",
-
+    "confirm_submit_all_submission" : "Do you want to submit all data?",
     "app_title": "Garner",
     "new": "New",
     "submit": "Submit",
