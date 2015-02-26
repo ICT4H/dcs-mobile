@@ -62,8 +62,12 @@ Provides submission create and update using enketo. Uses local store for persist
     };
 
     this.getUrlsToAddChildren = function() {
-        return contextService.getUrlsToAddChildren();;
-    }
+        return contextService.getUrlsToAddChildren().map(function(urlToAddChildren) {
+            return {'onClick': function() {
+                $location.url(urlToAddChildren.url);       
+            }, 'label': urlToAddChildren.label}
+        });
+    };
 
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
@@ -164,7 +168,7 @@ dcsApp.controller('submissionController',
                             app.goBack();
                         else {
                             "done".showInfo();
-                            $scope.page.onNext();
+                            loadSubmission();
                         }
                     },function() {
                         msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
@@ -193,7 +197,7 @@ dcsApp.controller('submissionController',
                 enketoService.loadEnketo(project, $scope.submission);
                 if($routeParams.currentIndex)
                         loadActions();
-                $scope.urlsToAddChildren = enketoService.getUrlsToAddChildren();
+                $scope.actions = $scope.union($scope.actions, enketoService.getUrlsToAddChildren());
             });
         });
     };

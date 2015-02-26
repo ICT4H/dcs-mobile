@@ -65,18 +65,18 @@ This service holds the latest accessed parent data.
 
     this.getUrlsToAddChildren =  function() {
         var is_new_parent_or_is_not_parent = !this.submission || !this.isParentProject()
-        if (is_new_parent_or_is_not_parent) return;
+        if (is_new_parent_or_is_not_parent) return [];
 
-        var urlToAddChild = '#/projects/'+this.project.child_ids+
+        var urlToAddChild = '/projects/'+this.project.child_ids+
                     '/submissions/new_child?parent_id='+this.project.project_uuid+
                     '&parent_submission_id='+this.parentSubmission.submission_id;
-        var urlsToAddChildren = {};
+        var urlsToAddChildren = [];
         //TODO remove harcoded action label; use value from child project.
         //TODO loop and create as many add as many children by split by ',' on project.child_ids
-        urlsToAddChildren['new_child'] = {
+        urlsToAddChildren.push({
             'label': 'New Entry',
             'url': urlToAddChild
-        };
+        });
         return urlsToAddChildren;
     };
 }]);
