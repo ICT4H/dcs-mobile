@@ -128,8 +128,8 @@ var Page = function($location, baseUrl, type, searchStr, currentIndex, totalReco
 }
 
 dcsApp.controller('submissionController',
-    ['$scope', '$routeParams', '$location', 'enketoService', 'dataProvider', 'app',
-    function($scope, $routeParams, $location, enketoService, dataProvider, app){
+    ['$scope', '$routeParams', '$location', 'enketoService', 'dataProvider', 'app', 'submissionDao', 'dcsService', 'dialogService',
+    function($scope, $routeParams, $location, enketoService, dataProvider, app, submissionDao, dcsService, dialogService){
     
     $scope.showSearchicon = false;
     $scope.server = $routeParams.server == "true"? true:false;
@@ -138,6 +138,46 @@ dcsApp.controller('submissionController',
     var type = $routeParams.type || 'all';
     var searchStr = $routeParams.searchStr || '';
 
+    var onDelete = function(submission) {
+         dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
+            submissionDao.deleteSubmissions([$scope.submission.submission_id]).then(function(){
+                if($scope.page.isLastPage())
+                    app.goBack();
+                else {
+                    "data_deleted".showInfo();
+                    loadSubmission();
+                }
+            }, function(error){
+                "failed_data_deletion".showError();
+            });
+        });
+    };
+
+    var onSubmit = function() {
+        "data_submit_msg".showInfoWithLoading();
+        submissionDao.getSubmissionById($scope.submission.submission_id)
+                    .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
+                    .then(dcsService.postSubmissionNewMedia)
+                .then(submissionDao.updateSubmission)
+                    .then(function() {
+                        if($scope.page.isLastPage())
+                            app.goBack();
+                        else {
+                            "done".showInfo();
+                            $scope.page.onNext();
+                        }
+                    },function() {
+                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+                    });
+    };
+
+    var loadActions  = function() {
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
+        $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+    };
+
+
     var addPagination = function(type, searchStr, currentIndex, total) {
         var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
         $scope.page = new Page($location, baseUrl, type, searchStr, currentIndex, total);
@@ -145,14 +185,20 @@ dcsApp.controller('submissionController',
 
     dataProvider.init($routeParams.project_uuid, type, searchStr, $scope.server);
 
-    dataProvider.getProject().then(function(project) {
-        dataProvider.getSubmission(currentIndex).then(function(result) {
-            var submission = result && result.data[0];
-            addPagination(type, searchStr, currentIndex, result && result.total);
-            enketoService.loadEnketo(project, submission);
-            $scope.urlsToAddChildren = enketoService.getUrlsToAddChildren();
+    var loadSubmission = function() {
+        dataProvider.getProject().then(function(project) {
+            dataProvider.getSubmission(currentIndex).then(function(result) {
+                $scope.submission = result && result.data[0];
+                addPagination(type, searchStr, currentIndex, result && result.total);
+                enketoService.loadEnketo(project, $scope.submission);
+                if($routeParams.currentIndex)
+                        loadActions();
+                $scope.urlsToAddChildren = enketoService.getUrlsToAddChildren();
+            });
         });
-    });
+    };
+
+    loadSubmission();
 
     app.goBack = function() {
         $location.url('/submission-list/' + $routeParams.project_uuid + '?type=' + type);
