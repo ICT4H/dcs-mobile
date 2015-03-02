@@ -27,7 +27,24 @@
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
-<div class="scrollable">  
+<!--  Advance Search -->
+<div class="scrollable" ng-show="showAdvanceSearch">
+  <div class="scrollable-content section">
+    <div class ="form-group">
+    <label>Field</label>
+    <select ng-model="selectedField" >
+      <option value="{{searchField.name}}" ng-repeat="searchField in searchFields">{{searchField.label}}</option>
+    </select>
+  </div>
+  <div class ="form-group">
+    <label>search String</label>
+    <input class="form-control" type ="text" ng-model="searchStr">
+  </div>
+  <button class="btn btn-primary" ng-click="searchInField(selectedField, searchStr)">Search</button>
+  </div>
+</div>
+<!-- -->
+<div class="scrollable" ng-hide="showAdvanceSearch">  
   <div class="scrollable-content">
     <div class="well-custom well-sm project-title" style="max-width:100%">{{project_name}}</div>
     <div class="list-group" ng-if="submissions.length !=0">

@@ -6,11 +6,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     var searchStr = $routeParams.searchStr;
     var MODIFIED = 1;
     var UNMODIFIED = 0;
-    var selectedCount = 0;
+    var selectedCount = 0;  
     var serverSubmissions = [];
     var selectedSubmission = [];
     $scope.conflictSubmissionCount = 0;
-    
+    $scope.showAdvanceSearch = false;
     var type = $routeParams.type || "all";
     $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
 
@@ -25,6 +25,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var assignSubmissions = function(submissions){
+        $scope.showAdvanceSearch = false;
         selectedSubmission = [];
         $scope.pagination.totalElement = submissions.total;
         $scope.submissions = submissions.data;
@@ -264,6 +265,48 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         });
     };
 
+    var _getFieldsLabelFromXform = function(xform) {
+        var parser = new DOMParser();
+        var labels = [];
+        xmlDoc = parser.parseFromString(xform,"text/xml");
+        questions = xmlDoc.getElementsByClassName('question');
+
+        for (var i = 0; i < questions.length; i++) {
+            name = $scope.last(questions[i].getElementsByTagName('input')[0].attributes.name.value.split('/'));
+            label = questions[i].getElementsByClassName('question-label')[0].innerHTML
+            labels.push({'name': name, 'label': label});
+        }
+        return labels;
+    };
+
+    var onAdvanceSearch = function() {
+        msg.showLoadingWithInfo("Loading Fields");
+        submissionDao.getProjectById($scope.project_uuid).then(function(result) {
+            $scope.showAdvanceSearch = true;
+            $scope.searchFields = _getFieldsLabelFromXform(result.xform);
+            $scope.selectedField = $scope.searchFields[0].name;
+            msg.hideAll();
+        });
+    };
+
+    $scope.searchInField = function(field, searchString) {
+        submissionDao.getAllSubmissionOf($scope.project_uuid).then(function(result) {
+            var matchedSubmissionsId =result.map(function(submission) {
+                var parser = new DOMParser();
+                fieldValue =parser.parseFromString(submission.xml,"text/xml").getElementsByTagName(field)[0].innerHTML;
+                if(fieldValue.indexOf(searchString) > -1 )
+                    return submission.submission_id;
+            });
+            submissionDao.createSearchTable(matchedSubmissionsId).then(function(){
+                $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                    type = "search";
+                    submissionDao.searchSubmissionsByType($scope.project_uuid, 'search', '', $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                        .then(assignSubmissions, ErrorLoadingSubmissions);
+                });
+            });
+        });
+    };
+
     var initOfflineActions =  function() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
@@ -271,6 +314,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
         $scope.actions.push({'onClick': goToServerSubmissions, 'label': resourceBundle.download});
         $scope.actions.push({'onClick': onDeltaPull, 'label': resourceBundle.download_delta});
+        $scope.actions.push({'onClick': onAdvanceSearch, 'label': "Advance Search"});
     };
 
     $scope.onSubmissionSelect = function(submissionRow, submission) {

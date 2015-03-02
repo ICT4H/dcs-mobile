@@ -5,6 +5,15 @@ dcsApp.service('submissionDao',['store', function(store){
 		'VALUES (?,?,?,?,?,?,?,?,?)';
 		return store.execute(query, getSubmissionAsValues(submission));
 	};
+
+	this.createSearchTable = function(submissionIds) {
+
+		var queries = [];
+		queries.push({'statement': 'DROP TABLE IF EXISTS  searchTable'});
+		queries.push({'statement': 'create temp table searchTable as select * from submissions where submission_id IN(' + getParamHolders(submissionIds) + ')', 'values': submissionIds});
+
+		return store.executeMultipleQueries(queries);
+	};
 	
 	this.updateSubmission = function(submission) {
 		var values = getSubmissionAsValues(submission);
@@ -38,7 +47,10 @@ dcsApp.service('submissionDao',['store', function(store){
 			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
 		'conflicted': [
 			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
-			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}]
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+		'search': [
+			{'statement': 'SELECT count(*) as total FROM searchTable', 'isSingleRecord':true},
+			{'statement': 'SELECT * FROM searchTable order by created desc limit ? offset ? ', 'values': [limit, offset], 'holder': 'data'}]
 		};
 
 		return queries[type];
@@ -61,6 +73,7 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
 	};
 
+	//TODO: This is unused method
 	this.getCountOfSubmissions = function(project_uuid) {
 		return store.execute('select count(*) as total FROM submissions where project_uuid = ?',[project_uuid], true);
 	};
@@ -77,6 +90,11 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid]);
 	};
 
+	this.getAllSubmissionOf = function(project_uuid) {
+		return store.execute('SELECT * from submissions where project_uuid = ?', [project_uuid]);
+	};
+
+	//TODO: This is unused method
 	this.getSubmissionsByProjectId = function(project_uuid, offset, limit) {
 
 		var queries = [];
