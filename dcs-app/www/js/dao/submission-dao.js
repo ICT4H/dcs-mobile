@@ -91,7 +91,7 @@ dcsApp.service('submissionDao',['store', function(store){
 	};
 
 	this.getAllSubmissionOf = function(project_uuid) {
-		return store.execute('SELECT * from submissions where project_uuid = ?', [project_uuid]);
+		return store.execute('SELECT submission_id, data from submissions where project_uuid = ?', [project_uuid]);
 	};
 
 	//TODO: This is unused method

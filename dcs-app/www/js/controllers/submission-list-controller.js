@@ -272,11 +272,23 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         questions = xmlDoc.getElementsByClassName('question');
 
         for (var i = 0; i < questions.length; i++) {
-            name = $scope.last(questions[i].getElementsByTagName('input')[0].attributes.name.value.split('/'));
+            name = $scope.rest(questions[i].getElementsByTagName('input')[0].attributes.name.value.split('/'), 2).join('/');
             label = questions[i].getElementsByClassName('question-label')[0].innerHTML
             labels.push({'name': name, 'label': label});
         }
         return labels;
+    };
+
+    var _getFieldValue = function(fields, json) {
+        
+        if(fields.length == 1)
+            return json[fields[0]];
+        arr = json[fields[0]];
+        fields = $scope.rest(fields);
+        fields.forEach(function(field) {
+            arr = $scope.flatten($scope.pluck(arr, field));
+        });
+        return arr;
     };
 
     var onAdvanceSearch = function() {
@@ -291,9 +303,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.searchInField = function(field, searchString) {
         submissionDao.getAllSubmissionOf($scope.project_uuid).then(function(result) {
-            var matchedSubmissionsId =result.map(function(submission) {
-                var parser = new DOMParser();
-                fieldValue =parser.parseFromString(submission.xml,"text/xml").getElementsByTagName(field)[0].innerHTML;
+            var matchedSubmissionsId = result.map(function(submission) {
+                fieldValue = _getFieldValue(field.split('/'), JSON.parse(submission.data));
                 if(fieldValue.indexOf(searchString) > -1 )
                     return submission.submission_id;
             });
