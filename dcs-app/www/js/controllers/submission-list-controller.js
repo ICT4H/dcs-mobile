@@ -64,7 +64,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.search = function(searchString) {
         searchStr = searchString;
-        loadLocal();
+        if($scope.serverPage) 
+            loadServer()       
+        else 
+            loadLocal();
     };
 
     var onDeltaPull = function() {
@@ -280,9 +283,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var _getFieldValue = function(fields, json) {
-        
-        if(fields.length == 1)
-            return json[fields[0]];
         arr = json[fields[0]];
         fields = $scope.rest(fields);
         fields.forEach(function(field) {

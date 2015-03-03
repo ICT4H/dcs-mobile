@@ -1,6 +1,6 @@
 <!-- to display menu actions of controller -->
-<div class="btn-group pull-right" ng-hide="showSearch || actions.length == 0">
-    <a class='btn' ng-click="flipSearch();searchString=''" ng-show="showSearchicon">
+<div class="btn-group pull-right" ng-hide="actions.length == 0">
+    <a class='btn' ng-click="flipSearch();searchString=''" ng-show="!showSearch">
       <i class="fa fa-search fa-2x"></i>
     </a>
     <a ui-turn-on='myDropdown' class='btn' >
