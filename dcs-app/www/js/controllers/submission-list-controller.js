@@ -29,6 +29,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission = [];
         $scope.pagination.totalElement = submissions.total;
         $scope.submissions = submissions.data;
+        $scope.title =  type + " data";
         msg.hideAll();
     };
 
@@ -269,26 +270,29 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var _getFieldsLabelFromXform = function(xform) {
-        var parser = new DOMParser();
+        var xmlDoc = $.parseXML(xform)
         var labels = [];
-        xmlDoc = parser.parseFromString(xform,"text/xml");
-        questions = xmlDoc.getElementsByClassName('question');
-
+        questions = xmlDoc.getElementsByTagName('label');
+        var filteredQuestions = [];
         for (var i = 0; i < questions.length; i++) {
-            name = $scope.rest(questions[i].getElementsByTagName('input')[0].attributes.name.value.split('/'), 2).join('/');
-            label = questions[i].getElementsByClassName('question-label')[0].innerHTML
+            if(questions[i].childNodes.length>1)
+                filteredQuestions.push(questions[i]);
+        }
+        for (var i = 0; i < filteredQuestions.length; i++) {
+            name = $scope.rest(filteredQuestions[i].getElementsByTagName('input')[0].attributes.name.value.split('/'), 2).join('/');
+        label = filteredQuestions[i].getElementsByTagName('span')[0].textContent;
             labels.push({'name': name, 'label': label});
         }
         return labels;
     };
 
     var _getFieldValue = function(fields, json) {
-        arr = json[fields[0]];
+        fieldValues = json[fields[0]];
         fields = $scope.rest(fields);
         fields.forEach(function(field) {
-            arr = $scope.flatten($scope.pluck(arr, field));
+            fieldValues = $scope.flatten($scope.pluck(fieldValues, field));
         });
-        return arr;
+        return fieldValues;
     };
 
     var onAdvanceSearch = function() {
