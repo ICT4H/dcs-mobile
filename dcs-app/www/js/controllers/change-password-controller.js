@@ -25,6 +25,10 @@ var changePasswordController = function($scope, $location, userDao, app, msg, dc
         $scope.user = user.originalObject;
     };
 
+    app.goBack = function() {
+        $location.url('/');
+    };
+
     onLoad();
 };	
 
