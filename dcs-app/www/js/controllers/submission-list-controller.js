@@ -292,7 +292,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         fields.forEach(function(field) {
             fieldValues = $scope.flatten($scope.pluck(fieldValues, field));
         });
-        return fieldValues;
+        return $scope.flatten([fieldValues]);
     };
 
     var onAdvanceSearch = function() {
@@ -307,10 +307,13 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     $scope.searchInField = function(field, searchString) {
         submissionDao.getAllSubmissionOf($scope.project_uuid).then(function(result) {
-            var matchedSubmissionsId = result.map(function(submission) {
-                fieldValue = _getFieldValue(field.split('/'), JSON.parse(submission.data));
-                if(fieldValue.indexOf(searchString) > -1 )
-                    return submission.submission_id;
+            var matchedSubmissionsId = [];
+            result.forEach(function(submission) {
+                fieldValues = _getFieldValue(field.split('/'), JSON.parse(submission.data));
+                fieldValues.forEach(function(fieldValue) {
+                    if(fieldValue.toLowerCase().indexOf(searchString.toLowerCase()) > -1) 
+                        matchedSubmissionsId.push(submission.submission_id); 
+                });
             });
             submissionDao.createSearchTable(matchedSubmissionsId).then(function(){
                 $scope.pagination.init($rootScope.pageSize.value, 0, function() {
