@@ -37,8 +37,8 @@ Provides abstraction over local store and server service.
     }
 }]);
 
-dcsApp.service('enketoService', ['$location', '$route', 'contextService' ,'submissionDao', 'messageService', 'dialogService',
-                        function($location, $route, contextService, submissionDao, msg, dialogService) {
+dcsApp.service('enketoService', ['$location', '$route', 'app', 'contextService' ,'submissionDao', 'messageService', 'dialogService',
+                        function($location, $route, app, contextService, submissionDao, msg, dialogService) {
 /*
 Provides submission create and update using enketo. Uses local store for persistence.
 */
@@ -52,13 +52,21 @@ Provides submission create and update using enketo. Uses local store for persist
         dbSubmission = submissionToEdit;
         parentUuid = contextService.getParentUuid();
 
-        loadEnketo({
+        var options = {
             'buttonLabel': submissionToEdit? 'Update': 'Save',
             'hideButton': contextService.isParentProject()? true:false,
             'onButtonClick': submissionToEdit? onEdit: onNew,
             'submissionXml': contextService.getModelStr(),
             'xform': contextService.getXform()
-        });
+        };
+        if(isEmulator) {
+            loadEnketo(options);
+        }
+        else {
+            fileSystem.setWorkingDir(app.user.name, project.name).then(function() {
+                loadEnketo(options);
+            });
+        }
     };
 
     this.getUrlsToAddChildren = function() {

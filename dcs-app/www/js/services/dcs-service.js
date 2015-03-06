@@ -1,4 +1,4 @@
-dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope, app) {
+dcsApp.service('dcsService', ['$q', '$rootScope','app', 'contextService', function($q, $rootScope, app, contextService) {
 
     this.getProjectsList = function(start,length, searchStr) {
         //TODO: add searchStr to the request.
@@ -117,7 +117,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', function($q, $rootScope,
             return deferred.promise;
         }
 
-        fileSystem.setWorkingDir(app.user.name, $rootScope.currentProject.name);
+        fileSystem.setWorkingDir(app.user.name, contextService.getProject().name);
         return getFilesMeta(fileNamesString)
             .then(function(filesMetaData) {
                 console.log('key: "value",  ' + filesMetaData.length);
