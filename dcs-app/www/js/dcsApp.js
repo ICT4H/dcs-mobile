@@ -82,10 +82,6 @@ dcsApp.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 'messa
         msg.removeMessage(index);
     };
 
-    $rootScope.createSurveyResponse = function(project_uuid) {
-        $location.path('/projects/' + project_uuid + '/submissions/new');
-    };
-
     $rootScope.showSearchicon = true;
     $rootScope.goBack = function() {
         app.goBack();

@@ -222,12 +222,17 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
+    $scope.createSurveyResponse = function(project_uuid) {
+        $location.path('/projects/' + project_uuid + '/submissions/new');
+    };
+
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
         app.flipArrayElement(selectedProject, project.project_uuid);
     };
 
     $scope.showUnsubmitted = function(project) {
+        contextService.setProject(project);
         $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
     };
     
