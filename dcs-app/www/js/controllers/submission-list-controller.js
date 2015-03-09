@@ -171,16 +171,28 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     var onDelete = function() {
-        if(!app.areItemSelected(selectedSubmission)) return;
-         
-         dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
-            submissionDao.deleteSubmissions(selectedSubmission).then(function(){
-                "data_deleted".showInfo();
-                loadLocal();
-            }, function(error){
-                "failed_data_deletion".showError();
+        if(selectedSubmission.length == 0) {
+            dialogService.confirmBox(resourceBundle.confirm_delete_all_submissions, function() {
+                msg.showLoadingWithInfo(resourceBundle.deleting_data);
+                submissionDao.deleteAllSubmissionOfProject($scope.project_uuid).then(function() {
+                    "data_deleted".showInfo();
+                    loadLocal();
+                }, function(error) {            
+                    "failed_data_deletion".showError();
+                });
             });
-        });
+        }   
+        else {
+            dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
+                msg.showLoadingWithInfo(resourceBundle.deleting_data);
+                submissionDao.deleteSubmissions(selectedSubmission).then(function(){
+                    "data_deleted".showInfo();
+                    loadLocal();
+                }, function(error){
+                    "failed_data_deletion".showError();
+                });
+            });
+        }
     };
 
     var onNew = function() {

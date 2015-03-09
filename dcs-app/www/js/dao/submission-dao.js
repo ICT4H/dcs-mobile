@@ -69,6 +69,10 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('DELETE FROM submissions WHERE submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
 
+	this.deleteAllSubmissionOfProject = function(project_uuid) {
+		return store.execute('DELETE FROM submissions where project_uuid = ?', [project_uuid]);
+	};
+
 	this.getProjectById = function(project_uuid) {
 		return store.execute('SELECT * FROM projects where project_uuid = ? ', [project_uuid], true);
 	};
