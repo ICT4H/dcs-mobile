@@ -151,7 +151,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         }
         else {
             //TODO remove the 100 magic number
-            dialogService.confirmBox(resourceBundle.confirm_submit_all_submission, function() {
+            dialogService.confirmBox(resourceBundle.confirm_submit_all_submissions, function() {
                 submissionDao.searchSubmissionsByType($scope.project_uuid, 'unsubmitted', '', 0, 100).then(function(result) {
                     if (result.total < 1) {
                         "no_changes_to_submit".showError();
