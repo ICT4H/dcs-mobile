@@ -8,20 +8,18 @@ describe('local project list controller', function() {
     jasmine.getJSONFixtures().fixturesPath = "base/dcs-app/www/i18n/";
     var data = loadJSONFixtures('resourceBundle.json');
 
+    angular.module('configModule', []);
+    //TODO can this be also a mocked module
+    // beforeEach(angular.mock.module('configModule'));
+
     beforeEach(angular.mock.module('dcsApp'));
 
     beforeEach(angular.mock.inject(function($q, $httpBackend, $rootScope, $controller) {
         this.$q = $q;
-        stubResourceBundleCall($httpBackend);        
         initScope($rootScope);
         controller = $controller;
         mocks = new DCSMocks($q);
     }));
-    
-    function stubResourceBundleCall($httpBackend) {
-        emptyRourceBundle = {};
-        $httpBackend.when("GET", 'i18n/resourceBundle.json').respond(emptyRourceBundle);        
-    }
 
     function initScope($rootScope) {
         rootScope = $rootScope.$new();
@@ -33,11 +31,6 @@ describe('local project list controller', function() {
 
     it("should behave...", function() {
         expect(1).toBe(1);
-        // jasmine.getFixtures().fixturesPath = "base/test/unit/";
-        // var data = jasmine.getFixtures().read('xform_html.html');
-
-        // console.log(data);
-
     });
 
 

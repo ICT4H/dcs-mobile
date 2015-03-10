@@ -1,10 +1,13 @@
+var configModule = angular.module('configModule', []);
+
 var dcsApp = angular.module('dcsApp', ['ngRoute',
     "mobile-angular-ui",
     "ngSanitize",
     "ngI18n",
     "angucomplete-alt",
     "angularMoment",
-    "angular-underscore"
+    "angular-underscore",
+    "configModule"
 ]);
 
 var isEmulator = false;
@@ -23,11 +26,17 @@ dcsApp.value('ngI18nConfig', {
     cache:true
 });
 
-dcsApp.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
+configModule.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 'messageService', 'ngI18nResourceBundle', 'ngI18nConfig', 'app', function($route, $rootScope, $location, $interval, $timeout, msg, ngI18nResourceBundle, ngI18nConfig, app) {
+    console.log('in configModule.run');
+
     ngI18nResourceBundle.get({locale: "en"}).success(function (resourceBundle) {
         $rootScope.resourceBundle = resourceBundle;
     });
-    
+
+    cordova.getAppVersion(function(version) {
+        $rootScope.appVersion = version;
+    });
+
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
         console.log('going to ' + $location.path());
         if ($location.path() != '/' && !app.isAuthenticated && $location.path() != '/change-password') {
