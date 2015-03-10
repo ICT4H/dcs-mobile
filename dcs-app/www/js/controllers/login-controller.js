@@ -1,4 +1,4 @@
-var loginController = function($scope, $location, userDao, msg, app, dcsService, dialogService) {
+var loginController = function($rootScope, $scope, $location, userDao, msg, app, dcsService, dialogService) {
     $scope.title = "Garner";
     $scope.users = [];
     $scope.user = {};
@@ -27,6 +27,7 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService,
     $scope.login = function(){  
         msg.showLoading();
         app.user = $scope.user;
+        $rootScope.user = app.user;
         if(!$scope.user.hasOwnProperty("name") || !$scope.user.hasOwnProperty("password")) {
             (101).showError();
             $location.path('/');    
@@ -64,4 +65,4 @@ var loginController = function($scope, $location, userDao, msg, app, dcsService,
     onLoad();
 
 };
-dcsApp.controller('loginController', ['$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', 'dialogService', loginController]);
+dcsApp.controller('loginController', ['$rootScope', '$scope', '$location', 'userDao', 'messageService', 'app', 'dcsService', 'dialogService', loginController]);
