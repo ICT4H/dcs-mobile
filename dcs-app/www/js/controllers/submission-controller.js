@@ -4,7 +4,6 @@ dcsApp.service('dataProvider', ['$q' ,'submissionDao', function($q, submissionDa
 Provides abstraction over local store and server service.
 */
     this.init = function(projectUuid, type, searchStr, isServer) {
-        this.takeCachedProject = this.projectUuid && this.projectUuid == projectUuid
         this.projectUuid = projectUuid;
         this.type = type;
         this.searchStr = searchStr;
@@ -22,18 +21,8 @@ Provides abstraction over local store and server service.
         }
     }
 
-    var cachedProject;
-    var setProjectInCache = function(project) {
-        cachedProject = project;
-        return $.when(project);
-    }
-
     this.getProject = function() {
-        if (this.takeCachedProject) {
-            return $q.when(cachedProject);
-        } else {
-            return submissionDao.getProjectById(this.projectUuid).then(setProjectInCache);
-        }
+        return submissionDao.getProjectById(this.projectUuid);
     }
 }]);
 
