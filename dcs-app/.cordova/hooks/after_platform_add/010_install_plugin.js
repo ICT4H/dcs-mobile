@@ -11,7 +11,8 @@ var pluginlist = [
   'org.apache.cordova.dialogs',
   'org.apache.cordova.file',
   'org.apache.cordova.file-transfer',
-  'org.apache.cordova.media-capture'
+  'org.apache.cordova.media-capture',
+  'uk.co.whiteoctober.cordova.appversion'
 ];
  
 // no need to configure below
