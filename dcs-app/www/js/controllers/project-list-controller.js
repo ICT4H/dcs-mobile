@@ -133,14 +133,18 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     var onDelete = function(){
         if(app.areItemSelected(selectedProject)) {
             dialogService.confirmBox('Delete Selected Forms?', function() {
-                projectDao.deleteSub(selectedProject).then(function(response) {
-                    projectDao.deleteProject(selectedProject).then(function(response) {
-                        loadLocal();
-                        (504).showInfo();
-                    }, (106).showError);
-                }, (106).showError);
-            });
+                deleteProject(selectedProject);
+            }, (106).showError);
         }
+    };
+
+    var deleteProject = function(selectedProject) {
+        projectDao.deleteSub(selectedProject).then(function(response) {
+            projectDao.deleteProject(selectedProject).then(function(response) {
+                loadLocal();
+                (504).showInfo();
+            }, (106).showError);
+        }, (106).showError);
     };
 
     var onUpdate = function() {
@@ -218,8 +222,27 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     };
 
     $scope.showAllSubmissions = function(project) {
-        contextService.setProject(project);
-        $location.url('/submission-list/' + project.project_uuid + '?type=all');
+        if(project.status=='server-deleted') {
+            dialogService.infoBox(resourceBundle.form_server_deleted, function() {
+                deleteProject([project.project_uuid]);
+            });
+        }
+        else if(project.status=='outdated') {
+            dialogService.infoBox(resourceBundle.form_outdated, function() {
+                projectDao.deleteSub([project.project_uuid]).then(function(response) {
+                    projectDao.deleteProject([project.project_uuid]).then(function(response) {
+                        _getNonExistingProjectUuids([project.project_uuid])
+                            .then(_downloadServerProject)
+                            .then(_downloadNonExistingParent)
+                            .then(_createUniqueLocalProjects);
+                    }, (106).showError);
+                }, (106).showError);
+            });
+        }
+        else {
+            contextService.setProject(project);
+            $location.url('/submission-list/' + project.project_uuid + '?type=all');    
+        }
     }
 
     $scope.createSurveyResponse = function(project_uuid) {

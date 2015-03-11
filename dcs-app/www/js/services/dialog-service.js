@@ -15,6 +15,10 @@ var dialogService = function() {
             ['Yes','No']
         );
     };
+
+    this.infoBox = function(message, onOk) {
+        navigator.notification.alert(message, onOk, 'Garner');
+    };
 };
 
 dcsApp.service('dialogService', [dialogService]);

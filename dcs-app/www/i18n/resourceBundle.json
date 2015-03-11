@@ -8,7 +8,7 @@
     "downloading_projects": "Downloading forms",
     "project_downloaded": "Forms Downloaded.",
     "project_exists_locally": "Form already download",
-    "504": "Form Deleted",
+    "504": "Form/s Deleted",
     "505": "Updated forms",
     "no_project_change": "Server has no form changes",
     "localProjectTitle": "Offline Forms",
@@ -73,5 +73,7 @@
     "home": "Home",
     "log_out": "Log out",
     "questions": "Questions",
-    "error_in_connecting": "Unable to connect server."
+    "error_in_connecting": "Unable to connect server.",
+    "form_server_deleted": "Form no longer available on server, deleting downloaded form and data.",
+    "form_outdated": "Form is updated over server, downloading the latest and clearing existing data."
 }
