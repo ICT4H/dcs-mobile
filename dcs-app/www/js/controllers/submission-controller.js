@@ -66,6 +66,10 @@ Provides submission create and update using enketo. Uses local store for persist
         });
     };
 
+    var onError = function(){
+        msg.hideLoadingWithErr(resourceBundle.failed_to_save);
+    }
+
     var onEdit = function(submission) {
         submission.submission_id = dbSubmission.submission_id;
         submission.submission_uuid = dbSubmission.submission_uuid;
@@ -75,7 +79,7 @@ Provides submission create and update using enketo. Uses local store for persist
         msg.displaySuccess('Updating submission');
         submissionDao.updateSubmission(submission).then(function() {
             $location.url('/submission-list/' + dbSubmission.project_uuid + '?type=all');
-        });
+        }, onError);
     };
 
     var onNew = function(submission) {
@@ -90,9 +94,7 @@ Provides submission create and update using enketo. Uses local store for persist
                 $route.reload();
             }
             dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
-        }, function(error) {
-            console.log(error);
-        });
+        }, onError);
     };
 }]);
 
