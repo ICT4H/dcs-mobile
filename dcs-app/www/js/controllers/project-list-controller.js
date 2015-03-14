@@ -134,6 +134,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         if(app.areItemSelected(selectedProject)) {
             dialogService.confirmBox('Delete Selected Forms?', function() {
                 deleteProject(selectedProject);
+                fileSystem.deleteUserFolders(app.user.name, selectedProject);
             }, (106).showError);
         }
     };

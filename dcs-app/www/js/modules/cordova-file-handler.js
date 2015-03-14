@@ -23,14 +23,29 @@
     * This creates and or sets _working_dir to dirEntry for file to be copied/read into/from.
     * The working dir should be set before copying/moving/reading file.
     *
-    * dirEntry created as: dcs/user_email/project_name; special chars replaced with _ (underscore)
+    * dirEntry created as: dcs/user_email/project_uuid; special chars replaced with _ (underscore)
     */
-    CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_name) {
+    CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_uuid) {
+        _working_dir = _getDefferedEntry(user_email, project_uuid);
+        return _working_dir;
+    };
+
+    CordovaFileSytem.prototype.changeToTempAndClear = function(userEmail) {
+        var that = this;
+
+        //TODO how to call for resolved or reject
+        return this.deleteUserFolders(userEmail, ['tmp']).then(function() {
+            return that.setWorkingDir(userEmail, 'tmp');
+        }, function(e) {
+            return that.setWorkingDir(userEmail, 'tmp');
+        });
+    }
+
+    function _getDefferedEntry(user_email, project_uuid) {
         var deffered = Q.defer();
 
         _fsReady.then(function(fs) {
-            // TODO read the dcs (app_path) from config
-            var path = 'dcs/' + slugify(user_email) + '/' + slugify(project_name);
+            var path = _getPathToFolder(user_email) + project_uuid;
             console.log('trying to create path: ' + path);
 
             createPath(fs.root, path).then(function() {
@@ -40,8 +55,13 @@
             );
         }, deffered.reject);
 
-        return _working_dir = deffered.promise;
-    };
+        return deffered.promise;
+    }
+
+    var _getPathToFolder = function(user_email) {
+        // TODO read the dcs (app_path) from config
+        return 'dcs/' + slugify(user_email) + '/';
+    }
 
     CordovaFileSytem.prototype.getWorkingDirEntry = function() {
         return _working_dir;
@@ -91,20 +111,14 @@
 
     };
 
-    CordovaFileSytem.prototype.deleteFile = function(fileName) {
-        return fileNameToFileEntry(fileName).then(removeFileEntry);
+    CordovaFileSytem.prototype.deleteFiles = function(fileNames) {
+        var promises = fileNames.map(_deleteFileName);
+        return Q.all(promises);
     };
 
-    CordovaFileSytem.prototype.deleteCurrentFolder = function(folderName) {
-        var deffered = Q.defer();
-        _working_dir.then(function(workingDirEntry) {
-            workingDirEntry.removeRecursively(function() {
-                console.log('Directory removed.');
-                deffered.resolve();
-            }, deffered.reject);
-        })
-        return deffered.promise;
-    };
+    var _deleteFileName = function(fileName) {
+        return fileNameToFileEntry(fileName).then(removeFileEntry);
+    }
 
     var removeFileEntry = function(fileEntry) {
         var deffered = Q.defer();
@@ -114,6 +128,127 @@
             },
             deffered.reject
         );
+        return deffered.promise;
+    }
+
+    CordovaFileSytem.prototype.deleteUserFolders = function(userEmail, folderNames) {
+        var userPath = _getPathToFolder(userEmail);
+        return _fsReady.then(function(fs) {
+            return _deleteFolders(fs, userPath, folderNames);
+        });
+    };
+
+    CordovaFileSytem.prototype.deleteAllFoldersOfUser = function(userEmail) {
+        var userPath = _getPathToFolder(userEmail);
+        return _fsReady.then(function(fs) {
+            return _getFolderEntry(fs, userPath).then(_deleteFolderEntry);
+        });
+    };
+
+    CordovaFileSytem.prototype.moveTempFilesToFolder = function(userEmail, destFolder) {
+        return _getDefferedEntry(userEmail, destFolder).then(function(destEntry) {
+            return _moveTempFilesTo(userEmail, destEntry);
+        })
+    }
+
+    CordovaFileSytem.prototype.moveTempFilesToCurrentDir = function(userEmail) {
+        return _working_dir.then(function(destEntry) {
+            return _moveTempFilesTo(userEmail, destEntry);
+        })
+    }
+
+    var _moveTempFilesTo = function(userEmail, destEntry) {
+        console.log('in moveTempFilesTo')
+        var userPath = _getPathToFolder(userEmail);
+
+        return _fsReady.then(function(fs) {
+            console.log('_fsReady then');
+            return _getFolderEntry(fs, userPath + 'tmp').then(function(folderEntry) {
+                return onInitFs(folderEntry).then(function(entries) {
+                    return _moveFileEntriesTo(entries, destEntry);
+                })
+            });
+        });
+    }
+
+    function toArray(list) {
+        return Array.prototype.slice.call(list || [], 0);
+    }
+
+    function onInitFs(folderEntry) {
+        console.log('in onInitFs entrypath: ' + folderEntry.fullPath);
+
+        var deffered = Q.defer();
+
+        var dirReader = folderEntry.createReader();
+        var entries = [];
+        // Call the reader.readEntries() until no more results are returned.
+        var readEntries = function() {
+            dirReader.readEntries(function(results) {
+                if (!results.length) {
+                    deffered.resolve(entries);
+                } else {
+                    entries = entries.concat(toArray(results));
+                    readEntries();
+                }
+            }, deffered.reject);
+        };
+        readEntries();
+        return deffered.promise;
+    }
+
+    function _moveFileEntriesTo(entries, destEntry) {
+        console.log('in _moveFileEntriesTo entries: ' + entries.length);
+        var promises = [];
+        var deffered = Q.defer();
+
+        entries.forEach(function(entry, i) {
+            promises.push(moveToDirDeffered(destEntry, entry))
+        });
+        Q.all(promises).then(deffered.resolve);
+
+        return deffered.promise;
+    }
+
+    var _deleteFolders = function(fs, userPath, folderNames) {
+        var folderEntriesPromises = folderNames.map(function(folderName) {
+            console.log('fetching entry of folder: ' + folderName);
+            return _getFolderEntry(fs, userPath + folderName);
+        });
+        return _deleteFolderEntries(folderEntriesPromises);
+    }
+
+    var _getFolderEntry = function(fs, path) {
+        var deffered = Q.defer();
+        fs.root.getDirectory(
+            path,
+            {create:true, exclusive:false},
+            deffered.resolve,
+            function() {
+                console.log('folder entry not-found: ' + path);
+                deffered.reject()
+            }
+        );
+        return deffered.promise;
+    }
+
+    var _deleteFolderEntries = function(folderEntriesPromises) {
+        var deffered = Q.defer();
+        Q.all(folderEntriesPromises).then(function(folderEntries) {
+            var deletePromises = folderEntries.map(_deleteFolderEntry);
+            Q.all(deletePromises).then(deffered.resolve);
+        }, deffered.reject);
+        return deffered.promise;
+    }
+
+    var _deleteFolderEntry = function(folderEntry) {
+        var deffered = Q.defer();
+        if (!folderEntry) deffered.resolve();
+
+        folderEntry.removeRecursively(function() {
+            console.log('Directory removed: ' + folderEntry.fullPath);
+            deffered.resolve();
+        }, deffered.reject);
         return deffered.promise;
     }
 
@@ -198,6 +333,19 @@
                 }
             },callbacks.error);
         });
+    };
+
+
+    var moveToDirDeffered = function(dirEntry, fileEntry) {
+        var deffered = Q.defer();
+
+        console.log('fileEntry.toURL:' + fileEntry.toURL());
+        fileEntry.moveTo(dirEntry, fileEntry.name, function(newFileEntry) {
+            console.log('moved file to media folder. New url: ' + newFileEntry.toURL());
+            deffered.resolve(newFileEntry.toURL(), newFileEntry.name)
+        }, deffered.reject);
+
+        return deffered.promise;
     };
 
     var moveToDir = function(dirEntry, fileEntry, callbacks) {

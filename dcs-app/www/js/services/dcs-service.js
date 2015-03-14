@@ -63,7 +63,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', 'contextService', functi
         }
         var promises = [];
         angular.forEach(media_file_names.split(','), function(fileName) {
-            promises.push(app.httpGetMediaFile(submission.submission_uuid, fileName));
+            promises.push(app.httpGetMediaFile(submission, fileName));
         });
 
         $q.all(promises)
@@ -117,7 +117,7 @@ dcsApp.service('dcsService', ['$q', '$rootScope','app', 'contextService', functi
             return deferred.promise;
         }
 
-        fileSystem.setWorkingDir(app.user.name, contextService.getProject().name);
+        fileSystem.setWorkingDir(app.user.name, contextService.getProject().project_uuid + '/' + submission.submission_id);
         return getFilesMeta(fileNamesString)
             .then(function(filesMetaData) {
                 console.log('key: "value",  ' + filesMetaData.length);

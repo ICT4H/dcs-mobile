@@ -174,6 +174,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         if(selectedSubmission.length == 0) {
             dialogService.confirmBox(resourceBundle.confirm_delete_all_submissions, function() {
                 msg.showLoadingWithInfo(resourceBundle.deleting_data);
+                fileSystem.deleteUserFolders(app.user.name, [$scope.project_uuid]);
                 submissionDao.deleteAllSubmissionOfProject($scope.project_uuid).then(function() {
                     "data_deleted".showInfo();
                     loadLocal();
@@ -185,7 +186,12 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         else {
             dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
                 msg.showLoadingWithInfo(resourceBundle.deleting_data);
+                //TODO need to get the file names string to be deleted
                 submissionDao.deleteSubmissions(selectedSubmission).then(function(){
+                    var submissionFolders = selectedSubmission.map(function(selectedSubmissionId) {
+                        return $scope.project_uuid + '/' + selectedSubmissionId;
+                    });
+                    fileSystem.deleteUserFolders(app.user.name, submissionFolders);
                     "data_deleted".showInfo();
                     loadLocal();
                 }, function(error){
@@ -213,8 +219,22 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         submission.status = BOTH;
         return dcsService.getSubmission(submission)
             .then(dcsService.getSubmissionMedia)
-            .then(submissionDao.createSubmission);      
+            .then(submissionDao.createSubmission)
+            .then(_moveRecentTempFiles);
     };
+
+    var _moveRecentTempFiles = function() {
+        return submissionDao.getRecentlyCreateSubmissionId().then(function(result) {
+            var recentlyCreatedSubmissionId = result[0].rowid;
+            console.log('recently created submission_id: ' + recentlyCreatedSubmissionId);
+            return _moveMediaFiles(recentlyCreatedSubmissionId)
+        })
+    }
+
+    var _moveMediaFiles = function(submissionId) {
+        var partialPath = $scope.project_uuid + '/' + submissionId;
+        fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
+    }
 
     var onDownload = function() {
         if(!app.areItemSelected(selectedSubmission)) return;
