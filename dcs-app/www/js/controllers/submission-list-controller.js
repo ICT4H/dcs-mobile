@@ -89,19 +89,47 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                         var idsWithoutlocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
                         var newUuids = $scope.difference($scope.difference(idsWithoutlocalConflicts, conflictUuids), updateUuids);
 
+                        var submissionArr = [];
+
+                        console.log('newUuids: ' + newUuids);
                         var newSubmissionsPro = newUuids.map(function(newUuid) {
                             submission = result.submissions[newUuid];
                             submission.status = "both";
-                            return submissionDao.createSubmission(submission);
+
+                            return submissionDao.createSubmission(submission)
+                                .then(function() {
+                                    submissionArr.push(submission);
+                                    return submission;
+                                });
                         });
 
+                        $q.all(newSubmissionsPro).then(function() {
+                            submissionArr.map(function(submission) {
+                                return dcsService.getSubmissionMedia(submission)
+                                    .then(_moveTempFilesToRecentlyCreatedSubmission);
+                            });
+                        })
+                        console.log('conflictUuids: ' + conflictUuids);
                         var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+                        var submissionUpdateArr = [];
 
+                        console.log('updateUuids: ' + updateUuids);
                         var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
                             var submission = result.submissions[updateUuid];
-                            submission.status = "both"
-                            return submissionDao.updateSubmissionUsingUuid(submission);
+                            submission.status = "both";
+                            return submissionDao.updateSubmissionUsingUuid(submission)
+                                .then(function() {
+                                    submissionUpdateArr.push(submission);
+                                    return submission;
+                                });
                         });
+
+                        $q.all(updateSubmissionsPro).then(function() {
+                            submissionUpdateArr.map(function(submission) {
+                                return dcsService.getSubmissionMedia(submission)
+                                    .then(_moveTempFilesToSubmissionFolder);
+                            });
+                        })
 
                         promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
                         app.promises(promises, function() {
@@ -220,20 +248,26 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return dcsService.getSubmission(submission)
             .then(dcsService.getSubmissionMedia)
             .then(submissionDao.createSubmission)
-            .then(_moveRecentTempFiles);
+            .then(_moveTempFilesToRecentlyCreatedSubmission);
     };
 
-    var _moveRecentTempFiles = function() {
+    var _moveTempFilesToRecentlyCreatedSubmission = function() {
         return submissionDao.getRecentlyCreateSubmissionId().then(function(result) {
             var recentlyCreatedSubmissionId = result[0].rowid;
             console.log('recently created submission_id: ' + recentlyCreatedSubmissionId);
-            return _moveMediaFiles(recentlyCreatedSubmissionId)
+            return _moveMediaFiles(recentlyCreatedSubmissionId);
         })
+    }
+
+    var _moveTempFilesToSubmissionFolder = function(submission) {
+        return submissionDao.getsubmissionIdByUuid(submission.submission_uuid).then(function(result) {
+            return _moveMediaFiles(result[0].submission_id);
+        });
     }
 
     var _moveMediaFiles = function(submissionId) {
         var partialPath = $scope.project_uuid + '/' + submissionId;
-        fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
+        return fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
     }
 
     var onDownload = function() {

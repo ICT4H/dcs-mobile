@@ -158,11 +158,10 @@
     }
 
     var _moveTempFilesTo = function(userEmail, destEntry) {
-        console.log('in moveTempFilesTo')
+        console.log('moveTempFilesTo: ' + destEntry.toURL());
         var userPath = _getPathToFolder(userEmail);
 
         return _fsReady.then(function(fs) {
-            console.log('_fsReady then');
             return _getFolderEntry(fs, userPath + 'tmp').then(function(folderEntry) {
                 return onInitFs(folderEntry).then(function(entries) {
                     return _moveFileEntriesTo(entries, destEntry);
@@ -212,7 +211,7 @@
 
     var _deleteFolders = function(fs, userPath, folderNames) {
         var folderEntriesPromises = folderNames.map(function(folderName) {
-            console.log('fetching entry of folder: ' + folderName);
+            console.log('fetching folderEntry of: ' + folderName);
             return _getFolderEntry(fs, userPath + folderName);
         });
         return _deleteFolderEntries(folderEntriesPromises);

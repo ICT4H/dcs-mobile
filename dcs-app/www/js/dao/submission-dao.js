@@ -98,6 +98,10 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.execute('SELECT submission_uuid FROM submissions where submission_uuid = ?', [submission_uuid]);
 	};
 
+	this.getsubmissionIdByUuid = function(submission_uuid) {
+		return store.execute('SELECT submission_id FROM submissions where submission_uuid = ?', [submission_uuid]);
+	};
+
 	this.getAllSubmissionOf = function(project_uuid) {
 		return store.execute('SELECT submission_id, data from submissions where project_uuid = ?', [project_uuid]);
 	};
