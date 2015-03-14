@@ -95,32 +95,34 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
         return deferred.promise;
     }
 
-    this.httpGetMediaFile = function(submission_uuid, fileName) {
+    this.httpGetMediaFile = function(submission, fileName) {
         var deferred = $q.defer();
         user = this.user;
-        var url = user.url + '/client/attachment/' + submission_uuid + '/' + fileName;
+        var url = user.url + '/client/attachment/' + submission.submission_uuid + '/' + fileName;
         var headersMap = {"Authorization": 'Basic ' + btoa(this.user.name + ':' + this.user.password)};
 
-        fileSystem.setWorkingDir(this.user.name, $rootScope.currentProject.name);
-        fileSystem.getWorkingDirEntry().then(function(dirEntry) {
-            var userProjectFolder = dirEntry.toURL();
-            var saveToFileUrl = userProjectFolder + fileName;
-            console.log('downloading file to: ' + saveToFileUrl);
-            downloadMedia(headersMap, url, saveToFileUrl).then(
+        fileSystem.changeToTempAndClear(this.user.name).then(function(tmpDir) {
+            var submissionMediaDir = tmpDir.toURL();
+            var saveFileToUrl = submissionMediaDir + fileName;
+            console.log('downloading file to: ' + saveFileToUrl);
+            downloadMedia(headersMap, url, saveFileToUrl).then(
                 deferred.resolve,
-                deferred.reject
+                function() {
+                    // failing to download also resolves; caller needs to handle this
+                    deferred.resolve(undefined);
+                }
             );
         });
         return deferred.promise;
     }
 
-    function downloadMedia(headerMap, url, saveToFileUrl) {
+    function downloadMedia(headerMap, url, saveFileToUrl) {
         var deferred = $q.defer();
         var fileTransfer = new FileTransfer();
 
         fileTransfer.download(
             encodeURI(url),
-            saveToFileUrl,
+            saveFileToUrl,
             function(entry) {
                 console.log("download complete: " + entry.toURL());
                 deferred.resolve();

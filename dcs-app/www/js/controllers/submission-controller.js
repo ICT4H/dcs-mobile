@@ -31,7 +31,7 @@ dcsApp.service('enketoService', ['$location', '$route', 'app', 'contextService' 
 /*
 Provides submission create and update using enketo. Uses local store for persistence.
 */
-    var dbSubmission, parentUuid, projectUuid;
+    var dbSubmission, parentUuid, projectUuid, isNew;
 
     this.loadEnketo = function(project, submissionToEdit) {
         contextService.setProject(project);
@@ -40,9 +40,10 @@ Provides submission create and update using enketo. Uses local store for persist
         projectUuid = project.project_uuid;
         dbSubmission = submissionToEdit;
         parentUuid = contextService.getParentUuid();
+        isNew = submissionToEdit? false: true;
 
         var options = {
-            'buttonLabel': submissionToEdit? 'Update': 'Save',
+            'buttonLabel': isNew? 'Save': 'Update',
             'hideButton': contextService.isParentProject()? true:false,
             'onButtonClick': submissionToEdit? onEdit: onNew,
             'submissionXml': contextService.getModelStr(),
@@ -50,9 +51,13 @@ Provides submission create and update using enketo. Uses local store for persist
         };
         if(isEmulator) {
             loadEnketo(options);
-        }
-        else {
-            fileSystem.setWorkingDir(app.user.name, project.name).then(function() {
+            return;
+        } else if (isNew) {
+            fileSystem.changeToTempAndClear(app.user.name).then(function() {
+                loadEnketo(options);
+            });
+        } else {
+            fileSystem.setWorkingDir(app.user.name, projectUuid + '/' + dbSubmission.submission_id).then(function() {
                 loadEnketo(options);
             });
         }
@@ -86,6 +91,7 @@ Provides submission create and update using enketo. Uses local store for persist
         submission.status = "modified";
         submission.project_uuid = projectUuid;
         submissionDao.createSubmission(submission).then(function() {
+            _moveRecentTempFiles();
             msg.displaySuccess('Saved');
             var goToSubmissionList = function() {
                 $location.url('/submission-list/' + (parentUuid? parentUuid : projectUuid) + '?type=all');
@@ -96,6 +102,21 @@ Provides submission create and update using enketo. Uses local store for persist
             dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
         }, onError);
     };
+
+    var _moveRecentTempFiles = function() {
+        return submissionDao.getRecentlyCreateSubmissionId().then(function(result) {
+            var recentlyCreatedSubmissionId = result[0].rowid;
+            return _moveMediaFiles(recentlyCreatedSubmissionId)
+        })
+    }
+
+    var _moveMediaFiles = function(submissionId) {
+        console.log('in _moveMediaFiles');
+        var partialPath = projectUuid + '/' + submissionId;
+        fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
+    }
+
+
 }]);
 
 var Page = function($location, baseUrl, type, searchStr, currentIndex, totalRecords) {
@@ -143,7 +164,10 @@ dcsApp.controller('submissionController',
 
     var onDelete = function(submission) {
          dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
-            submissionDao.deleteSubmissions([$scope.submission.submission_id]).then(function(){
+            submissionDao.deleteSubmissions([$scope.submission.submission_id]).then(function() {
+                var submissionFolder = $routeParams.project_uuid + '/' + selectedSubmissionId;
+                fileSystem.deleteUserFolders(app.user.name, [submissionFolder]);
+
                 if($scope.page.isLastPage())
                     app.goBack();
                 else {

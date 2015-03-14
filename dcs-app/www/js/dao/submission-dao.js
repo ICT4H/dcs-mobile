@@ -61,6 +61,10 @@ dcsApp.service('submissionDao',['store', function(store){
 		return store.executeMultipleQueries(queries);
 	};
 
+	this.getRecentlyCreateSubmissionId = function() {
+		return store.execute('SELECT last_insert_rowid() AS rowid FROM submissions LIMIT 1');
+	}
+
 	this.getSubmissionForUpdate = function(submissions_ids) {
 		return store.execute('select submission_uuid as id, version as rev from submissions where submission_uuid!="undefined" and submission_id IN(' + getParamHolders(submissions_ids) + ')', submissions_ids);
 	};
