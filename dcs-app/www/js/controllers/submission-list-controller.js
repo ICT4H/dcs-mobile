@@ -76,63 +76,37 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         var promises = [];
         "downloading_delta".showInfoWithLoading();
 
+        // TODO refactor to make readable. Ex:
+        // getProjectLastFetched($scope.project_uuid)
+        //     .then(getServerSubmissionAfterLastFetched)
+        //     .then(getLocalSubmissionsGroupedOnStatus)
+        //     .then(updateSubmissionsToMatchServer)
+        //     .then(updateSubmissionMediaToMatchServer)
+        //     .then(updateProjectLastFetched)
         submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
             dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
                 submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
                     var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
                     submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
-
                         var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid');
                         var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
                         var alreadyInConflictUuids = $scope.pluck(localResult.conflictedUuids, 'submission_uuid');
 
-                        var idsWithoutlocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
-                        var newUuids = $scope.difference($scope.difference(idsWithoutlocalConflicts, conflictUuids), updateUuids);
+                        var idsWithoutLocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
+                        var newUuids = $scope.difference($scope.difference(idsWithoutLocalConflicts, conflictUuids), updateUuids);
 
-                        var submissionArr = [];
+                        var newSubmissionsPro = addNewSubmissions(newUuids, result);
+                        var newSubmissionsMediaPro = addNewSubmissionsMedia(newSubmissionsPro);
 
-                        console.log('newUuids: ' + newUuids);
-                        var newSubmissionsPro = newUuids.map(function(newUuid) {
-                            submission = result.submissions[newUuid];
-                            submission.status = "both";
-
-                            return submissionDao.createSubmission(submission)
-                                .then(function() {
-                                    submissionArr.push(submission);
-                                    return submission;
-                                });
-                        });
-
-                        $q.all(newSubmissionsPro).then(function() {
-                            submissionArr.map(function(submission) {
-                                return dcsService.getSubmissionMedia(submission)
-                                    .then(_moveTempFilesToRecentlyCreatedSubmission);
-                            });
-                        })
                         console.log('conflictUuids: ' + conflictUuids);
                         var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
-                        var submissionUpdateArr = [];
 
-                        console.log('updateUuids: ' + updateUuids);
-                        var updateSubmissionsPro = updateUuids.map(function(updateUuid) {
-                            var submission = result.submissions[updateUuid];
-                            submission.status = "both";
-                            return submissionDao.updateSubmissionUsingUuid(submission)
-                                .then(function() {
-                                    submissionUpdateArr.push(submission);
-                                    return submission;
-                                });
-                        });
+                        var updateSubmissionsPro = updateChangedSubmissions(updateUuids, result);
+                        var updateSubmissionsMediaPro = updateChangedSubmissionMedia(updateSubmissionsPro);
 
-                        $q.all(updateSubmissionsPro).then(function() {
-                            submissionUpdateArr.map(function(submission) {
-                                return dcsService.getSubmissionMedia(submission)
-                                    .then(_moveTempFilesToSubmissionFolder);
-                            });
-                        })
-
-                        promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro);
-                        app.promises(promises, function() {
+                        promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro,
+                                        [newSubmissionsMediaPro, updateSubmissionsMediaPro]);
+                        $q.all(promises).then(function() {
                             loadLocal();
                             "done".showInfo();
                         });
@@ -155,6 +129,75 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     //         $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
     //     }
     // };
+
+    var addNewSubmissions = function(newUuids, result) {
+        console.log('newUuids: ' + newUuids);
+        return newUuids.map(function (newUuid) {
+            var submission = result.submissions[newUuid];
+            submission.status = "both";
+            return submissionDao.createSubmission(submission).then(function (result) {
+                var recentlyCreatedSubmissionId = result.select[0].rowid;
+                console.log('recently created submission_id: ' + recentlyCreatedSubmissionId);
+                submission.submission_id = recentlyCreatedSubmissionId;
+                return submission;
+                //return submissionDao.getRecentlyCreateSubmissionId().then(function(result) {
+                //})
+            });
+        });
+    }
+
+    var addNewSubmissionsMedia = function(newSubmissionsPro) {
+        console.log('in addNewSubmissionsMedia');
+        return $q.all(newSubmissionsPro).then(function (newSubmissions) {
+            console.log('r: starting reduce');
+            return newSubmissions.reduce(function(promise, submission) {
+                return promise.then(function() {
+                    return dcsService.getSubmissionMedia(submission).then(function(submission) {
+                        console.log('r: in reducing of: ' + submission.submission_id);
+                        // not-making fun here will bind the last submission in scope
+                        return _moveTempFilesToRecentlyCreatedSubmission(submission).then(function() {
+                            console.log('r: moved file for: ' + submission.submission_id);
+                            // this don't work. above is needed.
+                            return submission;
+                        });
+                    });
+                });
+            }, $q.when());
+
+            //return newSubmissions.map(function (submission) {
+            //    console.log('downloading media for new s_uuid: ' + submission.submission_uuid);
+            //    return dcsService.getSubmissionMedia(submission).then(function(submission) {
+            //        // not-making fun here will bind the last submission in scope
+            //        return _moveTempFilesToRecentlyCreatedSubmission(submission).then(function() {
+            //            // this don't work. above is needed.
+            //            return submission;
+            //        });
+            //    });
+            //});
+        });
+    }
+
+    var updateChangedSubmissions = function(updateUuids, result) {
+        console.log('updateUuids: ' + updateUuids);
+        return updateUuids.map(function (updateUuid) {
+            var submission = result.submissions[updateUuid];
+            submission.status = "both";
+            return submissionDao.updateSubmissionUsingUuid(submission)
+                .then(function () {
+                    return submission;
+                });
+        });
+    }
+
+    var updateChangedSubmissionMedia = function(updateSubmissionsPro) {
+        return $q.all(updateSubmissionsPro).then(function (updatedSubmissions) {
+            return updatedSubmissions.map(function (submission) {
+                console.log('moving media for existing s_uuid: ' + submission.submission_uuid);
+                return dcsService.getSubmissionMedia(submission)
+                    .then(_moveTempFilesToSubmissionFolder);
+            });
+        });
+    }
 
     var post_selected_submissions = function(submission_ids) {
         var multiplePromises = [];
@@ -251,12 +294,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             .then(_moveTempFilesToRecentlyCreatedSubmission);
     };
 
-    var _moveTempFilesToRecentlyCreatedSubmission = function() {
-        return submissionDao.getRecentlyCreateSubmissionId().then(function(result) {
-            var recentlyCreatedSubmissionId = result[0].rowid;
-            console.log('recently created submission_id: ' + recentlyCreatedSubmissionId);
-            return _moveMediaFiles(recentlyCreatedSubmissionId);
-        })
+    var _moveTempFilesToRecentlyCreatedSubmission = function(submission) {
+        return _moveMediaFiles(submission.submission_id);
     }
 
     var _moveTempFilesToSubmissionFolder = function(submission) {
@@ -266,6 +305,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     }
 
     var _moveMediaFiles = function(submissionId) {
+        console.log('moving files for submission_id: ' + submissionId);
         var partialPath = $scope.project_uuid + '/' + submissionId;
         return fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
     }
