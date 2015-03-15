@@ -71,85 +71,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             loadLocal();
     };
 
-    var onDeltaPull = function() {
-       
-        var promises = [];
-        "downloading_delta".showInfoWithLoading();
-
-        submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
-            dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(result) {
-                submissionDao.updatelastFetch($scope.project_uuid, result.last_fetch).then(function() {
-                    var allIdsFromServer = Object.keys(result.submissions, 'submission_uuid');
-                    submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
-                        var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid');
-                        var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
-                        var alreadyInConflictUuids = $scope.pluck(localResult.conflictedUuids, 'submission_uuid');
-                        var idsWithoutLocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
-
-                        var newUuids = $scope.difference($scope.difference(idsWithoutLocalConflicts, conflictUuids), updateUuids);
-                        var newSubmissionsPro = addNewSubmissions(newUuids, result);
-                        console.log('conflictUuids: ' + conflictUuids);
-                        var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
-                        var updateSubmissionsPro = updateChangedSubmissions(updateUuids, result);
-
-                        var mediaPromise = downloadMediaOfServerSubmissions(newSubmissionsPro.concat(updateSubmissionsPro));
-
-                        promises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro,
-                                        [mediaPromise]);
-                        $q.all(promises).then(function() {
-                            loadLocal();
-                            "done".showInfo();
-                        });
-                    });
-                });
-            }, function() {msg.hideLoadingWithErr(resourceBundle.error_in_connecting);});
-        }); 
-    };
-
-    // var setObseleteProjectWarning = function(project) {
-    //     delete $scope.projectWarning;
-
-    //     if(project.status == OUTDATED) {
-    //         $scope.outdateProject = true;
-    //         $scope.projectWarning = 'The porject is outdated. You can only submit existing submissions.';
-    //     }
-
-    //     if(project.status == SERVER_DELETED) {
-    //         $scope.deletedProject = true;
-    //         $scope.projectWarning = 'No actions other that delete is premited since project is deleted from server';
-    //     }
-    // };
-
-    var downloadMediaOfServerSubmissions = function(submissionPromises) {
-        return submissionPromises.reduce(function(promise, submissionPromise) {
-            return promise.then(function() {
-                return submissionPromise.then(dcsService.getSubmissionMedia)
-                        .then(_moveTempFilesOfServerSubmission);
-            });
-        }, $q.when());
-    }
-
-    var addNewSubmissions = function(newUuids, result) {
-        console.log('newUuids: ' + newUuids);
-        return newUuids.map(function (newUuid) {
-            var submission = result.submissions[newUuid];
-            submission.status = "both";
-            return submissionDao.createSubmission(submission).then(function() {
-                return submission;
-            });
-        });
-    }
-
-    var updateChangedSubmissions = function(updateUuids, result) {
-        console.log('updateUuids: ' + updateUuids);
-        return updateUuids.map(function (updateUuid) {
-            var submission = result.submissions[updateUuid];
-            submission.status = "both";
-            return submissionDao.updateSubmissionUsingUuid(submission).then(function() {
-                return submission;
-            });
-        });
-    }
 
     var post_selected_submissions = function(submission_ids) {
         var multiplePromises = [];
@@ -226,75 +147,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var onNew = function() {
         $location.url('/projects/' + $scope.project_uuid + '/submissions/new');
-    };
-
-    function deselectExistingSubmissions(submission_uuid) {
-        var deferred = $q.defer();
-        submissionDao.getsubmissionUuidByUuid(submission_uuid).then(function(result) {
-            if(result.length != 0)
-                app.flipArrayElement(selectedSubmission, submission_uuid);
-            deferred.resolve();
-        }, deferred.reject);
-        return deferred.promise;
-    };
-
-    function createDownloadRequest(submission_uuid) {
-        return {
-            submission_uuid: submission_uuid,
-            project_uuid: $scope.project_uuid,
-            status: BOTH
-        };
-    }
-
-    var downloadSelectedSubmission = function() {
-        console.log('downloading non-existing submissions');
-        return selectedSubmission.map(function(submission_uuid) {
-            var downloadSubmissionRequest = createDownloadRequest(submission_uuid);
-            return dcsService.getSubmission(downloadSubmissionRequest).then(function(serverSubmission) {
-                return submissionDao.createSubmission(serverSubmission).then(function() {
-                    return serverSubmission;
-                });
-            });
-        });
-    };
-
-    var _moveTempFilesToRecentlyCreatedSubmission = function(submission) {
-        return _moveMediaToSubmissionFolder(submission.submission_id);
-    }
-
-    var _moveTempFilesOfServerSubmission = function(submission) {
-        return submissionDao.getsubmissionIdByUuid(submission.submission_uuid).then(function(result) {
-            return _moveMediaToSubmissionFolder(result[0].submission_id);
-        });
-    }
-
-    var _moveMediaToSubmissionFolder = function(submissionId) {
-        console.log('moving files for submission_id: ' + submissionId);
-        var partialPath = $scope.project_uuid + '/' + submissionId;
-        return fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
-    }
-
-    var onDownload = function() {
-        if(!app.areItemSelected(selectedSubmission)) return;
-
-        msg.showLoading();
-        var deselectingPromises = [];
-
-        selectedSubmission.forEach(function(submission_uuid) {
-            deselectingPromises.push(deselectExistingSubmissions(submission_uuid));
-        });
-
-        $q.all(deselectingPromises).then(function() {
-            console.log('deselecting existing submission done');
-            var submissionPromises = downloadSelectedSubmission();
-            downloadMediaOfServerSubmissions(submissionPromises).then(function() {
-                type = "all";
-                loadLocal();
-                "data_downloaded".showInfo();
-            }, function(error) {
-                "download_data_failed".showError();
-            });
-        });
     };
 
     var initServerActions =  function() {
@@ -425,6 +277,153 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
         else
             $location.url('/local-project-list');
+    };
+
+    var onDownload = function() {
+        if(!app.areItemSelected(selectedSubmission)) return;
+
+        msg.showLoading();
+        var deselectingPromises = [];
+
+        selectedSubmission.forEach(function(submission_uuid) {
+            deselectingPromises.push(deselectExistingSubmissions(submission_uuid));
+        });
+
+        $q.all(deselectingPromises).then(function() {
+            console.log('deselecting existing submission done');
+            var submissionPromises = downloadSelectedSubmission();
+            downloadMediaOfServerSubmissions(submissionPromises).then(function() {
+                type = "all";
+                loadLocal();
+                "data_downloaded".showInfo();
+            }, function(error) {
+                "download_data_failed".showError();
+            });
+        });
+    };
+
+    function deselectExistingSubmissions(submission_uuid) {
+        var deferred = $q.defer();
+        submissionDao.getsubmissionUuidByUuid(submission_uuid).then(function(result) {
+            if(result.length != 0)
+                app.flipArrayElement(selectedSubmission, submission_uuid);
+            deferred.resolve();
+        }, deferred.reject);
+        return deferred.promise;
+    };
+
+    var downloadSelectedSubmission = function() {
+        console.log('downloading non-existing submissions');
+        return selectedSubmission.map(function(submission_uuid) {
+            var downloadSubmissionRequest = createDownloadRequest(submission_uuid);
+            return dcsService.getSubmission(downloadSubmissionRequest).then(function(serverSubmission) {
+                return submissionDao.createSubmission(serverSubmission).then(function() {
+                    return serverSubmission;
+                });
+            });
+        });
+    };
+
+    function createDownloadRequest(submission_uuid) {
+        return {
+            submission_uuid: submission_uuid,
+            project_uuid: $scope.project_uuid,
+            status: BOTH
+        };
+    }
+
+    var downloadMediaOfServerSubmissions = function(submissionPromises) {
+        return submissionPromises.reduce(function(promise, submissionPromise) {
+            return promise.then(function() {
+                return submissionPromise.then(dcsService.getSubmissionMedia)
+                        .then(_moveTempFilesOfServerSubmission);
+            });
+        }, $q.when());
+    };
+
+    var onDeltaPull = function() {
+        "downloading_delta".showInfoWithLoading();
+
+        var deltaPromise = getDeltaPromise();
+        deltaPromise.then(function() {
+            console.log('delta pull done; loading local submissions');
+            loadLocal();
+            "done".showInfo();
+        }, function() {
+            msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+        });
+    };
+
+    var getDeltaPromise = function() {
+        var deferred = $q.defer();
+        submissionDao.getLastFetch($scope.project_uuid).then(function(result) {
+            dcsService.getSubmissionsFrom($scope.project_uuid, result.last_fetch).then(function(serverResult) {
+                submissionDao.updatelastFetch($scope.project_uuid, serverResult.last_fetch).then(function() {
+                    var allIdsFromServer = Object.keys(serverResult.submissions, 'submission_uuid');
+                    submissionDao.getModifiedAndUnModifiedUuids(allIdsFromServer).then(function(localResult) {
+                        var deltaPromise = updateLocalWithServerDelta(localResult, serverResult);
+                        deferred.resolve(deltaPromise);
+                    });
+                });
+            });
+        });
+        return deferred.promise;
+    };
+
+    function updateLocalWithServerDelta(localResult, serverResult) {
+        var updatePromises = [];
+        var allIdsFromServer = Object.keys(serverResult.submissions, 'submission_uuid');
+
+        var conflictUuids = $scope.pluck(localResult.modifiedUuids, 'submission_uuid');
+        var updateUuids = $scope.pluck(localResult.unModifiedUuids, 'submission_uuid');
+        var alreadyInConflictUuids = $scope.pluck(localResult.conflictedUuids, 'submission_uuid');
+        var idsWithoutLocalConflicts = $scope.difference(allIdsFromServer, alreadyInConflictUuids);
+
+        var newUuids = $scope.difference($scope.difference(idsWithoutLocalConflicts, conflictUuids), updateUuids);
+        var newSubmissionsPro = addNewSubmissions(newUuids, serverResult);
+        console.log('conflictUuids: ' + conflictUuids);
+        var conflictSubmissionsPro = submissionDao.updateSubmissionStatus(conflictUuids, 'conflicted');
+        var updateSubmissionsPro = updateChangedSubmissions(updateUuids, serverResult);
+
+        var mediaPromise = downloadMediaOfServerSubmissions(newSubmissionsPro.concat(updateSubmissionsPro));
+
+        updatePromises.concat(newSubmissionsPro, updateSubmissionsPro, conflictSubmissionsPro,
+            [mediaPromise]);
+        return $q.all(updatePromises);
+    }
+
+    var addNewSubmissions = function(newUuids, result) {
+        console.log('newUuids: ' + newUuids);
+        return newUuids.map(function (newUuid) {
+            var submission = result.submissions[newUuid];
+            submission.status = "both";
+            return submissionDao.createSubmission(submission).then(function() {
+                return submission;
+            });
+        });
+    };
+
+    var updateChangedSubmissions = function(updateUuids, result) {
+        console.log('updateUuids: ' + updateUuids);
+        return updateUuids.map(function (updateUuid) {
+            var submission = result.submissions[updateUuid];
+            submission.status = "both";
+            return submissionDao.updateSubmissionUsingUuid(submission).then(function() {
+                return submission;
+            });
+        });
+    };
+
+    var _moveTempFilesOfServerSubmission = function(submission) {
+        return submissionDao.getsubmissionIdByUuid(submission.submission_uuid).then(function(result) {
+            return _moveMediaToSubmissionFolder(result[0].submission_id);
+        });
+    };
+
+    var _moveMediaToSubmissionFolder = function(submissionId) {
+        console.log('moving files for submission_id: ' + submissionId);
+        var partialPath = $scope.project_uuid + '/' + submissionId;
+        return fileSystem.moveTempFilesToFolder(app.user.name, partialPath);
     };
 
     loadLocal();
