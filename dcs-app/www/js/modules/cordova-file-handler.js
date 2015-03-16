@@ -10,7 +10,7 @@
     CordovaFileSytem.prototype.constructor = FileSystemInterface;
 
     CordovaFileSytem.prototype.init = function() {
-        //Making var static with assumption that there will be only one filessytem to intreact with
+        //Making var static with assumption that there will be only one filessytem to interact with
         if(!_fsReady)
             _fsReady = initFileSystem();
     };
@@ -26,7 +26,7 @@
     * dirEntry created as: dcs/user_email/project_uuid; special chars replaced with _ (underscore)
     */
     CordovaFileSytem.prototype.setWorkingDir = function(user_email, project_uuid) {
-        _working_dir = _getDefferedEntry(user_email, project_uuid);
+        _working_dir = _getDeferredEntry(user_email, project_uuid);
         return _working_dir;
     };
 
@@ -41,21 +41,21 @@
         });
     }
 
-    function _getDefferedEntry(user_email, project_uuid) {
-        var deffered = Q.defer();
+    function _getDeferredEntry(user_email, project_uuid) {
+        var deferred = Q.defer();
 
         _fsReady.then(function(fs) {
             var path = _getPathToFolder(user_email) + project_uuid;
             console.log('trying to create path: ' + path);
 
             createPath(fs.root, path).then(function() {
-                setCurrentDirTo(path, fs, deffered);
+                setCurrentDirTo(path, fs, deferred);
             },
-                deffered.reject
+                deferred.reject
             );
-        }, deffered.reject);
+        }, deferred.reject);
 
-        return deffered.promise;
+        return deferred.promise;
     }
 
     var _getPathToFolder = function(user_email) {
@@ -121,14 +121,14 @@
     }
 
     var removeFileEntry = function(fileEntry) {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
         fileEntry.remove(function() {
                 console.log('File removed.');
-                deffered.resolve();
+                deferred.resolve();
             },
-            deffered.reject
+            deferred.reject
         );
-        return deffered.promise;
+        return deferred.promise;
     }
 
     CordovaFileSytem.prototype.deleteUserFolders = function(userEmail, folderNames) {
@@ -146,7 +146,7 @@
     };
 
     CordovaFileSytem.prototype.moveTempFilesToFolder = function(userEmail, destFolder) {
-        return _getDefferedEntry(userEmail, destFolder).then(function(destEntry) {
+        return _getDeferredEntry(userEmail, destFolder).then(function(destEntry) {
             return _moveTempFilesTo(userEmail, destEntry);
         })
     }
@@ -163,7 +163,7 @@
 
         return _fsReady.then(function(fs) {
             return _getFolderEntry(fs, userPath + 'tmp').then(function(folderEntry) {
-                return onInitFs(folderEntry).then(function(entries) {
+                return getSubDirs(folderEntry).then(function(entries) {
                     return _moveFileEntriesTo(entries, destEntry);
                 })
             });
@@ -174,10 +174,10 @@
         return Array.prototype.slice.call(list || [], 0);
     }
 
-    function onInitFs(folderEntry) {
-        console.log('in onInitFs entrypath: ' + folderEntry.fullPath);
+    function getSubDirs(folderEntry) {
+        console.log('in getSubDirs; of: ' + folderEntry.fullPath);
 
-        var deffered = Q.defer();
+        var deferred = Q.defer();
 
         var dirReader = folderEntry.createReader();
         var entries = [];
@@ -185,28 +185,28 @@
         var readEntries = function() {
             dirReader.readEntries(function(results) {
                 if (!results.length) {
-                    deffered.resolve(entries);
+                    deferred.resolve(entries);
                 } else {
                     entries = entries.concat(toArray(results));
                     readEntries();
                 }
-            }, deffered.reject);
+            }, deferred.reject);
         };
         readEntries();
-        return deffered.promise;
+        return deferred.promise;
     }
 
     function _moveFileEntriesTo(entries, destEntry) {
-        console.log('in _moveFileEntriesTo entries: ' + entries.length);
+        console.log('in _moveFileEntriesTo; entries: ' + entries.length);
         var promises = [];
-        var deffered = Q.defer();
+        var deferred = Q.defer();
 
         entries.forEach(function(entry, i) {
-            promises.push(moveToDirDeffered(destEntry, entry))
+            promises.push(moveToDirDeferred(destEntry, entry))
         });
-        Q.all(promises).then(deffered.resolve);
+        Q.all(promises).then(deferred.resolve);
 
-        return deffered.promise;
+        return deferred.promise;
     }
 
     var _deleteFolders = function(fs, userPath, folderNames) {
@@ -218,50 +218,50 @@
     }
 
     var _getFolderEntry = function(fs, path) {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
         fs.root.getDirectory(
             path,
             {create:true, exclusive:false},
-            deffered.resolve,
+            deferred.resolve,
             function() {
                 console.log('folder entry not-found: ' + path);
-                deffered.reject()
+                deferred.reject()
             }
         );
-        return deffered.promise;
+        return deferred.promise;
     }
 
     var _deleteFolderEntries = function(folderEntriesPromises) {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
         Q.all(folderEntriesPromises).then(function(folderEntries) {
             var deletePromises = folderEntries.map(_deleteFolderEntry);
-            Q.all(deletePromises).then(deffered.resolve);
-        }, deffered.reject);
-        return deffered.promise;
+            Q.all(deletePromises).then(deferred.resolve);
+        }, deferred.reject);
+        return deferred.promise;
     }
 
     var _deleteFolderEntry = function(folderEntry) {
-        var deffered = Q.defer();
-        if (!folderEntry) deffered.resolve();
+        var deferred = Q.defer();
+        if (!folderEntry) deferred.resolve();
 
         folderEntry.removeRecursively(function() {
             console.log('Directory removed: ' + folderEntry.fullPath);
-            deffered.resolve();
-        }, deffered.reject);
-        return deffered.promise;
+            deferred.resolve();
+        }, deferred.reject);
+        return deferred.promise;
     }
 
     var initFileSystem = function() {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
         var fileSystemRequest  = window.requestFileSystem || window.webkitRequestFileSystem;
 
         fileSystemRequest(
             LocalFileSystem.PERSISTENT,
             0,
-            deffered.resolve,
-            deffered.reject);
+            deferred.resolve,
+            deferred.reject);
         console.log('cordovaMediaManager init called');
-        return deffered.promise;
+        return deferred.promise;
     };
 
     var slugify = function(text) {
@@ -272,13 +272,13 @@
     };
 
     var createPath = function(rootDirEntry, path) {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
         var folders = path.split('/');
-        _createSubFoldersRecursively(rootDirEntry, folders, deffered);
-        return deffered.promise;
+        _createSubFoldersRecursively(rootDirEntry, folders, deferred);
+        return deferred.promise;
     }
 
-    var _createSubFoldersRecursively = function(rootDirEntry, folders, deffered) {
+    var _createSubFoldersRecursively = function(rootDirEntry, folders, deferred) {
         folders = _cleanCurrentPath(folders);
         var currentParent = folders[0];
 
@@ -288,12 +288,12 @@
                 var isNonLeafFolder = folders.length > 1;
                 if (isNonLeafFolder) {
                     var subFolders = folders.slice(1);
-                    _createSubFoldersRecursively(dirEntry, subFolders, deffered);
+                    _createSubFoldersRecursively(dirEntry, subFolders, deferred);
                 } else {
-                    deffered.resolve();
+                    deferred.resolve();
                 }
             },
-            deffered.reject
+            deferred.reject
         );
     };
 
@@ -305,13 +305,13 @@
         return folders;
     }
 
-    var setCurrentDirTo = function(path, fs, deffered) {
+    var setCurrentDirTo = function(path, fs, deferred) {
         console.log('trying to set current dir to: ' + path);
         fs.root.getDirectory(
             path,
             {create:true, exclusive:false},
-            deffered.resolve,
-            deffered.reject
+            deferred.resolve,
+            deferred.reject
         );
     }
 
@@ -335,16 +335,16 @@
     };
 
 
-    var moveToDirDeffered = function(dirEntry, fileEntry) {
-        var deffered = Q.defer();
+    var moveToDirDeferred = function(dirEntry, fileEntry) {
+        var deferred = Q.defer();
 
         console.log('fileEntry.toURL:' + fileEntry.toURL());
         fileEntry.moveTo(dirEntry, fileEntry.name, function(newFileEntry) {
             console.log('moved file to media folder. New url: ' + newFileEntry.toURL());
-            deffered.resolve(newFileEntry.toURL(), newFileEntry.name)
-        }, deffered.reject);
+            deferred.resolve(newFileEntry.toURL(), newFileEntry.name)
+        }, deferred.reject);
 
-        return deffered.promise;
+        return deferred.promise;
     };
 
     var moveToDir = function(dirEntry, fileEntry, callbacks) {
@@ -367,20 +367,20 @@
     };
 
     var fileNameToFileEntry = function(fileName) {
-        var deffered = Q.defer();
+        var deferred = Q.defer();
 
         console.log('fileName in fileNameToFileEntry: ' + fileName);
         _working_dir.then(function(dirEntry) {
             dirEntry.getFile(fileName, {create: false}, function(fileEntry) {
                 console.log('fileEntry found...' + Object.keys(fileEntry));
-                deffered.resolve(fileEntry);
+                deferred.resolve(fileEntry);
             }, function(e) {
                 console.log('error trying to get file: ' + fileName);
-                deffered.reject();
+                deferred.reject();
             });
         });
 
-        return deffered.promise;
+        return deferred.promise;
     };
 
 }());
