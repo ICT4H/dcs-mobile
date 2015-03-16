@@ -18,7 +18,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.outdateProject = false;
     $scope.deletedProject = false;
     $scope.showSearch = false;
-    $scope.project_name = contextService.getProject().name;
+    var project = contextService.getProject();
+    $scope.project_name = project.name;
 
     $scope.flipSearch = function() {
         $scope.showSearch = !$scope.showSearch;
@@ -291,6 +292,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
         $q.all(deselectingPromises).then(function() {
             console.log('deselecting existing submission done');
+
+            if (! projectHasMedia()) {
+                performDownloadWithMediaFiles(false);
+                return;
+            }
             dialogService.confirmBox('Download media files?', function() {
                 performDownloadWithMediaFiles(true);
             }, function() {
@@ -319,7 +325,16 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return deferred.promise;
     };
 
+    function projectHasMedia() {
+        return project.has_media_field == 'true';
+    }
+
     var onDeltaPull = function() {
+        if (! projectHasMedia()) {
+            performDeltaDownloadWithMediaFiles(false);
+            return;
+        }
+
         dialogService.confirmBox('Download media files?', function() {
             performDeltaDownloadWithMediaFiles(true);
         }, function() {
