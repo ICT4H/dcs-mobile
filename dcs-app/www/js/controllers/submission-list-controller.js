@@ -297,7 +297,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                 performDownloadWithoutMediaFiles.then(postDownload, downloadFailed);
                 return;
             }
-            dialogService.confirmBox('Download media files?', function() {
+            dialogService.confirmBox(resourceBundle.confirm_media_download, function() {
                 performDownload().then(postDownload, downloadFailed);
             }, function() {
                 performDownloadWithoutMediaFiles().then(postDownload, downloadFailed);
@@ -343,7 +343,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             return;
         }
 
-        dialogService.confirmBox('Download media files?', function() {
+        dialogService.confirmBox(resourceBundle.confirm_media_download, function() {
             deltaDownLoad().then(postDeltaDownload, deltaDownloadFailed)
         }, function() {
             deltaDownLoadWithoutMedia().then(postDeltaDownload, deltaDownloadFailed)

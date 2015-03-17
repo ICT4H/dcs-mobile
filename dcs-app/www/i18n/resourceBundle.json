@@ -76,5 +76,6 @@
     "error_in_connecting": "Unable to connect server.",
     "form_server_deleted": "Form no longer available on server, deleting downloaded form and data.",
     "form_outdated": "Form is updated over server, downloading the latest and clearing existing data.",
-    "failed_to_save": "Failed to save data"
+    "failed_to_save": "Failed to save data",
+    "confirm_media_download": "Download media files?"
 }
