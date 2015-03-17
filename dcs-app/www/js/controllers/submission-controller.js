@@ -161,11 +161,12 @@ dcsApp.controller('submissionController',
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
     var searchStr = $routeParams.searchStr || '';
+    var submissionId;
 
     var onDelete = function(submission) {
          dialogService.confirmBox(resourceBundle.confirm_data_delete, function() {
-            submissionDao.deleteSubmissions([$scope.submission.submission_id]).then(function() {
-                var submissionFolder = $routeParams.project_uuid + '/' + selectedSubmissionId;
+            submissionDao.deleteSubmissions([submissionId]).then(function() {
+                var submissionFolder = $routeParams.project_uuid + '/' + submissionId;
                 fileSystem.deleteUserFolders(app.user.name, [submissionFolder]);
 
                 if($scope.page.isLastPage())
@@ -182,7 +183,7 @@ dcsApp.controller('submissionController',
 
     var onSubmit = function() {
         "data_submit_msg".showInfoWithLoading();
-        submissionDao.getSubmissionById($scope.submission.submission_id)
+        submissionDao.getSubmissionById(submissionId)
                     .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
                     .then(dcsService.postSubmissionNewMedia)
                 .then(submissionDao.updateSubmission)
@@ -215,9 +216,10 @@ dcsApp.controller('submissionController',
     var loadSubmission = function() {
         dataProvider.getProject().then(function(project) {
             dataProvider.getSubmission(currentIndex).then(function(result) {
-                $scope.submission = result && result.data[0];
+                var submission = result && result.data[0];
+                submissionId = submission && submission.submission_id;
                 addPagination(type, searchStr, currentIndex, result && result.total);
-                enketoService.loadEnketo(project, $scope.submission);
+                enketoService.loadEnketo(project, submission);
                 if($routeParams.currentIndex)
                         loadActions();
                 $scope.actions = $scope.union($scope.actions, enketoService.getUrlsToAddChildren());
