@@ -56,7 +56,7 @@ configModule.run(['$route', '$rootScope', '$location', '$interval', '$timeout', 
 
     $rootScope.startMessageGC();
     $rootScope.pageSizes = [5, 10, 15, 20];
-    $rootScope.pageSize = {'value':$rootScope.pageSizes[0]};
+    $rootScope.pageSize = {'value':$rootScope.pageSizes[1]};
     $rootScope.logout = function() {
         console.log('logout');
         app.isAuthenticated = false;
