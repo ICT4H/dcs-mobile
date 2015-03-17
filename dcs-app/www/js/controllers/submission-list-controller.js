@@ -294,25 +294,33 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             console.log('deselecting existing submission done');
 
             if (! projectHasMedia()) {
-                performDownloadWithMediaFiles(false);
+                performDownloadWithoutMediaFiles.then(postDownload, downloadFailed);
                 return;
             }
             dialogService.confirmBox('Download media files?', function() {
-                performDownloadWithMediaFiles(true);
+                performDownload().then(postDownload, downloadFailed);
             }, function() {
-                performDownloadWithMediaFiles(false);
+                performDownloadWithoutMediaFiles().then(postDownload, downloadFailed);
             })
         });
     };
 
-    var performDownloadWithMediaFiles = function(downloadMedia) {
-        submissionService.downloadSelectedSubmission(selectedSubmission, $scope.project_uuid, downloadMedia).then(function() {
-            type = "all";
-            loadLocal();
-            "data_downloaded".showInfo();
-        }, function(error) {
-            "download_data_failed".showError();
-        });
+    function performDownload() {
+        return submissionService.downloadSelectedSubmission(selectedSubmission, $scope.project_uuid)
+    }
+
+    var performDownloadWithoutMediaFiles = function(downloadMedia) {
+        return submissionService.downloadSelectedSubmissionWithoutMedia(selectedSubmission, $scope.project_uuid)
+    }
+
+    function postDownload() {
+        type = "all";
+        loadLocal();
+        "data_downloaded".showInfo();
+    }
+
+    function downloadFailed() {
+        "download_data_failed".showError();
     }
 
     function deselectExistingSubmissions(submission_uuid) {
@@ -331,27 +339,33 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var onDeltaPull = function() {
         if (! projectHasMedia()) {
-            performDeltaDownloadWithMediaFiles(false);
+            deltaDownLoadWithoutMedia().then(postDeltaDownload, deltaDownloadFailed)
             return;
         }
 
         dialogService.confirmBox('Download media files?', function() {
-            performDeltaDownloadWithMediaFiles(true);
+            deltaDownLoad().then(postDeltaDownload, deltaDownloadFailed)
         }, function() {
-            performDeltaDownloadWithMediaFiles(false);
+            deltaDownLoadWithoutMedia().then(postDeltaDownload, deltaDownloadFailed)
         });
     };
 
-    var performDeltaDownloadWithMediaFiles = function(downloadMedia) {
-        "downloading_delta".showInfoWithLoading();
-        var deltaPromise = submissionService.processDeltaSubmissions($scope.project_uuid, downloadMedia);
-        deltaPromise.then(function() {
-            console.log('delta pull done; loading local submissions');
-            loadLocal();
-            "done".showInfo();
-        }, function() {
-            msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
-        });
+    function deltaDownLoadWithoutMedia() {
+        return submissionService.processDeltaSubmissionsWithoutMedia($scope.project_uuid);
+    }
+
+    function deltaDownLoad() {
+        return submissionService.processDeltaSubmissions($scope.project_uuid);
+    }
+
+    function postDeltaDownload() {
+        console.log('delta pull done; loading local submissions');
+        loadLocal();
+        "done".showInfo();
+    }
+
+    function deltaDownloadFailed() {
+        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
     }
 
     loadLocal();

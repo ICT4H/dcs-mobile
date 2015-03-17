@@ -2,9 +2,36 @@ dcsApp.service('submissionService', ['$rootScope', '$q' ,'app', 'submissionDao',
 
     var projectUuid, downloadMedia;
 
-    this.processDeltaSubmissions = function(currentProjectUuid, downloadMediaFiles) {
+    this.processDeltaSubmissionsWithoutMedia = function(currentProjectUuid) {
+        downloadMedia = false;
+        return processDeltaSubmissions(currentProjectUuid);
+    };
+
+    this.processDeltaSubmissions = function(currentProjectUuid) {
+        downloadMedia = true;
+        return processDeltaSubmissions(currentProjectUuid);
+    };
+
+    this.downloadSelectedSubmission = function(selectedSubmission, currentProjectUuid) {
+        downloadMedia = true;
+        return downloadSelectedSubmission(selectedSubmission, currentProjectUuid);
+    };
+
+    this.downloadSelectedSubmissionWithoutMedia = function(selectedSubmission, currentProjectUuid) {
+        downloadMedia = false;
+        return downloadSelectedSubmission(selectedSubmission, currentProjectUuid);
+    };
+
+    function downloadSelectedSubmission(selectedSubmission, currentProjectUuid) {
+        console.log('downloading non-existing submissions with downloadMedia: ' + downloadMedia);
         projectUuid = currentProjectUuid;
-        downloadMedia = downloadMediaFiles;
+        var downloadedSubmission = downloadAndSave(selectedSubmission);
+        return downloadMediaOfServerSubmissions(downloadedSubmission);
+    };
+
+    var processDeltaSubmissions = function(currentProjectUuid) {
+        console.log('delta pull with downloadMedia: ' + downloadMedia);
+        projectUuid = currentProjectUuid;
         var deferred = $q.defer();
 
         submissionDao.getLastFetch(projectUuid).then(function(result) {
@@ -17,16 +44,8 @@ dcsApp.service('submissionService', ['$rootScope', '$q' ,'app', 'submissionDao',
                     });
                 });
             });
-        });
+        }).catch(deferred.reject);
         return deferred.promise;
-    };
-
-    this.downloadSelectedSubmission = function(selectedSubmission, currentProjectUuid, downloadMediaFiles) {
-        console.log('downloading non-existing submissions');
-        projectUuid = currentProjectUuid;
-        downloadMedia = downloadMediaFiles;
-        var downloadedSubmission = downloadAndSave(selectedSubmission);
-        return downloadMediaOfServerSubmissions(downloadedSubmission);
     };
 
     function downloadAndSave(selectedSubmission) {
