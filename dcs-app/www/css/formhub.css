@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'enketo-icons';
-  src: url("/fonts/enketo-icons-v2.woff") format("woff"), url("/fonts/enketo-icons-v2.ttf") format("truetype"), url("/fonts/enketo-icons-v2.svg#enketo-icons") format("svg");
+  src: url("../fonts/enketo-icons-v2.woff") format("woff"), url("../fonts/enketo-icons-v2.ttf") format("truetype"), url("../fonts/enketo-icons-v2.svg#enketo-icons") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -1733,8 +1733,8 @@ input[type="button"].btn-block {
 
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url("/lib/bootstrap-sass/fonts/glyphicons-halflings-regular.eot");
-  src: url("/lib/bootstrap-sass/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("/lib/bootstrap-sass/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg");
+  src: url("../fonts/glyphicons-halflings-regular.eot");
+  src: url("../fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg");
 }
 .glyphicon {
   position: relative;
@@ -4735,13 +4735,13 @@ body {
   font-style: normal;
 }
 
-strong {
+.paper > strong {
   font-family: 'OpenSans', Arial, sans-serif;
   font-weight: bold;
   font-style: normal;
 }
 
-h2, h3, h4, .question.or-appearance-list-nolabel ~ .note, .question.or-appearance-label ~ .note {
+.paper > h2, .paper > h3, .paper > h4, .paper > .question.or-appearance-list-nolabel ~ .note, .paper > .question.or-appearance-label ~ .note {
   font-family: 'OpenSans', Arial, sans-serif;
   font-weight: bold;
   font-style: normal;
@@ -4749,16 +4749,16 @@ h2, h3, h4, .question.or-appearance-list-nolabel ~ .note, .question.or-appearanc
   text-align: center;
 }
 
-h3 {
+.paper > h3 {
   padding: 5px 0 15px 0;
   word-wrap: break-word;
 }
 
-h4, .question.or-appearance-list-nolabel ~ .note, .question.or-appearance-label ~ .note {
+.paper > h4, .paper > .question.or-appearance-list-nolabel ~ .note, .paper > .question.or-appearance-label ~ .note {
   text-align: left;
 }
 
-input, select, textarea {
+.paper > input, select, textarea {
   font-family: 'OpenSans', Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
