@@ -89,3 +89,30 @@
   text-align: left;
   max-width: 66%;
 }
+
+.row a {
+  text-decoration: none !important;
+  color: #333 !important;
+}
+
+.panel-footer a {
+  text-decoration: none !important;
+  color: #333 !important;
+}
+
+.no-panel-bottom-margin {
+  margin-bottom: 0 !important;
+}
+
+.navbar-app {
+  color: #333 !important;
+}
+
+.navbar-app .btn {
+  color: #333 !important;
+}
+
+.list-group-item.active {
+  background-color: #333;
+  border-color: #333;
+}
