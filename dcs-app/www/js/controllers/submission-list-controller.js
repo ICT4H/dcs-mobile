@@ -30,6 +30,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission = [];
         $scope.pagination.totalElement = submissions.total;
         $scope.submissions = submissions.data;
+
         $scope.title =  type + " data";
         msg.hideAll();
     };
@@ -294,7 +295,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             console.log('deselecting existing submission done');
 
             if (! projectHasMedia()) {
-                performDownloadWithoutMediaFiles.then(postDownload, downloadFailed);
+                performDownloadWithoutMediaFiles().then(postDownload, downloadFailed);
                 return;
             }
             dialogService.confirmBox(resourceBundle.confirm_media_download, function() {
