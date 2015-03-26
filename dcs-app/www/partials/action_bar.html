@@ -1,5 +1,12 @@
 <!-- to display menu actions of controller -->
-<div class="btn-group pull-right" ng-hide="actions.length == 0">
+<div class="btn-group pull-right" ng-show="actions.length == 1">
+    <a class='btn' ng-click="flipSearch();searchString=''" ng-show="!showSearch">
+      <i class="fa fa-search fa-lg"></i>
+    </a>
+    <a class='btn' ng-click="actions[0].onClick()" ng-class="{'disable': action.isDisabled}"><i class="fa {{actions[0].icon}} fa-lg"></i></a>
+</div>
+
+<div class="btn-group pull-right" ng-show="actions.length > 1">
     <a class='btn' ng-click="flipSearch();searchString=''" ng-show="!showSearch">
       <i class="fa fa-search fa-lg"></i>
     </a>
