@@ -1,8 +1,9 @@
 var dialogService = function() {
+    var BUTTON_YES = 1;
 
     this.confirmBox = function(message, onYes, onNo) {
         function onConfirm(buttonIndex) {
-            if(buttonIndex!=BUTTON_NO)
+            if(buttonIndex == BUTTON_YES)
                 onYes();
             else 
                 if(onNo)
@@ -16,9 +17,6 @@ var dialogService = function() {
         );
     };
 
-    this.infoBox = function(message, onOk) {
-        navigator.notification.alert(message, onOk, 'Garner');
-    };
 };
 
 dcsApp.service('dialogService', [dialogService]);
