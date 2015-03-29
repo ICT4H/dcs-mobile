@@ -20,7 +20,21 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         }
     };
 
-    $scope.loadServer = loadServer;
+    $scope.loadServer = function() {
+        $scope.showBack = true;
+        selectedServerProjects = [];
+        $scope.projects = [];
+        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            $scope.serverPage = true;
+            'loading_forms'.showInfoWithLoading();
+            initServerActionItems();
+            dcsService.
+                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    .then(assignResult, function() {
+                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+                    });
+        });
+    }
 
     $scope.onProjectSelect = function(projectRow, project) {
         projectRow.selected = !projectRow.selected;
@@ -73,13 +87,12 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.title = resourceBundle.localProjectTitle;
     };
 
-    function initOnlineActionItems() {
+    function initServerActionItems() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDownloadProject, 'icon': 'fa-download' });
         document.addEventListener('backbutton', loadLocal, false);
         $scope.title = resourceBundle.serverProjectTitle;
     };
-
 
     function onUpdate() {
         dialogService.confirmBox(resourceBundle.refresh_all_forms, function() {
@@ -194,22 +207,6 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
                 loadLocal();
             }, onErrorDeleting);
         }, onErrorDeleting);
-    }
-
-    function loadServer() {
-        $scope.showBack = true;
-        selectedServerProjects = [];
-        $scope.projects = [];
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-            $scope.serverPage = true;
-            'loading_forms'.showInfoWithLoading();
-            initOnlineActionItems();
-            dcsService.
-                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignResult, function() {
-                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
-                    });
-        });
     }
 
     function loadLocal() {
