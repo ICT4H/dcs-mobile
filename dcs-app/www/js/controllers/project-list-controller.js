@@ -46,6 +46,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
 
+    $scope.loadServer = loadServer;
+
     var onDownloadProject = function() {
         if(!app.areItemSelected(selectedProject)) return;
 
@@ -125,7 +127,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.initOnlineActionItems = function() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onDownloadProject, 'label': resourceBundle.download });
+        $scope.actions.push({'onClick': onDownloadProject, 'icon': 'fa-download' });
         document.addEventListener('backbutton', loadLocal, false);
         $scope.title = resourceBundle.serverProjectTitle;
     };
@@ -218,7 +220,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.showSearch = !$scope.showSearch;
     }
 
-    $scope.disableLink = function(status) {
+    function isAllowed(status) {
         return status=='server-deleted' || status=='outdated';
     };
 

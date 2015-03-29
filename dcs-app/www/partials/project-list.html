@@ -4,12 +4,12 @@
 </div>
 <div ng-if="showBack" ui-content-for="sideBar">
   <div class="btn" ng-click="goBack()">
-    <i class="fa fa-arrow-left fa-2x"></i>
+    <i class="fa fa-arrow-left fa-lg"></i>
   </div>
 </div>
 <div ng-if="!showBack" ui-content-for="sideBar">
     <div ui-toggle="uiSidebarLeft" class="btn sidebar-toggle">
-        <i class="fa fa-bars fa-2x"></i>
+        <i class="fa fa-bars fa-lg"></i>
     </div>
 </div>
 <div class="scrollable">  
@@ -17,9 +17,33 @@
         <div class="list-group" ng-if="projects.length !=0">
             <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted'),'selected':selected }">
                 <div ng-if="!serverPage">
-                    <button class="fa fa-file-o pull-right fa-2x link" ng-click="createSurveyResponse(project.project_uuid)" style="margin-top: -10px;" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}"></button>
-                    <button class="numberCircle pull-right link btn" ng-click="showUnsubmitted(project)" ng-disabled="disableLink(project.status)" ng-class="{'disabled': disableLink(project.status)}">{{project.unsubmitted_count}}</button>
-                    <button class='link' ng-click="showAllSubmissions(project)" ng-class="{'strikeout': (project.status=='server-deleted')}">{{ project.name }}</button>
+                      <div class="panel panel-default no-panel-bottom-margin">
+                        <div class="panel-heading">
+                          <h3 class="panel-title" ng-class="{'strikeout': (project.status=='server-deleted')}">{{ project.name }}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12 list-inline">
+                                    <li style="padding-bottom:10px" class="col-xs-6">Unsubmitted &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
+                                    <a href ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
+                                </div>
+                                <p/>
+                                <div class="col-sm-12 list-inline">
+                                    <li class="col-xs-6">Updated 5 days ago</li>
+                                    <a href ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-download fa-fw"></i>&nbsp; Update</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="col-sm-12 list-inline">
+                                <a href class="col-sm-4 col-lg-4" ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>
+
+                                <a href class="col-sm-4 col-lg-4" ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
+
+                                <a href class="col-sm-4 col-lg-4" ng-click="showAllSubmissions(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
+                            </div>
+                        </div>
+                      </div>
                 </div>
                 <div ng-if="serverPage">
                     <span>{{ project.name }}</span>
@@ -30,7 +54,7 @@
             </div>
         </div>
         <div ng-if="projects.length == 0" class="well well-lg">
-            No offline forms. Please start with 'Download Forms'.
+            No offline forms. <a href ng-click="loadServer()">Click here</a> to download forms.
         </div>
     </div>  
 </div>

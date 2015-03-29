@@ -153,7 +153,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var initServerActions =  function() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onDownload, 'label': 'Download'}); 
+        $scope.actions.push({'onClick': onDownload, 'icon': 'fa-download'});
     };
 
     var createSubmissions = function(results) {
