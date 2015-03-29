@@ -1,6 +1,6 @@
 <span ui-content-for="title">
   <span ng-hide="showSearch" ng-if="title != 'server data'">
-      <span style="text-transform:capitalize" ui-turn-on='SubmissionTypes'>{{title}}
+      <span ng-class="{'local': (filteredBy=='unsubmitted')}" style="text-transform:capitalize" ui-turn-on='SubmissionTypes'>{{title}}
       <i class="fa fa-caret-down"></i>
       </span>
       <ul class="dropdown-toggle dropdown-menu dropDown" 
@@ -11,7 +11,7 @@
       ui-state="SubmissionTypes"
       ui-turn-off="SubmissionTypes">
         <li ng-click="ApplyFilterWith('all')"><a >All</a></li>
-        <li ng-click="ApplyFilterWith('unsubmitted')"><a >Unsubmitted</a></li>
+        <li ng-click="ApplyFilterWith('unsubmitted')" class="local"><a >Unsubmitted</a></li>
         <li ng-click="ApplyFilterWith('conflicted')"><a >Conflicted</a></li>
       </ul>
   </span>
