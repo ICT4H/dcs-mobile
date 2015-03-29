@@ -1,4 +1,4 @@
-<span ui-content-for="title"><span ng-hide="showSearch">{{ title }}</span></span>
+<span ui-content-for="title">{{ title }}</span>
 <div ui-content-for="navbarAction">
     <div ng-include="'partials/action_bar.html'"></div>
 </div>
@@ -15,46 +15,60 @@
 <div class="scrollable">  
     <div class="scrollable-content">
         <div class="list-group" ng-if="projects.length !=0">
-            <div ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted'),'selected':selected }">
-                <div ng-if="!serverPage">
-                      <div class="panel panel-default no-panel-bottom-margin">
-                        <div class="panel-heading">
-                          <h3 class="panel-title" ng-class="{'strikeout': (project.status=='server-deleted')}">{{ project.name }}</h3>
+            <!-- server -->
+            <div ng-if="serverPage" ng-repeat="project in projects" ng-init="selected=false" ng-click="onProjectSelect(this, project)"  ng-class="{'list-group-item': true, 'selected':selected }">
+                <span>{{ project.name }}</span>
+            </div>
+            <!-- local -->
+            <div ng-if="!serverPage" class="list-group-item" ng-repeat="project in projects">
+                <div class="panel panel-default no-panel-bottom-margin">
+                    <div class="panel-heading" ng-class="{'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted')}">
+                        <h3 class="panel-title">
+                            <a href ng-click="onDeleteProjectByUuid(project.project_uuid)"><i class="fa fa-trash-o fa-fw"></i></a> &nbsp;{{ project.name }}
+                            <a href class="pull-right" ng-click="createSurveyResponse(project.project_uuid)" ng-if="project.status=='updated'"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- outdated -->
+                        <div ng-if="project.status=='outdated'" class="row col-sm-12">
+                            <p>Server has a new version of this form which you need to download.</p>
+                            <p>Note that on downloading existing form and data will be deleted.</p>
+                            <a href class="pull-right" ng-click="forceRefreshByProjectUuid(project.project_uuid)"><i class="fa fa-download fa-fw"></i>&nbsp; Download Latest</a>
                         </div>
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-12 list-inline">
-                                    <li style="padding-bottom:10px" class="col-xs-6">Unsubmitted &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
-                                    <a href ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
-                                </div>
-                                <p/>
-                                <div class="col-sm-12 list-inline">
-                                    <li class="col-xs-6">Updated 5 days ago</li>
-                                    <a href ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-download fa-fw"></i>&nbsp; Update</a>
-                                </div>
-                            </div>
+                        <!-- server deleted -->
+                        <div ng-if="project.status=='server-deleted'" class="row col-sm-12">
+                            <p>The form is deleted over server.</p>
+                            <p>The existing form and data are no longer valid.</p>
+                            <a href class="pull-right" ng-click="onDeleteProjectByUuid(project.project_uuid)"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
                         </div>
-                        <div class="panel-footer">
+                        <!-- local workable project -->
+                        <div ng-if="project.status=='updated'" class="row">
                             <div class="col-sm-12 list-inline">
-                                <a href class="col-sm-4 col-lg-4" ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>
-
-                                <a href class="col-sm-4 col-lg-4" ng-click="createSurveyResponse(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
-
-                                <a href class="col-sm-4 col-lg-4" ng-click="showAllSubmissions(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
+                                <li style="padding-bottom:10px" class="col-xs-6">Unsubmitted &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
+                                <a href ng-click="showUnsubmitted(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
                             </div>
+                            <p/>
+                            <div class="col-sm-12 list-inline">
+                                <li style="padding-bottom:10px" class="col-xs-6">Offline Data &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
+                                <a href ng-click="showAllSubmissions(project)"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
+                            </div>
+                            <p/>
+                            <!--
+                            <div class="col-sm-12 list-inline">
+                                <li class="col-xs-6">Last Updated 5 days ago</li>
+                                <a href ng-click="refreshByUuid(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-refresh fa-fw"></i>&nbsp; Refresh</a>
+                            </div>
+                            -->
                         </div>
-                      </div>
-                </div>
-                <div ng-if="serverPage">
-                    <span>{{ project.name }}</span>
+                    </div>
                 </div>
             </div>
             <div ui-content-for="bottom">
                 <div ng-include="'partials/pagination_tag.html'"></div>
             </div>
         </div>
-        <div ng-if="projects.length == 0" class="well well-lg">
-            No offline forms. <a href ng-click="loadServer()">Click here</a> to download forms.
+        <div ng-if="!serverPage" class="well well-lg">
+            <a href ng-click="loadServer()">Click here</a> to download forms.
         </div>
     </div>  
 </div>

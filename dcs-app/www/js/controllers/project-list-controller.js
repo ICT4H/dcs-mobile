@@ -77,6 +77,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     */
     var _downloadServerProject = function(projectUuids) {
         if (projectUuids.length < 1) return $q.when([]);
+
         var deferred = $q.defer();
         dcsService.getQuestionnaires(projectUuids).then(function(serverProjects) {
             deferred.resolve(serverProjects);
@@ -132,37 +133,37 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.title = resourceBundle.serverProjectTitle;
     };
 
-    var onDelete = function(){
-        if(app.areItemSelected(selectedProject)) {
-            dialogService.confirmBox('Delete Selected Forms?', function() {
-                deleteProject(selectedProject);
-                fileSystem.deleteUserFolders(app.user.name, selectedProject);
-            }, (106).showError);
-        }
+    $scope.onDeleteProjectByUuid = function(projectUuid){
+        dialogService.confirmBox(resourceBundle.confirm_form_delete, function() {
+            deleteProjectsByUuids([projectUuid]);
+            fileSystem.deleteUserFolders(app.user.name, selectedProject);
+        });
     };
 
-    var deleteProject = function(selectedProject) {
-        projectDao.deleteSub(selectedProject).then(function(response) {
-            projectDao.deleteProject(selectedProject).then(function(response) {
+    function onErrorDeleting() {
+        "cannot_delete_form".showError();
+    }
+    
+    var deleteProjectsByUuids = function(projectUuids) {
+        projectDao.deleteSub(projectUuids).then(function(response) {
+            projectDao.deleteProject(projectUuids).then(function(response) {
                 loadLocal();
-                (504).showInfo();
-            }, (106).showError);
-        }, (106).showError);
+            }, onErrorDeleting);
+        }, onErrorDeleting);
     };
+
+    $scope.refreshByUuid = function(projectUuid) {
+        projectDao.getProjectToRefresh(projectUuid).then(function(projects) {
+            updateProjects(projects);
+        });
+    }
 
     var onUpdate = function() {
-        if(selectedProject.length != 0) {
-            projectDao.getProjectsforUpdate(selectedProject).then(function(projects) {
-                updateProjects(projects);
+        dialogService.confirmBox(resourceBundle.refresh_all_forms, function() {
+            projectDao.getAll().then(function(projects){
+              updateProjects(projects);
             });
-        }
-        else {
-            dialogService.confirmBox('Refresh Status of all Forms?', function() {
-                projectDao.getAll().then(function(projects){
-                  updateProjects(projects);
-                });
-            });
-        }
+        });
     };
 
     var updateProjects  = function(projects) {
@@ -188,9 +189,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     var initOfflineActionItems = function() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': loadServer, 'label': resourceBundle.download_forms });
-        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete });
-        $scope.actions.push({'onClick': onUpdate, 'label': resourceBundle.refresh_status });
+        $scope.actions.push({'onClick': onUpdate, 'icon': 'fa-refresh', 'label': resourceBundle.refresh_status });
         $scope.title = resourceBundle.localProjectTitle;
     };
 
@@ -224,28 +223,22 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         return status=='server-deleted' || status=='outdated';
     };
 
+    $scope.forceRefreshByProjectUuid = function(projectUuid) {
+        dialogService.confirmBox(resourceBundle.form_outdated, function() {
+            "downloading_projects".showInfoWithLoading();
+            projectDao.deleteSub([projectUuid]).then(function(response) {
+                projectDao.deleteProject([projectUuid]).then(function(response) {
+                    _downloadServerProject([projectUuid])
+                        .then(_downloadNonExistingParent)
+                        .then(_createUniqueLocalProjects);
+                }, onErrorDeleting);
+            }, onErrorDeleting);
+        });
+    }
+
     $scope.showAllSubmissions = function(project) {
-        if(project.status=='server-deleted') {
-            dialogService.infoBox(resourceBundle.form_server_deleted, function() {
-                deleteProject([project.project_uuid]);
-            });
-        }
-        else if(project.status=='outdated') {
-            dialogService.infoBox(resourceBundle.form_outdated, function() {
-                projectDao.deleteSub([project.project_uuid]).then(function(response) {
-                    projectDao.deleteProject([project.project_uuid]).then(function(response) {
-                        _getNonExistingProjectUuids([project.project_uuid])
-                            .then(_downloadServerProject)
-                            .then(_downloadNonExistingParent)
-                            .then(_createUniqueLocalProjects);
-                    }, (106).showError);
-                }, (106).showError);
-            });
-        }
-        else {
-            contextService.setProject(project);
-            $location.url('/submission-list/' + project.project_uuid + '?type=all');    
-        }
+        contextService.setProject(project);
+        $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
     $scope.createSurveyResponse = function(project_uuid) {

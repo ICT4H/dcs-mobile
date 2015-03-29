@@ -27,8 +27,8 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('update projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
 	};
 
-	this.getProjectsforUpdate = function(project_uuids) {
-		return store.execute('select project_uuid as id, version as rev from projects where project_uuid IN(' + getParamHolders(project_uuids) +')', project_uuids)
+	this.getProjectToRefresh = function(projectUuid) {
+		return store.execute('select project_uuid as id, version as rev from projects where project_uuid=?', [projectUuid])
 	};
 
 	this.deleteProject = function(projectUuids) {

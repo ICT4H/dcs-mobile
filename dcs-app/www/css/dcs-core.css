@@ -7,7 +7,12 @@
 }
 
 .outdated {
-  background-color: #FFAD33;
+  background-color: #FFAD33 !important;
+}
+
+.server-deleted {
+  text-decoration: line-through !important;
+  background-color: #FFAD33  !important;
 }
 
 .link {
@@ -17,10 +22,6 @@
   cursor:pointer;
   text-align: left;
   max-width: 66%;
-}
-
-.strikeout {
-  text-decoration: line-through!important;
 }
 
 .app-content-loading {
@@ -38,11 +39,6 @@
   top: 50%;
   margin-left: -25px;
   margin-top: -25px;
-}
-
-.server-deleted {
-  text-decoration: line-through !important;
-  background-color: #FFAD33 ;
 }
 
 .numberCircle {
