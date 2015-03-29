@@ -73,47 +73,13 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             loadLocal();
     };
 
-
-    var post_selected_submissions = function(submission_ids) {
-        var multiplePromises = [];
-        submission_ids.forEach(function(submissionId) {
-            multiplePromises.push(
-                submissionDao.getSubmissionById(submissionId)
-                    .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
-                    .then(dcsService.postSubmissionNewMedia)
-                    .then(submissionDao.updateSubmission));
-        });
-        return multiplePromises;
-    };
+    function errorSubmitting() {
+        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+    }
 
     var onSubmit = function() {
-        if(selectedSubmission.length != 0) {
-            "data_submit_msg".showInfoWithLoading();
-            $q.all(post_selected_submissions(selectedSubmission)).then(function() {
-                loadLocal();
-            },function(error){
-                msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
-            });
-        }
-        else {
-            //TODO remove the 100 magic number
-            dialogService.confirmBox(resourceBundle.confirm_submit_all_submissions, function() {
-                submissionDao.searchSubmissionsByType($scope.project_uuid, 'unsubmitted', '', 0, 100).then(function(result) {
-                    if (result.total < 1) {
-                        "no_changes_to_submit".showError();
-                        return    
-                    }
-                    
-                    var unsubmitted_ids = $scope.pluck(result.data, 'submission_id');
-                    "submitting_changes_msg".showInfoWithLoading();
-                    $q.all(post_selected_submissions(unsubmitted_ids)).then(function() {
-                        loadLocal();
-                    },function(error){
-                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
-                    });
-                });
-            });
-        }   
+        "data_submit_msg".showInfoWithLoading();
+        submissionService.submitAllOrSelectedIds($scope.project_uuid, selectedSubmission).then(loadLocal, errorSubmitting);
     };
 
     var onDelete = function() {

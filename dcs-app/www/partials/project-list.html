@@ -43,9 +43,9 @@
                         </div>
                         <!-- local workable project -->
                         <div ng-if="project.status=='updated'" class="row">
-                            <div class="col-sm-12 list-inline">
+                            <div ng-if="project.unsubmitted_count > 0" class="col-sm-12 list-inline">
                                 <li style="padding-bottom:10px" class="col-xs-6">Unsubmitted &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
-                                <a href ng-click="showUnsubmitted(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
+                                <a href ng-click="submitUnsubmitted(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
                             </div>
                             <p/>
                             <div class="col-sm-12 list-inline">

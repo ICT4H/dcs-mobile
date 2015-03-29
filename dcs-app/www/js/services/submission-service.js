@@ -1,4 +1,4 @@
-dcsApp.service('submissionService', ['$rootScope', '$q' ,'app', 'submissionDao', 'dcsService',  function($rootScope, $q, app, submissionDao, dcsService) {
+dcsApp.service('submissionService', ['$rootScope', '$q' ,'app', 'submissionDao', 'dcsService', 'dialogService',  function($rootScope, $q, app, submissionDao, dcsService, dialogService) {
 
     var projectUuid, downloadMedia;
 
@@ -20,6 +20,47 @@ dcsApp.service('submissionService', ['$rootScope', '$q' ,'app', 'submissionDao',
     this.downloadSelectedSubmissionWithoutMedia = function(selectedSubmission, currentProjectUuid) {
         downloadMedia = false;
         return downloadSelectedSubmission(selectedSubmission, currentProjectUuid);
+    };
+
+    this.submitAllOrSelectedIds = function(projectUuid, selectedSubmissionIds) {
+        var deferred = $q.defer();
+        var isDataSelected = selectedSubmissionIds && selectedSubmissionIds.length != 0
+
+        dialogService.confirmBox(resourceBundle.confirm_to_submit, function() {
+            if(isDataSelected) {
+                submitSelected(deferred, selectedSubmissionIds);
+            } else {
+                submitAll(projectUuid, deferred);
+            }
+        }, deferred.resolve);
+
+        return deferred.promise;
+    }
+
+    function submitSelected(deferred, selectedSubmissionIds) {
+        $q.all(postSelectedSubmissions(selectedSubmissionIds)).then(deferred.resolve, deferred.reject);
+    }
+
+    function submitAll(projectUuid, deferred) {
+        //TODO remove the 100 magic number
+        submissionDao.searchSubmissionsByType(projectUuid, 'unsubmitted', '', 0, 100).then(function(result) {
+            var unsubmittedIds = $rootScope.pluck(result.data, 'submission_id');
+            $q.all(postSelectedSubmissions(unsubmittedIds)).then(deferred.resolve, deferred.reject);
+        });
+    }
+
+    var postSelectedSubmissions = function(submissionIds) {
+        if (submissionIds.length < 1) return $.when();
+
+        var multiplePromises = [];
+        submissionIds.forEach(function(submissionId) {
+            multiplePromises.push(
+                submissionDao.getSubmissionById(submissionId)
+                    .then(dcsService.postSubmissionAndPurgeObsoluteMedia)
+                    .then(dcsService.postSubmissionNewMedia)
+                    .then(submissionDao.updateSubmission));
+        });
+        return multiplePromises;
     };
 
     function downloadSelectedSubmission(selectedSubmission, currentProjectUuid) {

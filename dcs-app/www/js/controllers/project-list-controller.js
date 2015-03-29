@@ -1,4 +1,4 @@
-var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg, dialogService, contextService) {
+var localProjectListController = function($rootScope, app, $scope, $q, $location, dcsService, paginationService, projectDao, msg, dialogService, contextService, submissionService) {
 
     resourceBundle = $rootScope.resourceBundle;
     $scope.pagination = paginationService.pagination;
@@ -76,9 +76,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $location.path('/projects/' + project_uuid + '/submissions/new');
     };
 
-    $scope.showUnsubmitted = function(project) {
+    $scope.submitUnsubmitted = function(project) {
+        msg.showLoading();
         contextService.setProject(project);
-        $location.url('/submission-list/' + project.project_uuid + '?type=unsubmitted');
+        submissionService.submitAllOrSelectedIds(project.project_uuid).then(loadLocal);
     };
 
     function initOfflineActionItems() {
@@ -224,4 +225,4 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     }
 };
 
-dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', 'contextService', localProjectListController]);
+dcsApp.controller('localProjectListController', ['$rootScope', 'app', '$scope', '$q', '$location', 'dcsService', 'paginationService', 'projectDao', 'messageService', 'dialogService', 'contextService', 'submissionService', localProjectListController]);
