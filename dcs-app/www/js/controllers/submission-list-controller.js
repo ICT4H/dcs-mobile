@@ -317,7 +317,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     function postDownload() {
         type = "all";
         loadLocal();
-        "data_downloaded".showInfo();
     }
 
     function downloadFailed() {
@@ -340,29 +339,25 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     var onDeltaPull = function() {
         if (! projectHasMedia()) {
-            deltaDownLoadWithoutMedia().then(postDeltaDownload, deltaDownloadFailed)
+            deltaDownLoadWithoutMedia().then(postDownload, deltaDownloadFailed)
             return;
         }
 
         dialogService.confirmBox(resourceBundle.confirm_media_download, function() {
-            deltaDownLoad().then(postDeltaDownload, deltaDownloadFailed)
+            deltaDownLoad().then(postDownload, deltaDownloadFailed)
         }, function() {
-            deltaDownLoadWithoutMedia().then(postDeltaDownload, deltaDownloadFailed)
+            deltaDownLoadWithoutMedia().then(postDownload, deltaDownloadFailed)
         });
     };
 
     function deltaDownLoadWithoutMedia() {
+        msg.showLoading();
         return submissionService.processDeltaSubmissionsWithoutMedia($scope.project_uuid);
     }
 
     function deltaDownLoad() {
+        msg.showLoading();
         return submissionService.processDeltaSubmissions($scope.project_uuid);
-    }
-
-    function postDeltaDownload() {
-        console.log('delta pull done; loading local submissions');
-        loadLocal();
-        "done".showInfo();
     }
 
     function deltaDownloadFailed() {
