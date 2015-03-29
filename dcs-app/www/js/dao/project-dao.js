@@ -4,8 +4,8 @@ dcsApp.service('projectDao',['store', function(store){
 		console.log('in create project; last_fetch'+ Date.parse(project.created) +'project_type: ' + project.project_type +' parent_uuid: ' +project.parent_info.parent_uuid+ ' action_label: '+ project.parent_info.action_label +' parent_fields_code_label_str: '+ project.parent_info.parent_fields_code_label_str +' child_ids: '+ project.child_ids);
 
 		return store.execute(
-			'insert into projects (project_uuid, version, created, status, name, xform, headers, last_fetch, project_type, parent_uuid, action_label, parent_fields_code_label_str, child_ids, has_media_field) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-			[project.project_uuid, project.version, project.created,'updated', project.name, project.xform, project.headers, Date.parse(project.created), project.project_type, project.parent_info.parent_uuid, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids, project.has_media_field]);
+			'insert into projects (project_uuid, version, created, status, name, xform, headers, last_fetch, project_type, parent_uuid, action_label, parent_fields_code_label_str, child_ids, has_media_field, last_updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+			[project.project_uuid, project.version, project.created,'updated', project.name, project.xform, project.headers, Date.parse(project.created), project.project_type, project.parent_info.parent_uuid, project.parent_info.action_label, project.parent_info.parent_fields_code_label_str, project.child_ids, project.has_media_field, project.last_updated]);
 	};
 
 	this.getProjectByUuids = function(projectUuids) {
@@ -16,8 +16,16 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('select project_uuid as id, version as rev from projects', []);
 	};
 
-	this.setprojectStatus = function(project_uuid, status) {
-		return store.execute('update projects set status=? where project_uuid=?',[status, project_uuid])
+	this.setProjectStatus = function(project_uuid, status) {
+		return store.execute('update projects set status=? where project_uuid=?',[status, project_uuid]);
+	};
+
+	this.setProjectUpdated = function(project_uuid, last_updated) {
+		return store.execute('update projects set last_updated=? where project_uuid=?',[last_updated, project_uuid]);
+	};
+
+	this.setAllProjectUpdatedTo = function(last_updated) {
+		return store.execute('update projects set last_updated=?', [last_updated]);
 	};
 
 	//TODO remove the as no more used

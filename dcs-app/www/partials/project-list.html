@@ -53,12 +53,10 @@
                                 <a href ng-click="showAllSubmissions(project)"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
                             </div>
                             <p/>
-                            <!--
                             <div class="col-sm-12 list-inline">
-                                <li class="col-xs-6">Last Updated 5 days ago</li>
+                                <li class="col-xs-6"  am-time-ago="project.last_updated" am-preprocess="utc"></li>
                                 <a href ng-click="refreshByUuid(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-refresh fa-fw"></i>&nbsp; Refresh</a>
                             </div>
-                            -->
                         </div>
                     </div>
                 </div>

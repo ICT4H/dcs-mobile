@@ -105,22 +105,30 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     function updateProjects(projects) {
         msg.showLoading();
-        dcsService.checkProjectsStatus(projects).then(function(outdatedProjects){
-            if(outdatedProjects.length == 0) {
-                'no_project_change'.showInfo();
-                return;
-            }
-
+        dcsService.checkProjectsStatus(projects).then(function(response) {
             var promises = [];
-            outdatedProjects.forEach(function(outdatedProject) {
-                promises.push(projectDao.setprojectStatus(outdatedProject.id, outdatedProject.status));
-            });
+            promises.push(setProjectsLastUpdateAsync(projects, response.last_updated));
+            addOutdatedStatusUpdationPromise(response, promises);
+
             $q.all(promises).then(function() {
                 loadLocal();
-                (505).showInfo();
-            }, (107).showError);
+            }, ''.showError.bind('updation_failed'));
         }, function(error, status) {
             msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+        });
+    }
+
+    function setProjectsLastUpdateAsync(projects, lastUpdated) {
+        var isSingleProjectSelected = projects.length == 1;
+        if (isSingleProjectSelected)
+            return projectDao.setProjectUpdated(projects[0].id, lastUpdated);
+        else
+            return projectDao.setAllProjectUpdatedTo(lastUpdated);
+    }
+
+    function addOutdatedStatusUpdationPromise(response, promises) {
+        response.outdated_projects.forEach(function (outdatedProject) {
+            promises.push(projectDao.setProjectStatus(outdatedProject.id, outdatedProject.status));
         });
     }
 
