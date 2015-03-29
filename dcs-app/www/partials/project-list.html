@@ -30,31 +30,31 @@
                     </div>
                     <div class="panel-body">
                         <!-- outdated -->
-                        <div ng-if="project.status=='outdated'" class="row col-sm-12">
+                        <div ng-if="project.status=='outdated'" class="row col-xs-12">
                             <p>Server has a new version of this form which you need to download.</p>
                             <p>Note that on downloading existing form and data will be deleted.</p>
                             <a href class="pull-right" ng-click="forceRefreshByProjectUuid(project.project_uuid)"><i class="fa fa-download fa-fw"></i>&nbsp; Download Latest</a>
                         </div>
                         <!-- server deleted -->
-                        <div ng-if="project.status=='server-deleted'" class="row col-sm-12">
+                        <div ng-if="project.status=='server-deleted'" class="row col-xs-12">
                             <p>The form is deleted over server.</p>
                             <p>The existing form and data are no longer valid.</p>
                             <a href class="pull-right" ng-click="onDeleteProjectByUuid(project.project_uuid)"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
                         </div>
                         <!-- local workable project -->
                         <div ng-if="project.status=='updated'" class="row">
-                            <div ng-if="project.unsubmitted_count > 0" class="col-sm-12 list-inline">
-                                <li style="padding-bottom:10px" class="col-xs-6">Unsubmitted &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
+                            <div ng-if="project.unsubmitted_count > 0" class="col-xs-12 list-inline">
+                                <li style="padding-bottom:10px" class="col-xs-8">Unsubmitted &nbsp;<span class="badge local">{{project.unsubmitted_count}}</span></li>
                                 <a href ng-click="submitUnsubmitted(project)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-upload fa-fw"></i>&nbsp; Submit</a>
                             </div>
                             <p/>
-                            <div class="col-sm-12 list-inline">
-                                <li style="padding-bottom:10px" class="col-xs-6">Offline Data &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
+                            <div class="col-xs-12 list-inline">
+                                <li style="padding-bottom:10px" class="col-xs-8">Offline Data &nbsp;<span class="badge">{{project.unsubmitted_count}}</span></li>
                                 <a href ng-click="showAllSubmissions(project)"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
                             </div>
                             <p/>
-                            <div class="col-sm-12 list-inline">
-                                <li class="col-xs-6"  am-time-ago="project.last_updated" am-preprocess="utc"></li>
+                            <div class="col-xs-12 list-inline">
+                                <li class="col-xs-8">Updated <span am-time-ago="project.last_updated" am-preprocess="utc"></span></li>
                                 <a href ng-click="refreshByUuid(project.project_uuid)" ng-class="{'disabled': disableLink(project.status)}"><i class="fa fa-refresh fa-fw"></i>&nbsp; Refresh</a>
                             </div>
                         </div>
