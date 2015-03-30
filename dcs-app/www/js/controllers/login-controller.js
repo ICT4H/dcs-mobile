@@ -1,12 +1,16 @@
 var loginController = function($rootScope, $scope, $location, userDao, msg, app, dcsService, dialogService) {
     $scope.title = "Garner";
     $scope.users = [];
-    $scope.user = {};
+    var defaultUrl = 'https://garner.twhosted.com';
+    $scope.user = {'url': defaultUrl};
     var isNewUser;
 
     $scope.userSelected = function(user){
         isNewUser = user.isNew;
         $scope.user = user.originalObject;
+        console.log('$scope.user.url: ' + $scope.user.url);
+        if (!$scope.user.url || $scope.user.url.length < 0)
+            $scope.user.url = defaultUrl;
     };
 
     var onSuccess = function(){
