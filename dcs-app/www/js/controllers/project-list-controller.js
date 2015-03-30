@@ -79,12 +79,12 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.submitUnsubmitted = function(project) {
         msg.showLoading();
         contextService.setProject(project);
-        submissionService.submitAllOrSelectedIds(project.project_uuid).then(loadLocal);
+        submissionService.submitAllOrSelectedIds(project.project_uuid).then(loadLocal, errorSubmitting);
     };
 
     function initOfflineActionItems() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onUpdate, 'icon': 'fa-refresh', 'label': resourceBundle.refresh_status });
+        $scope.actions.push({'onClick': onUpdate, 'icon': 'fa-refresh', 'label': resourceBundle.refresh_status});
         $scope.title = resourceBundle.localProjectTitle;
     };
 
@@ -97,7 +97,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     function onUpdate() {
         dialogService.confirmBox(resourceBundle.refresh_all_forms, function() {
-            projectDao.getAll().then(function(projects){
+            projectDao.getAll().then(function(projects) {
               updateProjects(projects);
             });
         });
@@ -209,7 +209,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     function onErrorDeleting() {
         'cannot_delete_form'.showError();
     }
-    
+
+    function errorSubmitting() {
+        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+    }
+
     function deleteProjectsByUuids(projectUuids) {
         projectDao.deleteSub(projectUuids).then(function(response) {
             projectDao.deleteProject(projectUuids).then(function(response) {
