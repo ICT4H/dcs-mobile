@@ -22,7 +22,8 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 		.then(this.execute('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
 						 'version text, status text, project_uuid text, created text, data text, xml text,'+
 						 'new_files_added text, un_changed_files text)', [], false))
-		.then(this.execute('CREATE INDEX IF NOT EXISTS project_uuid_index ON submissions (project_uuid)', [], false));
+		.then(this.execute('CREATE INDEX IF NOT EXISTS project_uuid_index ON submissions (project_uuid)', [], false))
+		.then(this.execute('CREATE INDEX IF NOT EXISTS data_status_index ON submissions (status)', [], false));
 	};
 
 	this.executeUserQueries = function(query, values, isSingleRecord) {	
