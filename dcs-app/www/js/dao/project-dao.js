@@ -47,11 +47,14 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('delete FROM submissions where project_uuid IN(' + getParamHolders(projectUuids) + ')', projectUuids);
 	}
 
-	this.getProjectsList = function(offset, limit, searchStr) {
+	this.getProjectsList = function(offset, limit) {
 		var queries = [];
-		var searchString = searchStr || '';
-		queries.push({'statement': 'select count(*) as total from projects where name like "%' + searchString +'%"','isSingleRecord':true})
-		queries.push({'statement': 'SELECT p.*, COUNT(s.project_uuid) AS unsubmitted_count FROM projects p LEFT JOIN (select project_uuid from submissions where status="modified") s ON p.project_uuid = s.project_uuid  where p.name like "%' + searchString +'%" GROUP BY p.project_uuid order by created desc  limit ? offset ?','values':[limit, offset], 'holder': 'projects'})
+		queries.push({'statement': 'SELECT COUNT(*) AS total FROM projects','isSingleRecord':true})
+		queries.push({'statement': 'SELECT p.*, IFNULL(local_count,0) as local_count, IFNULL(unsubmitted_count,0) as unsubmitted_count FROM projects p LEFT JOIN '+
+									'(select project_uuid, COUNT(project_uuid) AS local_count from submissions group by project_uuid) as s1  ON s1.project_uuid = p.project_uuid LEFT JOIN '+
+									'(select project_uuid, COUNT(project_uuid) AS unsubmitted_count from submissions where status="modified" group by project_uuid) as s2 '+
+									'ON s2.project_uuid = p.project_uuid order by created desc LIMIT ? OFFSET ?',
+					'values':[limit, offset], 'holder': 'projects'})
 		return store.executeMultipleQueries(queries);
 	};
 
