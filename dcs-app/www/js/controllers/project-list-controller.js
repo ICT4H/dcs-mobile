@@ -107,7 +107,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         msg.showLoading();
         dcsService.checkProjectsStatus(projects).then(function(response) {
             var promises = [];
+
             promises.push(setProjectsLastUpdateAsync(projects, response.last_updated));
+
+            updateProjectIsAssigned(response, promises)
+
             addOutdatedStatusUpdationPromise(response, promises);
 
             $q.all(promises).then(function() {
@@ -116,6 +120,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         }, function(error, status) {
             msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
         });
+    }
+
+    function updateProjectIsAssigned(response, promises) {
+        promises.push(projectDao.unAssignProjectUuids(response.unassign_uuids));
     }
 
     function setProjectsLastUpdateAsync(projects, lastUpdated) {
@@ -139,7 +147,9 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         getNonExistingProjectUuids(selectedServerProjects)
             .then(downloadServerProject)
             .then(downloadNonExistingParent)
-            .then(createUniqueLocalProjects);
+            .then(createUniqueLocalProjects)
+            .then(downloadDataOfParents)
+            .then(loadLocal);
     }
 
     function getNonExistingProjectUuids(projectUuids) {
@@ -187,10 +197,30 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     function createUniqueLocalProjects(projects) {
         var uniqueProjects = $scope.uniq(projects, $scope.iteratee('project_uuid'));
-        app.mapPromise(uniqueProjects, projectDao.createProject).then( function(response) {
+        var deferred = $q.defer();
+
+        $q.all(uniqueProjects.map(function(uniqueProject) {
+            return projectDao.createProject(uniqueProject);
+        })).then(function() {
             loadLocal();
-            'project_downloaded'.showInfo();
-        }, ''.showError.bind('error_saving_project'));
+            console.log('create uniq prj done');
+            deferred.resolve(uniqueProjects);
+        }, function() {
+            deferred.reject();
+            ''.showError.bind('error_saving_project');
+        });
+
+        return deferred.promise;
+    }
+
+    function downloadDataOfParents(projects) {
+        console.log('downloading parent data');
+        return $q.all(projects.map(function(project) {
+            if (project.project_type == 'parent')
+                return submissionService.processDeltaSubmissionsWithoutMedia(project.project_uuid);
+            else
+                return $q.when();
+        }));
     }
 
     function assignResult(result) {
