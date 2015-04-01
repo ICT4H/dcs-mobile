@@ -65,9 +65,13 @@ Provides submission create and update using enketo. Uses local store for persist
 
     this.getUrlsToAddChildren = function() {
         return contextService.getUrlsToAddChildren().map(function(urlToAddChildren) {
-            return {'onClick': function() {
-                $location.url(urlToAddChildren.url);       
-            }, 'label': urlToAddChildren.label}
+            return {
+                'onClick': function() {
+                    $location.url(urlToAddChildren.url);
+                },
+                'icon': 'fa fa-check fa-lg fa-fw',
+                'label': 'Select'
+            }
         });
     };
 
@@ -93,13 +97,13 @@ Provides submission create and update using enketo. Uses local store for persist
         submissionDao.createSubmission(submission).then(function() {
             _moveRecentTempFiles();
             msg.displaySuccess('Saved');
-            var goToSubmissionList = function() {
-                $location.url('/submission-list/' + (parentUuid? parentUuid : projectUuid) + '?type=all');
+            var goToLocalProjects = function() {
+                $location.url('/local-project-list');
             }
             var reload = function() {
                 $route.reload();
             }
-            dialogService.confirmBox("Do you want to create another one?", reload, goToSubmissionList);
+            dialogService.confirmBox("Do you want to create another one?", reload, goToLocalProjects);
         }, onError);
     };
 
@@ -157,6 +161,7 @@ dcsApp.controller('submissionController',
     
     $scope.showSearchicon = false;
     $scope.server = $routeParams.server == "true"? true:false;
+    $scope.title = resourceBundle.createSubmission;
 
     var currentIndex = parseInt($routeParams.currentIndex);
     var type = $routeParams.type || 'all';
@@ -199,10 +204,19 @@ dcsApp.controller('submissionController',
                     });
     };
 
-    var loadActions  = function() {
+    var loadActions  = function(project) {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
-        $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+        var isEdit = $routeParams.currentIndex? true: false;
+        var currentIsParent = project.project_type == 'parent'? true: false;
+
+        if(currentIsParent) {
+            $scope.title = 'Creating using'
+            $scope.actions = enketoService.getUrlsToAddChildren();
+            console.log('parent action: ' + JSON.stringify($scope.actions));
+        } else if(isEdit) {
+            $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
+            $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+        }
     };
 
 
@@ -220,9 +234,7 @@ dcsApp.controller('submissionController',
                 submissionId = submission && submission.submission_id;
                 addPagination(type, searchStr, currentIndex, result && result.total);
                 enketoService.loadEnketo(project, submission);
-                if($routeParams.currentIndex)
-                        loadActions();
-                $scope.actions = $scope.union($scope.actions, enketoService.getUrlsToAddChildren());
+                loadActions(project);
             });
         });
     };

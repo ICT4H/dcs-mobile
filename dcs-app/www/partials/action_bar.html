@@ -1,6 +1,8 @@
 <!-- to display menu actions of controller -->
-<div class="btn-group pull-right" ng-show="actions.length == 1">
-    <a class='btn' ng-click="actions[0].onClick()" ng-class="{'disable': action.isDisabled}"><i class="fa {{actions[0].icon}} fa-lg"></i></a>
+<div class="btn-group pull-right" ng-show="actions.length == 1" >
+    <a class='btn' ng-click="actions[0].onClick()" >
+        <i class="fa {{actions[0].icon}} fa-lg"></i>&nbsp; <span style="text-transform:capitalize">{{actions[0].label}}</span></a>
+
 </div>
 
 <div class="btn-group pull-right" ng-show="actions.length > 1">

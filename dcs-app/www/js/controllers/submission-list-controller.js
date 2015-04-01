@@ -1,4 +1,4 @@
-var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, contextService, submissionService){
+var submissionListController = function($rootScope, app, $scope, $q, $routeParams, $location, dcsService, submissionDao, msg, paginationService, dialogService, contextService, submissionService, projectDao){
 
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
@@ -9,7 +9,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.showSearch = false;
     var project = contextService.getProject();
-    $scope.project_name = project.name;
+    if (project.project_type == 'parent')
+        $scope.project_name = 'View ' + project.name + ' to continue';
+    else
+        $scope.project_name = project.name;
 
     var searchStr = $routeParams.searchStr;
     var selectedSubmission = [];
@@ -73,6 +76,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     function initOfflineActions() {
         $scope.actions = [];
+        if (project.project_type == 'parent') return;
+
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
         $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
         $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
@@ -184,7 +189,15 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     function onNew() {
-        $location.url('/projects/' + $scope.project_uuid + '/submissions/new');
+        if (project.project_type == 'child') {
+            projectDao.getProjectByUuids([project.parent_uuid]).then(function(results) {
+                var parentProject = results[0];
+                contextService.setProject(parentProject);
+                $location.url('/submission-list/' + parentProject.project_uuid + '?type=all');
+            });
+        } else {
+            $location.url('/projects/' + $scope.project_uuid + '/submissions/new');
+        }
     };
 
     function createSubmissions(results) {
@@ -326,5 +339,5 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     }
 };
 
-dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'contextService', 'submissionService', submissionListController]);
+dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'contextService', 'submissionService', 'projectDao', submissionListController]);
 
