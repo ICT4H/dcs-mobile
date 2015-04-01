@@ -67,12 +67,12 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     }
 
-    $scope.showAllSubmissions = function(project) {
+    $scope.onShowAllSubmissions = function(project) {
         contextService.setProject(project);
         $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
-    $scope.createSurveyResponse = function(project) {
+    $scope.onNewSurveyResponse = function(project) {
         if (project.project_type == 'child') {
             var parentProject = $scope.findWhere($scope.projects, {'project_uuid': project.parent_uuid});
             contextService.setProject(parentProject);
@@ -91,7 +91,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     function initOfflineActionItems() {
         $scope.actions = [];
-        $scope.actions.push({'onClick': onUpdate, 'icon': 'fa-refresh', 'label': resourceBundle.refresh_status});
+        $scope.actions.push({'onClick': onRefreshAll, 'icon': 'fa-refresh', 'label': resourceBundle.refresh_all});
         $scope.title = resourceBundle.localProjectTitle;
     };
 
@@ -102,7 +102,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.title = resourceBundle.serverProjectTitle;
     };
 
-    function onUpdate() {
+    function onRefreshAll() {
         dialogService.confirmBox(resourceBundle.refresh_all_forms, function() {
             projectDao.getAll().then(function(projects) {
               updateProjects(projects);

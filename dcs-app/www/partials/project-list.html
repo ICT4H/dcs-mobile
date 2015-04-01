@@ -25,7 +25,7 @@
                     <div class="panel-heading" ng-class="{'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted')}">
                         <h3 class="panel-title">
                             <a href ng-click="onDeleteProjectByUuid(project.project_uuid)"><i class="fa fa-trash-o fa-fw"></i></a> &nbsp;{{ project.name }}
-                            <a href class="pull-right" ng-click="createSurveyResponse(project)" ng-if="project.status=='updated'"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>
+                            <a href class="pull-right" ng-click="onNewSurveyResponse(project)" ng-if="project.status=='updated'"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>
                         </h3>
                     </div>
                     <div class="panel-body">
@@ -50,7 +50,7 @@
                             <p/>
                             <div class="col-xs-12 list-inline">
                                 <li style="padding-bottom:10px" class="col-xs-8">Offline Data &nbsp;<span class="badge">{{project.local_count}}</span></li>
-                                <a href ng-click="showAllSubmissions(project)"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
+                                <a href ng-click="onShowAllSubmissions(project)"><i class="fa fa-folder-open-o fa-fw"></i>&nbsp; Open</a>
                             </div>
                             <p/>
                             <div class="col-xs-12 list-inline">
