@@ -957,8 +957,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
        return {
          link: function(scope, element, attr) {
            Capture.putYielder(attr.uiYieldTo, element, scope, element.html());
-           element.contents().remove();
-
+           
+           element.on('$destroy', function(){
+             Capture.removeYielder(attr.uiYieldTo);
+           });
+           
            scope.$on('$destroy', function(){
              Capture.removeYielder(attr.uiYieldTo);
            });
@@ -1206,6 +1209,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           return statusesMeta[id] === undefined || this.get(id) === undefined;
         },
 
+        has: function(id) {
+          return statusesMeta[id] !== undefined;
+        },
+
+        referenceCount: function(id) {
+          var status = statusesMeta[id];
+          return status === undefined ? undefined : status.references;
+        },
+
         equals: function(id, value) {
           return this.get(id) === value;
         },
@@ -1263,6 +1275,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
               var method = SharedState[methodName];
               return {
                 restrict: 'A',
+                priority: 1, // This would make postLink calls happen after ngClick 
+                             // (and similar) ones, thus intercepting events after them.
+                             // 
+                             // This will prevent eventual ng-if to detach elements 
+                             // before ng-click fires.
+
                 compile: function(elem, attrs) {
                   var fn = methodName === 'set' ?
                     $parse(attrs[directiveName]) :
@@ -1282,6 +1300,46 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             }
       ]);
     });
+
+
+  var parseScopeContext = function(attr) {
+    if (!attr || attr === '') {
+      return [];
+    }
+    var vars = attr ? attr.trim().split(/ *, */) : [];
+    var res = [];
+    for (var i = 0; i < vars.length; i++) {
+      var item = vars[i].split(/ *as */);
+      if (item.length > 2 || item.length < 1) {
+        throw new Error('Error parsing uiScopeContext="' + attr + '"');
+      }
+      res.push(item);
+    }
+    return res;
+  };
+
+  var mixScopeContext = function(context, scopeVars, scope) {
+    for (var i = 0; i < scopeVars.length; i++) {
+      var key = scopeVars[i][0];
+      var alias = scopeVars[i][1] || key;
+      context[alias] = scope[key];
+    }
+  };
+
+  var parseUiCondition = function(name, attrs, $scope, SharedState, $parse) {
+    var exprFn = $parse(attrs[name]);
+    var uiScopeContext = parseScopeContext(attrs.uiScopeContext);
+    return function() {
+      var context;
+      if (uiScopeContext.length) {
+        context = angular.extend({}, SharedState.values());
+        mixScopeContext(context, uiScopeContext, $scope);  
+      } else {
+        context = SharedState.values();
+      }
+      return exprFn(context);
+    };
+  };
 
   // Same as ng-if but takes into account SharedState too
   module.directive('uiIf', ['$animate', 'SharedState', '$parse', function($animate, SharedState, $parse) {
@@ -1307,10 +1365,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       $$tlb: true,
       link: function ($scope, $element, $attr, ctrl, $transclude) {
           var block, childScope, previousElements, 
-          exprFn = $parse($attr.uiIf),
-          uiIfFn = function() { // can be slow
-            return exprFn(angular.extend({}, SharedState.values(), $scope));
-          };
+          uiIfFn = parseUiCondition('uiIf', $attr, $scope, SharedState, $parse);
 
           $scope.$watch(uiIfFn, function uiIfWatchAction(value) {
             if (value) {
@@ -1363,9 +1418,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       multiElement: true,
       link: function(scope, element, attr) {
         var exprFn = $parse(attr.uiHide),
-        uiHideFn = function() { // can be slow
-          return exprFn(angular.extend({}, SharedState.values(), scope));
-        };
+        uiHideFn = parseUiCondition('uiHide', attr, scope, SharedState, $parse);
         scope.$watch(uiHideFn, function uiHideWatchAction(value){
           $animate[value ? 'addClass' : 'removeClass'](element,NG_HIDE_CLASS, {
             tempClasses : NG_HIDE_IN_PROGRESS_CLASS
@@ -1385,9 +1438,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       multiElement: true,
       link: function(scope, element, attr) {
         var exprFn = $parse(attr.uiShow),
-        uiShowFn = function() { // can be slow
-          return exprFn(angular.extend({}, SharedState.values(), scope));
-        };
+        uiShowFn = parseUiCondition('uiShow', attr, scope, SharedState, $parse);
         scope.$watch(uiShowFn, function uiShowWatchAction(value){
           $animate[value ? 'removeClass' : 'addClass'](element, NG_HIDE_CLASS, {
             tempClasses : NG_HIDE_IN_PROGRESS_CLASS
@@ -1404,9 +1455,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       restrict: 'A',
       link: function(scope, element, attr) {
         var exprFn = $parse(attr.uiClass),
-        uiClassFn = function() { // can be slow
-          return exprFn(angular.extend({}, SharedState.values(), scope));
-        };
+        uiClassFn = parseUiCondition('uiClass', attr, scope, SharedState, $parse);
         scope.$watch(uiClassFn, function uiClassWatchAction(value){
           var classesToAdd = "";
           var classesToRemove = "";
@@ -1769,6 +1818,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         restrict: 'C',
         link: function(scope, elem) {
           $rootElement.addClass('has-modal');
+          elem.on('$destroy', function(){
+            $rootElement.removeClass('has-modal');
+          });
           scope.$on('$destroy', function(){
             $rootElement.removeClass('has-modal');
           });
@@ -1783,6 +1835,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         restrict: 'C',
         link: function(scope, elem) {
           $rootElement.addClass('has-modal-overlay');
+          elem.on('$destroy', function(){
+            $rootElement.removeClass('has-modal-overlay');
+          });
           scope.$on('$destroy', function(){
             $rootElement.removeClass('has-modal-overlay');
           });
@@ -1790,8 +1845,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       };
   }]);   
 }());
-
-
 (function() {
   'use strict';
 
@@ -1950,7 +2003,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                       var interval = setInterval(adjustParentPadding, 30);
 
                       element.on('$destroy', function(){
+                        parentStyle['padding' + side] = null;
                         clearInterval(interval);
+                        interval = adjustParentPadding = element = null;
                       });
                     }
                   };
@@ -1982,22 +2037,25 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         SharedState,
         bindOuterClick,
         $location
-      ) {
-        
-        var outerClickCb = function (scope){
-          SharedState.turnOff(stateName);
-        };
-
-        var outerClickIf = function() {
-          return SharedState.isActive(stateName);
-        };
-        
+      ) {  
         return {
           restrict: 'C',
           link: function (scope, elem, attrs) {
             var parentClass = 'has-sidebar-' + side;
             var visibleClass = 'sidebar-' + side + '-visible';
             var activeClass = 'sidebar-' + side + '-in';
+
+            if (attrs.id) {
+              stateName = attrs.id;
+            }
+
+            var outerClickCb = function (scope){
+              SharedState.turnOff(stateName);
+            };
+
+            var outerClickIf = function() {
+              return SharedState.isActive(stateName);
+            };
 
             $rootElement.addClass(parentClass);
             scope.$on('$destroy', function () {
@@ -2025,7 +2083,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
               } else {
                 $rootElement
                   .removeClass(activeClass);
-                // Note: .removeClass(visibleClass) is called by 'app' directive
+                // Note: .removeClass(visibleClass) is called on 'mobile-angular-ui.app.transitionend'
               }
             });
 
@@ -2043,6 +2101,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
               }
             });
 
+            scope.$on('mobile-angular-ui.app.transitionend', function() {
+              if (!SharedState.isActive(stateName)) {
+                $rootElement.removeClass(visibleClass);  
+              }
+            });
+
             if (attrs.closeOnOuterClicks !== 'false') {
               bindOuterClick(scope, elem, outerClickCb, outerClickIf);
             }
@@ -2052,18 +2116,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     ]);
   });
 
-  module.directive('app', ['$rootElement', 'SharedState', function($rootElement, SharedState) {
+  module.directive('app', ['$rootScope', 'SharedState', function($rootScope, SharedState) {
     return {
       restrict: 'C',
       link: function(scope, element, attributes) {
         
         element.on('transitionend webkitTransitionEnd oTransitionEnd otransitionend', function() {
-          if (!SharedState.isActive('uiSidebarLeft')) {
-            $rootElement.removeClass('sidebar-left-visible');  
-          }
-          if (!SharedState.isActive('uiSidebarRight')) {
-            $rootElement.removeClass('sidebar-right-visible');
-          }
+          $rootScope.$broadcast('mobile-angular-ui.app.transitionend');
         });          
 
       }
