@@ -55,10 +55,10 @@
           <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
 
           <div ng-if="item.status == 'conflicted'">
-            <button class="pull-right link" ng-click="resolveConflict(item.submission_uuid)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+            <button class="pull-right link" ng-click="onResolveConflict(item.submission_uuid)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
           </div>
           <div ng-if="item.status != 'conflicted'">
-            <button class="pull-right link" ng-click="setPathForView(item.submission_id, false, $index)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+            <button class="pull-right link" ng-click="onView(item.submission_id, false, $index)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
           </div>
         </div>
         <div ng-if="serverPage">

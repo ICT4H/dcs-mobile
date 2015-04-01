@@ -3,43 +3,24 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.pagination = paginationService.pagination;
     $scope.actions = [];
     $scope.searchFields = {all: 'All'};  
-    var searchStr = $routeParams.searchStr;
-    var MODIFIED = 1;
-    var UNMODIFIED = 0;
-    var selectedCount = 0;  
-    var serverSubmissions = [];
-    var selectedSubmission = [];
-    $scope.conflictSubmissionCount = 0;
     $scope.showAdvanceSearch = false;
-    var type = $routeParams.type || "all";
+    var type = $routeParams.type || 'all';
     $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
-
     $scope.project_uuid = $routeParams.project_uuid;
-    $scope.outdateProject = false;
-    $scope.deletedProject = false;
     $scope.showSearch = false;
     var project = contextService.getProject();
     $scope.project_name = project.name;
+
+    var searchStr = $routeParams.searchStr;
+    var selectedSubmission = [];
+
+    loadLocal();
 
     $scope.flipSearch = function() {
         $scope.showSearch = !$scope.showSearch;
     };
 
-    var assignSubmissions = function(submissions){
-        $scope.showAdvanceSearch = false;
-        selectedSubmission = [];
-        $scope.pagination.totalElement = submissions.total;
-        $scope.submissions = submissions.data;
-
-        $scope.title =  type + " data";
-        msg.hideAll();
-    };
-
-    var ErrorLoadingSubmissions = function(data, error) {
-        msg.hideLoadingWithErr(resourceBundle.failed_to_load_data);
-    };
-
-    $scope.setPathForView = function(submissionId, isFromServer, index) {
+    $scope.onView = function(submissionId, isFromServer, index) {
         var actualIndex = ($scope.pagination.pageSize * $scope.pagination.pageNumber) + index ;
         var queryParams = 'type=' + type + '&currentIndex=' + index + '&server=' + isFromServer + '&searchStr=' + (searchStr || "");
         $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
@@ -49,20 +30,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/submission-list/' + $scope.project_uuid + '?type=' + option);
     };
 
-    var loadLocal = function() {
-        $scope.serverPage = false;
-        $scope.title =  type + " data";
-        msg.showLoadingWithInfo(resourceBundle.loading_data);
-        initOfflineActions();
-        selectedSubmission = [];
-        if(type == "server") {
-            loadServer();
-        } else {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.searchSubmissionsByType($scope.project_uuid, type, searchStr, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignSubmissions, ErrorLoadingSubmissions);
-            });
-        }
+    $scope.onSearchClose = function(searchStr) {
+        $scope.search('');
     };
 
     $scope.search = function(searchString) {
@@ -73,25 +42,126 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
             loadLocal();
     };
 
+    $scope.searchInField = function(field, searchString) {
+        submissionDao.getAllSubmissionOf($scope.project_uuid).then(function(result) {
+            var matchedSubmissionsId = [];
+            result.forEach(function(submission) {
+                fieldValues = _getFieldValue(field.split('/'), JSON.parse(submission.data));
+                fieldValues.forEach(function(fieldValue) {
+                    if(fieldValue.toLowerCase().indexOf(searchString.toLowerCase()) > -1) 
+                        matchedSubmissionsId.push(submission.submission_id); 
+                });
+            });
+            submissionDao.createSearchTable(matchedSubmissionsId).then(function(){
+                $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                    type = 'search';
+                    submissionDao.searchSubmissionsByType($scope.project_uuid, 'search', '', $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                        .then(assignSubmissions, ErrorLoadingSubmissions);
+                });
+            });
+        });
+    };
+
+    $scope.onSubmissionSelect = function(submissionRow, submission) {
+        submissionRow.selected = !submissionRow.selected;
+        app.flipArrayElement(selectedSubmission, submission.submission_id);
+    };
+
+    $scope.onResolveConflict = function(submission_uuid) {
+        $location.url('/conflict-resolver/' + $scope.project_uuid + '/' + submission_uuid);
+    };
+
+    var initOfflineActions =  function() {
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
+        $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
+        $scope.actions.push({'onClick': goToServerSubmissions, 'label': resourceBundle.download});
+        $scope.actions.push({'onClick': onDeltaPull, 'label': resourceBundle.download_delta});
+        $scope.actions.push({'onClick': onAdvanceSearch, 'label': 'Advance Search'});
+    };
+
+    var initServerActions =  function() {
+        $scope.actions = [];
+        $scope.actions.push({'onClick': onDownload, 'icon': 'fa-download'});
+    };
+
+    app.goBack = function() {
+        if($scope.showSearch) {
+            $scope.showSearch = false;
+            $scope.search('');
+        }
+        else if($scope.serverPage)
+            $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
+        else
+            $location.url('/local-project-list');
+    };
+
+    function loadLocal() {
+        $scope.serverPage = false;
+        $scope.title =  type + ' data';
+        msg.showLoadingWithInfo(resourceBundle.loading_data);
+        initOfflineActions();
+        selectedSubmission = [];
+        if(type == 'server') {
+            loadServer();
+        } else {
+            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+                submissionDao.searchSubmissionsByType($scope.project_uuid, type, searchStr, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                    .then(assignSubmissions, ErrorLoadingSubmissions);
+            });
+        }
+    };
+
+    function loadServer() {
+        $scope.serverPage = true;
+        $scope.title =  type + ' data';
+        selectedSubmission = [];
+        msg.showLoadingWithInfo(resourceBundle.loading_data);
+        initServerActions();
+        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+            dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
+            .then(assignServerSubmissions, ErrorLoadingSubmissions);
+        });
+    };
+
+    function assignSubmissions(submissions){
+        $scope.showAdvanceSearch = false;
+        selectedSubmission = [];
+        $scope.pagination.totalElement = submissions.total;
+        $scope.submissions = submissions.data;
+
+        $scope.title =  type + ' data';
+        msg.hideAll();
+    };
+
+    function ErrorLoadingSubmissions(data, error) {
+        msg.hideLoadingWithErr(resourceBundle.failed_to_load_data);
+    };
+
     function errorSubmitting() {
         msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
     }
 
-    var onSubmit = function() {
-        "data_submit_msg".showInfoWithLoading();
+    function onSubmit() {
+        'data_submit_msg'.showInfoWithLoading();
         submissionService.submitAllOrSelectedIds($scope.project_uuid, selectedSubmission).then(loadLocal, errorSubmitting);
     };
 
-    var onDelete = function() {
+    function goToServerSubmissions() {
+        $location.url('/submission-list/' + $scope.project_uuid + '?type=server');
+    };
+
+    function onDelete() {
         if(selectedSubmission.length == 0) {
             dialogService.confirmBox(resourceBundle.confirm_delete_all_submissions, function() {
                 msg.showLoadingWithInfo(resourceBundle.deleting_data);
                 fileSystem.deleteUserFolders(app.user.name, [$scope.project_uuid]);
                 submissionDao.deleteAllSubmissionOfProject($scope.project_uuid).then(function() {
-                    "data_deleted".showInfo();
+                    'data_deleted'.showInfo();
                     loadLocal();
                 }, function(error) {            
-                    "failed_data_deletion".showError();
+                    'failed_data_deletion'.showError();
                 });
             });
         }   
@@ -104,25 +174,20 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                         return $scope.project_uuid + '/' + selectedSubmissionId;
                     });
                     fileSystem.deleteUserFolders(app.user.name, submissionFolders);
-                    "data_deleted".showInfo();
+                    'data_deleted'.showInfo();
                     loadLocal();
                 }, function(error){
-                    "failed_data_deletion".showError();
+                    'failed_data_deletion'.showError();
                 });
             });
         }
     };
 
-    var onNew = function() {
+    function onNew() {
         $location.url('/projects/' + $scope.project_uuid + '/submissions/new');
     };
 
-    var initServerActions =  function() {
-        $scope.actions = [];
-        $scope.actions.push({'onClick': onDownload, 'icon': 'fa-download'});
-    };
-
-    var createSubmissions = function(results) {
+    function createSubmissions(results) {
         var submissions = [];
         angular.forEach(results, function(item) {
             submissions.push({'date': item[2], 'submission_id': item[0]});
@@ -130,7 +195,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return submissions;
     };
 
-    var assignServerSubmissions = function(response) {
+    function assignServerSubmissions(response) {
         selectedSubmission = [];
         msg.hideAll();
         submissions = createSubmissions(response.data);
@@ -141,19 +206,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.submissions = submissions;
     };
 
-    var loadServer = function() {
-        $scope.serverPage = true;
-        $scope.title =  type + " data";
-        selectedSubmission = [];
-        msg.showLoadingWithInfo(resourceBundle.loading_data);
-        initServerActions();
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-            dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
-            .then(assignServerSubmissions, ErrorLoadingSubmissions);
-        });
-    };
-
-    var _getFieldsLabelFromXform = function(xform) {
+    function _getFieldsLabelFromXform(xform) {
         var xmlDoc = $.parseXML(xform)
         var labels = [];
         questions = xmlDoc.getElementsByTagName('label');
@@ -170,7 +223,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return labels;
     };
 
-    var _getFieldValue = function(fields, json) {
+    function _getFieldValue(fields, json) {
         fieldValues = json[fields[0]];
         fields = $scope.rest(fields);
         fields.forEach(function(field) {
@@ -179,8 +232,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return $scope.flatten([fieldValues]);
     };
 
-    var onAdvanceSearch = function() {
-        msg.showLoadingWithInfo("Loading Fields");
+    function onAdvanceSearch() {
+        msg.showLoadingWithInfo('Loading Fields');
         submissionDao.getProjectById($scope.project_uuid).then(function(result) {
             $scope.showAdvanceSearch = true;
             $scope.searchFields = _getFieldsLabelFromXform(result.xform);
@@ -189,65 +242,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         });
     };
 
-    $scope.searchInField = function(field, searchString) {
-        submissionDao.getAllSubmissionOf($scope.project_uuid).then(function(result) {
-            var matchedSubmissionsId = [];
-            result.forEach(function(submission) {
-                fieldValues = _getFieldValue(field.split('/'), JSON.parse(submission.data));
-                fieldValues.forEach(function(fieldValue) {
-                    if(fieldValue.toLowerCase().indexOf(searchString.toLowerCase()) > -1) 
-                        matchedSubmissionsId.push(submission.submission_id); 
-                });
-            });
-            submissionDao.createSearchTable(matchedSubmissionsId).then(function(){
-                $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                    type = "search";
-                    submissionDao.searchSubmissionsByType($scope.project_uuid, 'search', '', $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                        .then(assignSubmissions, ErrorLoadingSubmissions);
-                });
-            });
-        });
-    };
-
-    var initOfflineActions =  function() {
-        $scope.actions = [];
-        $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
-        $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
-        $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
-        $scope.actions.push({'onClick': goToServerSubmissions, 'label': resourceBundle.download});
-        $scope.actions.push({'onClick': onDeltaPull, 'label': resourceBundle.download_delta});
-        $scope.actions.push({'onClick': onAdvanceSearch, 'label': "Advance Search"});
-    };
-
-    $scope.onSubmissionSelect = function(submissionRow, submission) {
-        submissionRow.selected = !submissionRow.selected;
-        app.flipArrayElement(selectedSubmission, submission.submission_id);
-    };
-
-    var goToServerSubmissions = function() {
-        $location.url('/submission-list/' + $scope.project_uuid + '?type=server');
-    };
-
-    $scope.resolveConflict = function(submission_uuid) {
-        $location.url('/conflict-resolver/' + $scope.project_uuid + "/" + submission_uuid);
-    };
-
-    $scope.onSearchClose = function(searchStr) {
-        $scope.search('');
-    };
-
-    app.goBack = function() {
-        if($scope.showSearch) {
-            $scope.showSearch = false;
-            $scope.search('');
-        }
-        else if($scope.serverPage)
-            $location.url('/submission-list/' + $scope.project_uuid + '?type=all');
-        else
-            $location.url('/local-project-list');
-    };
-
-    var onDownload = function() {
+    function onDownload() {
         if(!app.areItemSelected(selectedSubmission)) return;
 
         msg.showLoading();
@@ -276,17 +271,17 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return submissionService.downloadSelectedSubmission(selectedSubmission, $scope.project_uuid)
     }
 
-    var performDownloadWithoutMediaFiles = function(downloadMedia) {
+    function performDownloadWithoutMediaFiles(downloadMedia) {
         return submissionService.downloadSelectedSubmissionWithoutMedia(selectedSubmission, $scope.project_uuid)
     }
 
     function postDownload() {
-        type = "all";
+        type = 'all';
         loadLocal();
     }
 
     function downloadFailed() {
-        "download_data_failed".showError();
+        'download_data_failed'.showError();
     }
 
     function deselectExistingSubmissions(submission_uuid) {
@@ -303,7 +298,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         return project.has_media_field == 'true';
     }
 
-    var onDeltaPull = function() {
+    function onDeltaPull() {
         if (! projectHasMedia()) {
             deltaDownLoadWithoutMedia().then(postDownload, deltaDownloadFailed)
             return;
@@ -329,8 +324,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     function deltaDownloadFailed() {
         msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
     }
-
-    loadLocal();
 };
 
 dcsApp.controller('submissionListController', ['$rootScope', 'app', '$scope', '$q', '$routeParams', '$location', 'dcsService', 'submissionDao', 'messageService', 'paginationService', 'dialogService', 'contextService', 'submissionService', submissionListController]);
