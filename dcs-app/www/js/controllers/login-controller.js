@@ -4,25 +4,19 @@ var loginController = function($rootScope, $scope, $location, userDao, msg, app,
     var defaultUrl = 'https://garner.twhosted.com';
     $scope.user = {'url': defaultUrl};
     var isNewUser;
-
+    $scope.changedUrl = "";
+    
     $scope.userSelected = function(user){
         isNewUser = user.isNew;
         $scope.user = user.originalObject;
         console.log('$scope.user.url: ' + $scope.user.url);
         if (!$scope.user.url || $scope.user.url.length < 0)
             $scope.user.url = defaultUrl;
+        if($scope.changedUrl) {
+            $scope.user.url = $scope.changedUrl;
+            $scope.changedUrl = "";            
+        }
     };
-
-    var onSuccess = function(){
-        app.isAuthenticated = true;
-        msg.hideAll();
-        $location.path('/local-project-list');
-    };
-
-    var onError = function(error){
-        msg.hideLoadingWithErr(error);
-        $location.path('/');
-    }
 
     $scope.forgetPassword = function() {
         $location.path('/change-password');
@@ -53,12 +47,8 @@ var loginController = function($rootScope, $scope, $location, userDao, msg, app,
             }, onError);            
     };
 
-    var onLoad = function(){
-        userDao.createRegister()
-        .then(userDao.getUsers().then(function(users){
-            $scope.users = users;
-        }));
-        $scope.isEmulator = isEmulator;
+    $scope.saveUrl = function(changedUrl) {
+        $scope.changedUrl = changedUrl;
     };
 
     app.goBack = function() {
@@ -66,6 +56,25 @@ var loginController = function($rootScope, $scope, $location, userDao, msg, app,
             navigator.app.exitApp();
         }, function() {});
     };
+
+    function onLoad(){
+        userDao.createRegister()
+        .then(userDao.getUsers().then(function(users){
+            $scope.users = users;
+        }));
+        $scope.isEmulator = isEmulator;
+    };
+
+    function onSuccess(){
+        app.isAuthenticated = true;
+        msg.hideAll();
+        $location.path('/local-project-list');
+    };
+
+    function onError(error){
+        msg.hideLoadingWithErr(error);
+        $location.path('/');
+    }
 
     onLoad();
 

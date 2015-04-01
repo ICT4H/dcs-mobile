@@ -22,6 +22,7 @@ var changePasswordController = function($scope, $location, userDao, app, msg, dc
         .then(userDao.getUsers().then(function(users){
             $scope.users = users;
         }));
+        $scope.isEmulator = isEmulator;
     };
 
     $scope.userSelected = function(user){

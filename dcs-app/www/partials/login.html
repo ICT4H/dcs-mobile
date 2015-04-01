@@ -9,6 +9,12 @@
           <div class="text-center">
             <img src="images/dcs_logo.png">
           </div>
+          <div class="text-center">
+            Connecting to {{user.url}}
+          </div>
+          <div class="text-center">
+            <a href ui-turn-on="modal1">Change</a>
+          </div>
           <div class ="form-group">
               <div angucomplete-alt
                 id="ex1"
@@ -24,14 +30,36 @@
           <div class ="form-group">
               <input class="form-control" type ="password" ng-model="user.password" placeholder="{{resourceBundle.password}}">
           </div>
-          <div class ="form-group">
-              <a href="" ng-click="forgetPassword()">{{resourceBundle.update_password}}</a>
-          </div>
-          <div class="form-group" ng-show="isEmulator">
-              <label>{{resourceBundle.url}}</label>
-              <input class="form-control" type ="text" ng-model="user.url">
-          </div>
           <button class="btn btn-primary" ng-click="login()">{{resourceBundle.login}}</button>
+          <div class ="help_text form-group" style="padding:10px 0px 0px 0px">
+              Did you change your password? Update 
+              <a href="" ng-click="forgetPassword()">here</a>
+              and login again
+          </div>
+          <!-- Change url Modal -->
+          <div ui-content-for="modals">
+            <div class="modal" ui-if="modal1" ui-state='modal1'>
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <a class="close" 
+                            ui-turn-off="modal1">&times;</a>
+                    <h4 class="modal-title">Change Url</h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label>{{resourceBundle.url}}</label>
+                        <input class="form-control" type ="text" ng-model="user.url">
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <a ui-turn-off="modal1" class="btn btn-default">Close</a>
+                    <a class="btn btn-primary" ng-click="saveUrl(user.url)" ui-turn-off="modal1" >Save changes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
       <div class="text-center help_text">
           {{resourceBundle.login_offine_help_text}}

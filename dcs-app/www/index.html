@@ -64,7 +64,6 @@
         <div class="navbar navbar-app navbar-absolute-bottom" ui-yield-to="bottom">
             <div class="btn-group justified"></div>
         </div>
-
         <!-- App Body -->
         <div class="app-body" ng-class="{loading: loading}">
             <div ng-show="showMessage">
@@ -81,6 +80,7 @@
             </div>
         </div>
     </div>
+    <div ui-yield-to="modals"></div>
 <!-- ~ .app -->
     <script src="cordova.js"></script>
     <!-- build:js scripts/vendor.js -->
