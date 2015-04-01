@@ -71,7 +71,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/conflict-resolver/' + $scope.project_uuid + '/' + submission_uuid);
     };
 
-    var initOfflineActions =  function() {
+    function initOfflineActions() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
         $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
@@ -81,7 +81,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.actions.push({'onClick': onAdvanceSearch, 'label': 'Advance Search'});
     };
 
-    var initServerActions =  function() {
+    function initServerActions() {
         $scope.actions = [];
         $scope.actions.push({'onClick': onDownload, 'icon': 'fa-download'});
     };

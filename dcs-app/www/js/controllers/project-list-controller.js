@@ -72,8 +72,14 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $location.url('/submission-list/' + project.project_uuid + '?type=all');
     }
 
-    $scope.createSurveyResponse = function(project_uuid) {
-        $location.path('/projects/' + project_uuid + '/submissions/new');
+    $scope.createSurveyResponse = function(project) {
+        if (project.project_type == 'child') {
+            contextService.setProject(project);
+            var parent_uuid = project.parent_uuid;
+            $location.url('/submission-list/' + parent_uuid + '?type=all');
+        } else {
+            $location.path('/projects/' + project.project_uuid + '/submissions/new');
+        }
     };
 
     $scope.submitUnsubmitted = function(project) {
