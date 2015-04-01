@@ -15,6 +15,14 @@
   background-color: #FFAD33  !important;
 }
 
+.help_text {
+  font-family: Open Sans-serif;
+  font-weight: normal;
+  padding: 30px;
+  font-size: 15px;
+  font-style: italic;
+}
+
 .link {
   background:none!important;
   border:none; 

@@ -11,6 +11,7 @@
     "localProjectTitle": "Offline Forms",
     "serverProjectTitle": "Select and Download Forms",
     "download_forms": "Download Forms",
+    "forget_password": "Update Password",
     "failed_to_load_data": "Failed to load data",
     "no_submission_change": "No submission has been changed",
     "localsubmissionTitle": "Offline Data",
@@ -57,7 +58,7 @@
     "about_us_title": "About Garner",
     "username": "Username",
     "password": "Password",
-    "new_password": "New password",
+    "new_password": "Updated password",
     "change_password_title": "Update Password",
     "update_password": "Update Password",
     "login": "Login",
@@ -71,5 +72,6 @@
     "form_server_deleted": "Form no longer available on server, deleting downloaded form and data.",
     "form_outdated": "Form is updated over server, downloading the latest and clearing existing data.",
     "failed_to_save": "Failed to save data",
-    "confirm_media_download": "Download media files?"
+    "confirm_media_download": "Download media files?",
+    "login_offine_help_text": "In order to login in without an internet connection, you must have logged in at least once prior to going offline."
 }

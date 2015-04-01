@@ -58,6 +58,7 @@ var loginController = function($rootScope, $scope, $location, userDao, msg, app,
         .then(userDao.getUsers().then(function(users){
             $scope.users = users;
         }));
+        $scope.isEmulator = isEmulator;
     };
 
     app.goBack = function() {

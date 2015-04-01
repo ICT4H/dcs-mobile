@@ -1,5 +1,8 @@
 var changePasswordController = function($scope, $location, userDao, app, msg, dcsService) {
-	$scope.changePassword = function(user) {
+    var defaultUrl = 'https://garner.twhosted.com';
+    $scope.user = {'url': defaultUrl};
+
+    $scope.changePassword = function(user) {
         msg.showLoading();
         app.user = user;
 		dcsService.verifyUser(user)
@@ -23,6 +26,9 @@ var changePasswordController = function($scope, $location, userDao, app, msg, dc
 
     $scope.userSelected = function(user){
         $scope.user = user.originalObject;
+        console.log('$scope.user.url: ' + $scope.user.url);
+        if (!$scope.user.url || $scope.user.url.length < 0)
+            $scope.user.url = defaultUrl;
     };
 
     app.goBack = function() {
