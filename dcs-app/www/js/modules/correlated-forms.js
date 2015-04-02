@@ -58,7 +58,7 @@ var SurveyRelation = function(child_project, parent_submission) {
         this._add_nodes_to_form();
         this._hide_parent_matching_fields();
 
-        xform_str = ( new XMLSerializer() ).serializeToString(this.xform_doc);
+        var xform_str = ( new XMLSerializer() ).serializeToString(this.xform_doc);
         return xform_str;
     }
 

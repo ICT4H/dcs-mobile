@@ -8,11 +8,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.showSearch = false;
-    var project = contextService.getProject();
-    if (project.project_type == 'parent')
-        $scope.project_name = 'View ' + project.name + ' to continue';
-    else
-        $scope.project_name = project.name;
+
+    $scope.project_name = contextService.getSecondaryTitleForListing();
 
     var searchStr = $routeParams.searchStr;
     var selectedSubmission = [];
@@ -76,7 +73,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     function initOfflineActions() {
         $scope.actions = [];
-        if (project.project_type == 'parent') return;
+        if (contextService.childFlow) return;
 
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
         $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
@@ -189,10 +186,11 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     function onNew() {
-        if (project.project_type == 'child') {
+        if (contextService.isChildProject()) {
             projectDao.getProjectByUuids([project.parent_uuid]).then(function(results) {
                 var parentProject = results[0];
-                contextService.setProject(parentProject);
+                var childProject = contextService.getProject()
+                contextService.setProject(parentProject, childProject);
                 $location.url('/submission-list/' + parentProject.project_uuid + '?type=all');
             });
         } else {

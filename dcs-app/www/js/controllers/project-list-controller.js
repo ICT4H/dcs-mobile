@@ -75,10 +75,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     $scope.onNewSurveyResponse = function(project) {
         if (project.project_type == 'child') {
             var parentProject = $scope.findWhere($scope.projects, {'project_uuid': project.parent_uuid});
-            contextService.setProject(parentProject);
+            contextService.setParentAndChildProjects(parentProject, project);
             var parent_uuid = project.parent_uuid;
-            $location.url('/submission-list/' + parent_uuid + '?type=all');
-        } else {
+            $location.url('/submission-list/' + parent_uuid + '?type=all&fromChild=true');
+       } else {
+            contextService.setProject(project);
             $location.path('/projects/' + project.project_uuid + '/submissions/new');
         }
     };
