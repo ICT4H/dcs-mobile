@@ -35,10 +35,12 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('update projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
 	};
 
-	this.resetAllAssignedProjects = function(projectUuids) {
+	this.updateAssignedAndUnassigned = function(assignedUuids, unassignedUuids) {
 		var queries = [];
-		queries.push({'statement': 'update projects SET is_assigned=\'true\'', 'holder': 'assign'})
-		queries.push({'statement': 'update projects SET is_assigned=\'false\' where project_uuid IN(' + getParamHolders(projectUuids) + ')', 'values':projectUuids})
+		queries.push({'statement': 'update projects SET is_assigned=\'true\' where project_uuid IN(' +
+			getParamHolders(assignedUuids) + ')', 'values': assignedUuids, 'holder': 'assign'});
+		queries.push({'statement': 'update projects SET is_assigned=\'false\' where project_uuid IN(' +
+			getParamHolders(unassignedUuids) + ')', 'values': unassignedUuids});
 
 		return store.executeMultipleQueries(queries);
 	}

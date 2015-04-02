@@ -134,7 +134,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
             promises.push(setProjectsLastUpdateAsync(projects, response.last_updated));
 
-            resetAllAssignedProjects(response, promises)
+            updateAssignedProjects(response, projects, promises);
 
             addOutdatedStatusUpdationPromise(response, promises);
 
@@ -148,8 +148,13 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     }
 
-    function resetAllAssignedProjects(response, promises) {
-        promises.push(projectDao.resetAllAssignedProjects(response.unassign_uuids));
+    function updateAssignedProjects(response, projects, promises) {
+        var assignedUuids = $scope.chain(projects)
+                                    .pluck('project_uuid')
+                                    .difference(response.unassigned_uuids)
+                                    .value();
+        console.log('assigned projects: ' + assignedUuids);
+        promises.push(projectDao.updateAssignedAndUnassigned(assignedUuids, response.unassigned_uuids));
     }
 
     function setProjectsLastUpdateAsync(projects, lastUpdated) {
