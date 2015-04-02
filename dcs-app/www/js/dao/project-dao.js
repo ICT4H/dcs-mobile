@@ -13,7 +13,7 @@ dcsApp.service('projectDao',['store', function(store){
 	};
 
 	this.getAll = function() {
-		return store.execute('select project_uuid as id, version as rev, project_type from projects', []);
+		return store.execute('select project_uuid, version, project_type from projects', []);
 	};
 
 	this.setProjectStatus = function(project_uuid, status) {
@@ -35,16 +35,16 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('update projects SET version=?, status=?, name=?, xform=?, headers=? where project_uuid=?', values);
 	};
 
-	this.unAssignProjectUuids = function(projectUuids) {
+	this.resetAllAssignedProjects = function(projectUuids) {
 		var queries = [];
-		queries.push({'statement': 'update projects SET is_assigned=\'false\' where project_uuid IN(' + getParamHolders(projectUuids) + ')', 'values':projectUuids})
 		queries.push({'statement': 'update projects SET is_assigned=\'true\'', 'holder': 'assign'})
+		queries.push({'statement': 'update projects SET is_assigned=\'false\' where project_uuid IN(' + getParamHolders(projectUuids) + ')', 'values':projectUuids})
 
 		return store.executeMultipleQueries(queries);
 	}
 
 	this.getProjectToRefresh = function(projectUuid) {
-		return store.execute('select project_uuid as id, project_uuid, version as rev, project_type from projects where project_uuid=?', [projectUuid])
+		return store.execute('select project_uuid, version, project_type from projects where project_uuid=?', [projectUuid])
 	};
 
 	this.deleteProject = function(projectUuids) {

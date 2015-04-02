@@ -52,7 +52,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         if (project.project_type == 'child') {
             updateProjectAndParent(project);
         } else {
-            var requestProject = {'project_uuid': project.project_uuid, 'id': project.project_uuid, 'rev': project.version, 'project_type': project.project_type};
+            var requestProject = getRequest(project);
             updateProjects([requestProject]);
         }
     }
@@ -116,12 +116,15 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     }
 
     function updateProjectAndParent(project) {
-        var requestProject = {'project_uuid': project.project_uuid, 'id': project.project_uuid, 'rev': project.version, 'project_type': project.project_type};
+        var requestProject = getRequest(project);
         projectDao.getProjectToRefresh(project.parent_uuid).then(function(parents) {
-            var parent = parents[0];
-            var parentProjectRequest = {'project_uuid': parent.project_uuid, 'id':parent.project_uuid, 'rev': parent.rev, 'project_type': parent.project_type};
+            var parentProjectRequest = getRequest(parents[0]);
             updateProjects([requestProject, parentProjectRequest]);
         });
+    }
+
+    function getRequest(project) {
+        return {'project_uuid': project.project_uuid, 'version': project.version, 'project_type': project.project_type};
     }
 
     function updateProjects(projects) {
@@ -131,7 +134,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
             promises.push(setProjectsLastUpdateAsync(projects, response.last_updated));
 
-            updateProjectIsAssigned(response, promises)
+            resetAllAssignedProjects(response, promises)
 
             addOutdatedStatusUpdationPromise(response, promises);
 
@@ -145,21 +148,21 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     }
 
-    function updateProjectIsAssigned(response, promises) {
-        promises.push(projectDao.unAssignProjectUuids(response.unassign_uuids));
+    function resetAllAssignedProjects(response, promises) {
+        promises.push(projectDao.resetAllAssignedProjects(response.unassign_uuids));
     }
 
     function setProjectsLastUpdateAsync(projects, lastUpdated) {
         var isSingleProjectSelected = projects.length == 1;
         if (isSingleProjectSelected)
-            return projectDao.setProjectUpdated(projects[0].id, lastUpdated);
+            return projectDao.setProjectUpdated(projects[0].project_uuid, lastUpdated);
         else
             return projectDao.setAllProjectUpdatedTo(lastUpdated);
     }
 
     function addOutdatedStatusUpdationPromise(response, promises) {
         response.outdated_projects.forEach(function (outdatedProject) {
-            promises.push(projectDao.setProjectStatus(outdatedProject.id, outdatedProject.status));
+            promises.push(projectDao.setProjectStatus(outdatedProject.project_uuid, outdatedProject.status));
         });
     }
 
