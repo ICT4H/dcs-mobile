@@ -81,42 +81,11 @@ Provides submission create and update using enketo. Uses local store for persist
 
 }]);
 
-var Page = function($location, baseUrl, type, searchStr, currentIndex, totalRecords) {
-
-    this.getTotal = function() {
-        return totalRecords;
-    }
-
-    this.showPagination = function() {
-        //dont show for create submission
-        return !isNaN(currentIndex);
-    }
-
-    this.getTo = function() {
-        return currentIndex + 1;
-    }
-
-    this.isFirstPage = function() {
-        return currentIndex === 0;
-    }
-
-    this.isLastPage = function() {
-        return currentIndex + 1 === totalRecords;
-    }
-
-    this.onNext = function() {
-        $location.url(baseUrl + '?type='+type+'&searchStr='+searchStr+'&currentIndex=' + (currentIndex+1));
-    }
-
-    this.onPrevious = function() {
-        $location.url(baseUrl + '?type='+type+'&searchStr='+searchStr+'&currentIndex=' + (currentIndex-1));
-    }
-}
-
 dcsApp.controller('submissionController',
-    ['$scope', '$routeParams', '$location', 'enketoService', 'submissionDao', 'app', 'submissionDao', 'dcsService', 'dialogService', 'contextService',
-    function($scope, $routeParams, $location, enketoService, submissionDao, app, submissionDao, dcsService, dialogService, contextService){
+    ['$scope', '$routeParams', '$location', 'enketoService', 'submissionDao', 'app', 'submissionDao', 'dcsService', 'dialogService', 'contextService', 'singleItemPage',
+    function($scope, $routeParams, $location, enketoService, submissionDao, app, submissionDao, dcsService, dialogService, contextService, singleItemPage){
     
+    $scope.page = singleItemPage;
     $scope.showSearchicon = false;
     $scope.server = $routeParams.server == "true"? true:false;
     $scope.title = resourceBundle.createSubmission;
@@ -193,8 +162,7 @@ dcsApp.controller('submissionController',
 
 
     var addPagination = function(type, searchStr, currentIndex, total) {
-        var baseUrl = '/projects/'+$routeParams.project_uuid+'/submissions/'+currentIndex+'/';
-        $scope.page = new Page($location, baseUrl, type, searchStr, currentIndex, total);
+        singleItemPage.init($routeParams.project_uuid, type, searchStr, currentIndex, total);
     }
 
     function getSubmissionByCurrentIndex(project_uuid, type, searchStr, currentIndex) {
