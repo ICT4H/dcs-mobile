@@ -50,10 +50,10 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.refreshByUuid = function(project) {
         if (project.project_type == 'child') {
-            updateProjectAndParent(project);
+            refreshProjectAndParent(project);
         } else {
-            var requestProject = getRequest(project);
-            updateProjects([requestProject]);
+            var refreshRequest = getRefreshRequest(project);
+            refreshProjects([refreshRequest]);
         }
     }
 
@@ -110,24 +110,24 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     function onRefreshAll() {
         dialogService.confirmBox(resourceBundle.refresh_all_forms, function() {
             projectDao.getAll().then(function(projects) {
-              updateProjects(projects);
+              refreshProjects(projects);
             });
         });
     }
 
-    function updateProjectAndParent(project) {
-        var requestProject = getRequest(project);
+    function refreshProjectAndParent(project) {
+        var refreshRequest = getRefreshRequest(project);
         projectDao.getProjectToRefresh(project.parent_uuid).then(function(parents) {
-            var parentProjectRequest = getRequest(parents[0]);
-            updateProjects([requestProject, parentProjectRequest]);
+            var parentRefreshRequest = getRefreshRequest(parents[0]);
+            refreshProjects([refreshRequest, parentRefreshRequest]);
         });
     }
 
-    function getRequest(project) {
+    function getRefreshRequest(project) {
         return {'project_uuid': project.project_uuid, 'version': project.version, 'project_type': project.project_type};
     }
 
-    function updateProjects(projects) {
+    function refreshProjects(projects) {
         msg.showLoading();
         dcsService.checkProjectsStatus(projects).then(function(response) {
             var promises = [];
