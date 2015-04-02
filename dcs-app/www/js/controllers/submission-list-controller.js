@@ -305,6 +305,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     function projectHasMedia() {
+        var project = contextService.getProject();
         return project.has_media_field == 'true';
     }
 

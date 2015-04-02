@@ -61,7 +61,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
                 projectDao.deleteProject([projectUuid]).then(function(response) {
                     downloadServerProject([projectUuid])
                         .then(downloadNonExistingParent)
-                        .then(createUniqueLocalProjects);
+                        .then(createUniqueLocalProjects)
+                        .then(loadLocal);
                 }, onErrorDeleting);
             }, onErrorDeleting);
         });
@@ -210,7 +211,6 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $q.all(uniqueProjects.map(function(uniqueProject) {
             return projectDao.createProject(uniqueProject);
         })).then(function() {
-            loadLocal();
             console.log('create uniq prj done');
             deferred.resolve(uniqueProjects);
         }, function() {
