@@ -30,7 +30,7 @@ dcsApp.controller('submissionController',
         $scope.actions = [];
         var isEdit = $routeParams.currentIndex? true: false;
         if( contextService.isParentProject() ) {
-            setSubTitleAndParentSelectAction();
+            setTitlesAndParentSelectAction();
         } else if( isEdit ) {
             $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
             $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
@@ -87,10 +87,11 @@ dcsApp.controller('submissionController',
         }
     }
 
-    function setSubTitleAndParentSelectAction() {
+    function setTitlesAndParentSelectAction() {
         var childProject = contextService.getChildProject();
         var childProjectName = childProject.name;
-        $scope.title = 'Create new ' + childProjectName + ' using';
+        $scope.title = '';
+        $scope.subTitle = 'Create new ' + childProjectName + ' using';
 
         var newChildUrl = '/projects/'+childProject.project_uuid+'/submissions/new_child';
         var selectAction = {
