@@ -20,7 +20,7 @@
                 <span>{{ project.name }}</span>
             </div>
             <!-- local -->
-            <div ng-if="!serverPage" class="list-group-item" ng-repeat="project in projects">
+            <div ng-if="!serverPage" class="list-group-item" ng-repeat="project in projects | filter:{'is_assigned': 'true'}">
                 <div class="panel panel-default no-panel-bottom-margin">
                     <div class="panel-heading" ng-class="{'outdated':(project.status=='outdated'), 'server-deleted':(project.status=='server-deleted')}">
                         <h3 class="panel-title">
