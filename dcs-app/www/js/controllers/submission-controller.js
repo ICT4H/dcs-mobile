@@ -34,6 +34,9 @@ dcsApp.controller('submissionController',
         } else if( isEdit ) {
             $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
             $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
+        } else {
+            //HACK to show back
+            $scope.actions.push({'onClick': function() {}, 'icon': 'fa circle-thin fa-lg'});
         }
     };
 
