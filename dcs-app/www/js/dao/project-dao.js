@@ -13,7 +13,7 @@ dcsApp.service('projectDao',['store', function(store){
 	};
 
 	this.getAll = function() {
-		return store.execute('select project_uuid as id, version as rev from projects', []);
+		return store.execute('select project_uuid as id, version as rev, project_type from projects', []);
 	};
 
 	this.setProjectStatus = function(project_uuid, status) {

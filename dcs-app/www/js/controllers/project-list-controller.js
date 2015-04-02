@@ -123,6 +123,8 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
             addOutdatedStatusUpdationPromise(response, promises);
 
+            promises.push(downloadDataOfParents(projects));
+
             $q.all(promises).then(function() {
                 loadLocal();
             }, ''.showError.bind('updation_failed'));
