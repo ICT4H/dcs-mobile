@@ -48,10 +48,13 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         });
     };
 
-    $scope.refreshByUuid = function(projectUuid) {
-        projectDao.getProjectToRefresh(projectUuid).then(function(projects) {
-            updateProjects(projects);
-        });
+    $scope.refreshByUuid = function(project) {
+        if (project.project_type == 'child') {
+            updateProjectAndParent(project);
+        } else {
+            var requestProject = {'project_uuid': project.project_uuid, 'id': project.project_uuid, 'rev': project.version, 'project_type': project.project_type};
+            updateProjects([requestProject]);
+        }
     }
 
     $scope.forceRefreshByProjectUuid = function(projectUuid) {
@@ -109,6 +112,15 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
             projectDao.getAll().then(function(projects) {
               updateProjects(projects);
             });
+        });
+    }
+
+    function updateProjectAndParent(project) {
+        var requestProject = {'project_uuid': project.project_uuid, 'id': project.project_uuid, 'rev': project.version, 'project_type': project.project_type};
+        projectDao.getProjectToRefresh(project.parent_uuid).then(function(parents) {
+            var parent = parents[0];
+            var parentProjectRequest = {'project_uuid': parent.project_uuid, 'id':parent.project_uuid, 'rev': parent.rev, 'project_type': parent.project_type};
+            updateProjects([requestProject, parentProjectRequest]);
         });
     }
 

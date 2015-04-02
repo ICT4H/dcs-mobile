@@ -44,7 +44,7 @@ dcsApp.service('projectDao',['store', function(store){
 	}
 
 	this.getProjectToRefresh = function(projectUuid) {
-		return store.execute('select project_uuid as id, version as rev from projects where project_uuid=?', [projectUuid])
+		return store.execute('select project_uuid as id, project_uuid, version as rev, project_type from projects where project_uuid=?', [projectUuid])
 	};
 
 	this.deleteProject = function(projectUuids) {
