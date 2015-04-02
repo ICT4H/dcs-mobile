@@ -2,10 +2,11 @@ dcsApp.service('contextService', [function() {
 /*
 This service provides the xform html and model string. For Correlated project,
 it uses SurveyRelation to provide xform html and model string.
-For parent edit/view, url links to create children are provided.
 
-The assumption is for new child submission, parent submission will be accessed first.
-This service holds the latest accessed parent data.
+selectParentFlow is set (true) when new of child form is selected
+and is reset (false) when parent data/submission has been selected.
+
+The assumption is for new child submission, parent submission will be selected first (parentSubmission)
 */
 
     var relationHandler;
