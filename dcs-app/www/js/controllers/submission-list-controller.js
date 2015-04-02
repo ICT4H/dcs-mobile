@@ -8,7 +8,6 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.showSearch = false;
-
     $scope.project_name = contextService.getSecondaryTitleForListing();
 
     var searchStr = $routeParams.searchStr;
@@ -187,10 +186,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     function onNew() {
         if (contextService.isChildProject()) {
-            projectDao.getProjectByUuids([project.parent_uuid]).then(function(results) {
+            var childProject = contextService.getProject();
+            projectDao.getProjectByUuids([childProject.parent_uuid]).then(function(results) {
                 var parentProject = results[0];
-                var childProject = contextService.getProject()
-                contextService.setProject(parentProject, childProject);
+                contextService.setParentAndChildProjects(parentProject, childProject);
                 $location.url('/submission-list/' + parentProject.project_uuid + '?type=all');
             });
         } else {

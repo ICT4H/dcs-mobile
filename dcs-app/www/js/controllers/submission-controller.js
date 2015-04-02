@@ -26,7 +26,7 @@ dcsApp.controller('submissionController',
         });
     };
 
-    var addActions  = function(currentProject) {
+    function addActions(currentProject) {
         $scope.actions = [];
         var isEdit = $routeParams.currentIndex? true: false;
         if( contextService.isParentProject() ) {
