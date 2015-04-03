@@ -44,7 +44,7 @@ The assumption is for new child submission, parent submission will be selected f
 
     this.getSecondaryTitleForListing = function() {
         if (this.selectParentFlow)
-            return 'View ' + this.project.name + ' to continue';
+            return 'Select one ' + this.project.name + ' to continue';
         else
             return this.project.name;
     }

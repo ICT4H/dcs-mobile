@@ -8,7 +8,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.filteredBy = ({all: 'local', unsubmitted: 'unsubmitted', conflicted: 'conflicted'})[type]
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.showSearch = false;
-    $scope.project_name = contextService.getSecondaryTitleForListing();
+    $scope.sub_title = contextService.getSecondaryTitleForListing();
 
     var searchStr = $routeParams.searchStr;
     var selectedSubmission = [];
