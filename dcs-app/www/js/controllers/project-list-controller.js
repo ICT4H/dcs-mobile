@@ -158,11 +158,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
     }
 
     function setProjectsLastUpdateAsync(projects, lastUpdated) {
-        var isSingleProjectSelected = projects.length == 1;
-        if (isSingleProjectSelected)
-            return projectDao.setProjectUpdated(projects[0].project_uuid, lastUpdated);
-        else
-            return projectDao.setAllProjectUpdatedTo(lastUpdated);
+        return projectDao.setLastUpdatedOfProjectUuids($scope.pluck(projects, 'project_uuid'), lastUpdated);
     }
 
     function addOutdatedStatusUpdationPromise(response, promises) {

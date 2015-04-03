@@ -20,12 +20,8 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('update projects set status=? where project_uuid=?',[status, project_uuid]);
 	};
 
-	this.setProjectUpdated = function(project_uuid, last_updated) {
-		return store.execute('update projects set last_updated=? where project_uuid=?',[last_updated, project_uuid]);
-	};
-
-	this.setAllProjectUpdatedTo = function(last_updated) {
-		return store.execute('update projects set last_updated=?', [last_updated]);
+	this.setLastUpdatedOfProjectUuids = function(projectUuids, lastUpdated) {
+		return store.execute('update projects set last_updated=? where project_uuid IN('+getParamHolders(projectUuids)+ ')', [lastUpdated].concat(projectUuids));
 	};
 
 	//TODO remove the as no more used
