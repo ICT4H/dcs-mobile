@@ -25,6 +25,15 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
     };
 
+    $scope.onSelect = function(selectedIndex) {
+        var childProject = contextService.getChildProject();
+        var newChildUrl = '/projects/'+childProject.project_uuid+'/submissions/new_child';
+        var selectedParentSubmission = {'data': JSON.stringify($scope.dataObjs[selectedIndex].data_obj)};
+        contextService.setSubmission(selectedParentSubmission);
+        contextService.resetFlowForChildProject();
+        $location.url(newChildUrl);
+    }
+
     $scope.ApplyFilterWith = function(option) {
         $location.url('/submission-list/' + $scope.project_uuid + '?type=' + option);
     };
@@ -130,8 +139,19 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.showAdvanceSearch = false;
         selectedSubmission = [];
         $scope.pagination.totalElement = submissions.total;
-        $scope.submissions = submissions.data;
 
+        $scope.selectParentFlow = contextService.selectParentFlow;
+        if (contextService.selectParentFlow) {
+            var childProject = contextService.getChildProject();
+            $scope.parentFieldCodeLabels = JSON.parse(childProject.parent_fields_code_label_str);
+            $scope.parentFieldCodes = Object.keys($scope.parentFieldCodeLabels);
+
+            $scope.dataObjs = submissions.data.map(function(submission, i) {
+                return {'current_index': i, 'submission_id': submission.submission_id, 'data_obj': JSON.parse(submission.data)}
+            });
+        } else {
+            $scope.submissions = submissions.data;
+        }
         $scope.title =  type + ' data';
         msg.hideAll();
     };

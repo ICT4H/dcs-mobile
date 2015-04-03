@@ -48,7 +48,26 @@
   <div class="scrollable-content">
     <div class="well-custom well-sm project-title" style="max-width:100%">{{project_name}}</div>
     <div class="list-group" ng-if="submissions.length !=0">
-        <div ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected, 'outdated':(item.status=='conflicted'), 'local':(item.status=='modified')}"
+        <div ng-if="selectParentFlow" class="list-group-item">
+          <div class="panel panel-default" ng-repeat="data in dataObjs">
+            <div class="panel-body">
+              <p ng-repeat="fieldCode in parentFieldCodes">
+                <span class="col-xs-5">{{parentFieldCodeLabels[fieldCode]}}</span>
+                <span><strong>{{data.data_obj[fieldCode]}}</strong></span>
+              </p>
+            </div>
+            <div class="panel-footer">
+              <span class="col-sm-6">
+                <a href ng-click="onView(data['submission_id'], false, data['current_index'])"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
+              </span>
+              <span class="col-sm-6">
+                <a href ng-click="onSelect(data['current_index'])"><i class="fa fa-check fa-lg fa-fw"></i>&nbsp; Select</a>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="!selectParentFlow" ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected, 'outdated':(item.status=='conflicted'), 'local':(item.status=='modified')}"
       ng-click="onSubmissionSelect(this, item)">
         <div ng-if="!serverPage">
           <span am-time-ago="item.created" am-preprocess="utc"></span>
