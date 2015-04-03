@@ -28,7 +28,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.onSelect = function(selectedIndex) {
         var childProject = contextService.getChildProject();
         var newChildUrl = '/projects/'+childProject.project_uuid+'/submissions/new_child';
-        var selectedParentSubmission = {'data': JSON.stringify($scope.dataObjs[selectedIndex].data_obj)};
+        var selectedParentSubmission = {'data': $scope.dataObjs[selectedIndex].data_obj};
         contextService.setSubmission(selectedParentSubmission);
         contextService.resetFlowForChildProject();
         $location.url(newChildUrl);

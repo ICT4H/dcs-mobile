@@ -15,8 +15,8 @@ Provides submission create and update using enketo. Uses local store for persist
             'buttonLabel': isNew? 'Save': 'Update',
             'hideButton': contextService.selectParentFlow,
             'onButtonClick': submissionToEdit? onEdit: onNew,
-            'submissionXml': contextService.getModelStr(),
-            'xform': contextService.getXform()
+            'xform': contextService.getXform(),// this should be called before getModelStr
+            'submissionXml': contextService.getModelStr()
         };
         if(isEmulator) {
             loadEnketo(options);

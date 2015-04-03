@@ -30,7 +30,6 @@ The assumption is for new child submission, parent submission will be selected f
     this.resetFlowForChildProject = function() {
         this.project = this.childProject;
         this.selectParentFlow = false;
-        relationHandler = new SurveyRelation(this.childProject, JSON.parse(this.parentSubmission.data));
     }
 
     this.setSubmission = function(submission) {
@@ -76,7 +75,8 @@ The assumption is for new child submission, parent submission will be selected f
 
     this.getXform = function() {
         if (this.isChildProject()) {
-            var mayBeParentDataJson = this.parentSubmission && JSON.parse(this.parentSubmission.data)
+            // child should call getXform before getModelStr so as relationHandler is instantiated
+            var mayBeParentDataJson = this.getAvailableParentDataObject();
             relationHandler = new SurveyRelation(this.project, mayBeParentDataJson);
             return relationHandler.add_note_fields_for_parent_values();
         }
@@ -88,6 +88,15 @@ The assumption is for new child submission, parent submission will be selected f
         if (parentDataSelectedAndNewChild)
             return relationHandler.getUpdatedModelStr();
         return this.submission? this.submission.xml : '';
+    }
+
+    this.getAvailableParentDataObject = function() {
+        if (!this.parentSubmission)
+            return undefined;
+        
+        var parentDataObject = (typeof this.parentSubmission.data == 'string')?
+                                JSON.parse(this.parentSubmission.data): this.parentSubmission.data;
+        return parentDataObject;
     }
 }]);
 
