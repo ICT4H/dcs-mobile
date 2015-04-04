@@ -20,7 +20,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     };
 
     $scope.onView = function(submissionId, isFromServer, index) {
-        var actualIndex = ($scope.pagination.pageSize * $scope.pagination.pageNumber) + index ;
+        var actualIndex = $scope.pagination.getPageStartCount() + index ;
         var queryParams = 'type=' + type + '&currentIndex=' + index + '&server=' + isFromServer + '&searchStr=' + (searchStr || "");
         $location.url('/projects/' + $scope.project_uuid  + '/submissions/'+ submissionId + '?' + queryParams);
     };
@@ -61,9 +61,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                 });
             });
             submissionDao.createSearchTable(matchedSubmissionsId).then(function(){
-                $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                    type = 'search';
-                    submissionDao.searchSubmissionsByType($scope.project_uuid, 'search', '', $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+                $scope.pagination.start($rootScope.pageSize.value, function(startIndex, pageSize) {
+                    var queryType = 'search';
+                    submissionDao.searchSubmissionsByType($scope.project_uuid, queryType, '', startIndex, pageSize)
                         .then(assignSubmissions, ErrorLoadingSubmissions);
                 });
             });
@@ -116,8 +116,8 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         if(type == 'server') {
             loadServer();
         } else {
-            $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-                submissionDao.searchSubmissionsByType($scope.project_uuid, type, searchStr, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+            $scope.pagination.start($rootScope.pageSize.value, function(startIndex, pageSize) {
+                submissionDao.searchSubmissionsByType($scope.project_uuid, type, searchStr, startIndex, pageSize)
                     .then(assignSubmissions, ErrorLoadingSubmissions);
             });
         }
@@ -129,9 +129,9 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         selectedSubmission = [];
         msg.showLoadingWithInfo(resourceBundle.loading_data);
         initServerActions();
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
-            dcsService.getSubmissions($scope.project_uuid, $scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize, searchStr || "")
-            .then(assignServerSubmissions, ErrorLoadingSubmissions);
+        $scope.pagination.start($rootScope.pageSize.value, function(startIndex, pageSize) {
+            dcsService.getSubmissions($scope.project_uuid, startIndex, pageSize, searchStr || "")
+                .then(assignServerSubmissions, ErrorLoadingSubmissions);
         });
     };
 

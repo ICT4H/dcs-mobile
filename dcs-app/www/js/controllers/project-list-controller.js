@@ -24,15 +24,13 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.showBack = true;
         selectedServerProjects = [];
         $scope.projects = [];
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+        $scope.pagination.start($rootScope.pageSize.value, function(startIndex, pageSize) {
             $scope.serverPage = true;
             'loading_forms'.showInfoWithLoading();
             initServerActionItems();
-            dcsService.
-                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
-                    .then(assignResult, function() {
-                        msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
-                    });
+            dcsService.getProjectsList(startIndex, pageSize).then(assignResult, function() {
+                msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
+            });
         });
     }
 
@@ -282,12 +280,11 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         $scope.showBack = false;
         selectedServerProjects = [];
         $scope.projects = [];
-        $scope.pagination.init($rootScope.pageSize.value, 0, function() {
+        $scope.pagination.start($rootScope.pageSize.value, function(startIndex, pageSize) {
             $scope.serverPage = false;
             'loading_forms'.showInfo();
             initOfflineActionItems();
-            projectDao.
-                getProjectsList($scope.pagination.pageNumber * $scope.pagination.pageSize, $scope.pagination.pageSize)
+            projectDao.getProjectsList(startIndex, pageSize)
                     .then(assignResult, 'error_loading_forms'.showError);
         });
     }

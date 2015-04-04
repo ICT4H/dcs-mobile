@@ -1,28 +1,28 @@
-var paginationService = function() {
+dcsApp.service('paginationService', [function() {
 
-    //Pagination
     this.pagination = {};
     this.pagination.pageSize = 0;
     this.pagination.totalElement = 0;
     this.pagination.pageNumber = 0;
     this.pagination.paginationCallBack;
 
-    this.pagination.init = function(ElementsPerPage, totalElement, callBack, index) {
-        this.pageSize = ElementsPerPage;
-        this.totalElement = totalElement;
-        this.pageNumber = index || 0;
+    this.pagination.start = function(pageSize, callBack) {
+        this.pageSize = pageSize;
+        //this.totalElement needs to be set inside callBack
+        var startIndex = 0;
+        this.pageNumber = startIndex;
         this.paginationCallBack = callBack;
-        this.paginationCallBack(this.pageNumber);
+        this.paginationCallBack(this.pageNumber, this.pageSize);
     };
 
     this.pagination.onNext = function() {
         this.pageNumber = this.pageNumber + 1;
-        this.paginationCallBack(this.pageNumber);
+        this.paginationCallBack(this.pageNumber, this.pageSize);
     };
 
     this.pagination.onPrevious = function() {
         this.pageNumber = this.pageNumber - 1;
-        this.paginationCallBack(this.pageNumber);
+        this.paginationCallBack(this.pageNumber, this.pageSize);
     };
 
     this.pagination.isLastPage = function() {
@@ -33,12 +33,6 @@ var paginationService = function() {
 
     this.pagination.isFirstPage = function() {
         return this.pageNumber == 0;
-    };
-
-    this.pagination.isAtLast = function(listIndex) {
-        if(this.isLastPage())
-            return listIndex ==  this.totalElement % this.pageSize - 1 ;
-        return listIndex == this.pageSize-1;
     };
 
     this.pagination.getFrom = function() {
@@ -53,5 +47,7 @@ var paginationService = function() {
         return this.totalElement;
     };
 
-};
-dcsApp.service('paginationService', [paginationService]);
+    this.pagination.getPageStartCount = function() {
+        return this.pageSize * this.pageNumber;
+    }
+}]);
