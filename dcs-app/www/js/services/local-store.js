@@ -19,6 +19,9 @@ dcsApp.service('store',['$q', 'app', function($q, app){
 						'created text, status text, name text, xform text, headers text, local_headers text, last_fetch integer,'+
 						'project_type text, parent_uuid text, action_label text, parent_fields_code_label_str text, child_ids text,'+
 						'has_media_field text, last_updated text, is_assigned text, displayable_mobile_fields)', [], false))
+		.then(this.execute('CREATE INDEX IF NOT EXISTS is_assigned_index ON projects (is_assigned)', [], false))
+		.then(this.execute('CREATE INDEX IF NOT EXISTS child_ids_index ON projects (child_ids)', [], false))
+
 		.then(this.execute('CREATE TABLE IF NOT EXISTS submissions (submission_id integer primary key, submission_uuid text,'+
 						 'version text, status text, project_uuid text, created text, data text, xml text,'+
 						 'new_files_added text, un_changed_files text)', [], false))

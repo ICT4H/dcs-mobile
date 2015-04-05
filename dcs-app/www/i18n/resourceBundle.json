@@ -28,6 +28,7 @@
     "conflict_resolver_title": "Resolve Conflict",
     "conflict_title": "Data Conflicts",
     "confirm_form_delete": "Delete this Form?",
+    "deleting_forms": "Deleting forms",
     "confirm_data_delete": "Do you want to delete selected data?",
     "data_deleted": "Data deleted",
     "failed_data_deletion": "Failed to delete data",

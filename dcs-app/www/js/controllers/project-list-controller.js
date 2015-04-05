@@ -41,6 +41,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
 
     $scope.onDeleteProjectByUuid = function(projectUuid){
         dialogService.confirmBox(resourceBundle.confirm_form_delete, function() {
+            'deleting_forms'.showInfoWithLoading();
             deleteProjectsByUuids([projectUuid]);
             fileSystem.deleteUserFolders(app.user.name, selectedServerProjects);
         });
@@ -59,7 +60,7 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         dialogService.confirmBox(resourceBundle.form_outdated, function() {
             'downloading_projects'.showInfoWithLoading();
             projectDao.deleteSub([projectUuid]).then(function(response) {
-                projectDao.deleteProject([projectUuid]).then(function(response) {
+                projectDao.deleteProjects([projectUuid]).then(function(response) {
                     downloadServerProject([projectUuid])
                         .then(downloadNonExistingParent)
                         .then(createUniqueLocalProjects)
@@ -268,12 +269,30 @@ var localProjectListController = function($rootScope, app, $scope, $q, $location
         msg.hideLoadingWithErr(resourceBundle.error_in_connecting);
     }
 
+    function appendUnassignedParentsOfUuids(projectUuids) {
+        var deferred = $q.defer();
+        projectDao.getUnassigedUuidsByChildUuids(projectUuids).then(function(results) {
+            if (!results)
+                deferred.resolve(projectUuids);
+
+            var unassignedUuids = $scope.pluck(results, 'project_uuid');
+            deferred.resolve(projectUuids.concat(unassignedUuids));
+        });
+        return deferred.promise;
+    }
+
+    function deleteSubmissionsByProjectUuids(projectUuids) {
+        return projectDao.deleteSub(projectUuids).then(function() {
+            console.log('deleting submissions of projects: ' + projectUuids);
+            return projectUuids;
+        });
+    }
+
     function deleteProjectsByUuids(projectUuids) {
-        projectDao.deleteSub(projectUuids).then(function(response) {
-            projectDao.deleteProject(projectUuids).then(function(response) {
-                loadLocal();
-            }, onErrorDeleting);
-        }, onErrorDeleting);
+        appendUnassignedParentsOfUuids(projectUuids)
+            .then(deleteSubmissionsByProjectUuids)
+            .then(projectDao.deleteProjects)
+            .then(loadLocal, onErrorDeleting);
     }
 
     function loadLocal() {

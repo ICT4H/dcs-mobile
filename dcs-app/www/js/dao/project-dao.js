@@ -12,6 +12,10 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('select * from projects where project_uuid IN(' +getParamHolders(projectUuids) +')',  projectUuids);
 	};
 
+	this.getUnassigedUuidsByChildUuids = function(childUuids) {
+		return store.execute('select project_uuid from projects where is_assigned=\'false\' and child_ids IN(' +getParamHolders(childUuids) +')',  childUuids);
+	};
+
 	this.getAll = function() {
 		return store.execute('select project_uuid, version, project_type from projects', []);
 	};
@@ -45,7 +49,7 @@ dcsApp.service('projectDao',['store', function(store){
 		return store.execute('select project_uuid, version, project_type from projects where project_uuid=?', [projectUuid])
 	};
 
-	this.deleteProject = function(projectUuids) {
+	this.deleteProjects = function(projectUuids) {
 		return store.execute('delete FROM projects where project_uuid IN(' + getParamHolders(projectUuids) + ')', projectUuids);
 	};
 
