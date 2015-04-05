@@ -29,7 +29,8 @@ dcsApp.controller('submissionController',
     function addActions(currentProject) {
         $scope.actions = [];
         var isEdit = $routeParams.currentIndex? true: false;
-        if( contextService.isParentProject() ) {
+        var isParentSelectFlow = contextService.isParentProject() && contextService.selectParentFlow;
+        if( isParentSelectFlow ) {
             setTitlesAndParentSelectAction();
         } else if( isEdit ) {
             $scope.actions.push({'onClick': onDelete, 'label': resourceBundle.delete});
