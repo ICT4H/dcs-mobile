@@ -81,7 +81,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
 
     function initOfflineActions() {
         $scope.actions = [];
-        if (contextService.childFlow) return;
+        if (contextService.selectParentFlow) return;
 
         $scope.actions.push({'onClick': onNew, 'label': resourceBundle.new});
         $scope.actions.push({'onClick': onSubmit, 'label': resourceBundle.submit});
