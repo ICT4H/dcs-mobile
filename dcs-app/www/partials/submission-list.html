@@ -70,14 +70,23 @@
         <div ng-if="!selectParentFlow" ng-repeat="item in submissions" ng-init="selected=false" ng-class="{'list-group-item': true, 'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected, 'outdated':(item.status=='conflicted'), 'local':(item.status=='modified')}"
       ng-click="onSubmissionSelect(this, item)">
         <div ng-if="!serverPage">
-          <span am-time-ago="item.created" am-preprocess="utc"></span>
-          <p class="small">on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</p>
-
-          <div ng-if="item.status == 'conflicted'">
-            <button class="pull-right link" ng-click="onResolveConflict(item.submission_uuid)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
-          </div>
-          <div ng-if="item.status != 'conflicted'">
-            <button class="pull-right link" ng-click="onView(item.submission_id, false, $index)" ng-disabled="item.status=='server-deleted'" style="margin-top: -30px;">view</button>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <p ng-if=" displayable_mobile_fields.length > 0" ng-repeat="field in displayable_mobile_fields">
+                <span>{{field.label}}: {{item.data[field.name]}}</span>
+              </p>
+              <p ng-if=" displayable_mobile_fields.length == 0 ">
+                <span>created on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</span>
+              </p>
+            </div>
+            <div class="panel-footer">
+              <span class="col-sm-9">
+                <a href ng-click="onView(item.submission_id, false, $index)"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
+              </span>
+              <span class="col-sm-9">
+                <a href ng-click="onSelect(data['current_index'])"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
+              </span>
+            </div>
           </div>
         </div>
         <div ng-if="serverPage">

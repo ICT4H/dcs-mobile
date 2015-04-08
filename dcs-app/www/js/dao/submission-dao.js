@@ -41,13 +41,16 @@ dcsApp.service('submissionDao',['store', function(store){
 		var queries = {
 		'all': [
 			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
-			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and data like "%'+ searchStr +'%" order by created desc limit ? offset ?', 'values': [project_uuid, limit, offset], 'holder': 'data'},
+			{'statement': 'SELECT displayable_mobile_fields FROM projects WHERE project_uuid = ?', 'values': [project_uuid], 'holder': 'displayable_mobile_fields', 'isSingleRecord':true}],
 		'unsubmitted': [
 			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
-			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "modified" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'},
+			{'statement': 'SELECT displayable_mobile_fields FROM projects WHERE project_uuid = ?', 'values': [project_uuid], 'holder': 'displayable_mobile_fields', 'isSingleRecord':true}],
 		'conflicted': [
 			{'statement': 'SELECT count(*) as total FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%"', 'values': [project_uuid], 'isSingleRecord':true},
-			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'}],
+			{'statement': 'SELECT * FROM submissions WHERE project_uuid = ? and status = "conflicted" and data like "%' + searchStr + '%" order by created desc limit ? offset ? ', 'values': [project_uuid, limit, offset], 'holder': 'data'},
+			{'statement': 'SELECT displayable_mobile_fields FROM projects WHERE project_uuid = ?', 'values': [project_uuid], 'holder': 'displayable_mobile_fields', 'isSingleRecord':true}],
 		'search': [
 			{'statement': 'SELECT count(*) as total FROM searchTable', 'isSingleRecord':true},
 			{'statement': 'SELECT * FROM searchTable order by created desc limit ? offset ? ', 'values': [limit, offset], 'holder': 'data'}]

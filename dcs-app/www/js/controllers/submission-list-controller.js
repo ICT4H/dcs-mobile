@@ -139,7 +139,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
         $scope.showAdvanceSearch = false;
         selectedSubmission = [];
         $scope.pagination.totalElement = submissions.total;
-
+        $scope.displayable_mobile_fields = JSON.parse(submissions.displayable_mobile_fields);
         $scope.selectParentFlow = contextService.selectParentFlow;
         if (contextService.selectParentFlow) {
             var childProject = contextService.getChildProject();
@@ -150,7 +150,10 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
                 return {'current_index': i, 'submission_id': submission.submission_id, 'data_obj': JSON.parse(submission.data)}
             });
         } else {
-            $scope.submissions = submissions.data;
+            $scope.submissions = submissions.data.map(function(submission) {
+                submission.data = JSON.parse(submission.data);
+                return submission;
+            });
         }
         $scope.title =  type + ' data';
         msg.hideAll();
