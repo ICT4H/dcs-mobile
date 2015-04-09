@@ -250,9 +250,6 @@ module.exports = function (grunt) {
             'css/*',
 
             // 'img/{,*/}*.{webp}',
-            'bower_components/mobile-angular-ui/dist/fonts/*',
-            'bower_components/mobile-angular-ui/dist/css/mobile-angular-ui-base.min.css',
-            'bower_components/mobile-angular-ui/dist/css/mobile-angular-ui-desktop.min.css',
             'js/enketo.min.js',
             'fonts/*'
           ]
