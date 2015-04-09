@@ -22,7 +22,6 @@ module.exports = function(config){
       SPECS+'mocks.js',
       SPECS+'button-factory-specs.js',
       SPECS+'correlated-forms-specs.js',
-      SPECS+'device-back-handler-specs.js',
       SPECS+'file-handler-specs.js',
       SPECS+'project-controller-tests.js',
       //SPECS+'submission-controller-specs.js',
