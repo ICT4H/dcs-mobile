@@ -51,10 +51,10 @@
         <div ng-if="selectParentFlow" class="list-group-item">
           <div class="panel panel-default" ng-repeat="data in dataObjs">
             <div class="panel-body">
-              <p ng-repeat="fieldCode in parentFieldCodes">
-                <span class="col-sm-5">{{parentFieldCodeLabels[fieldCode]}}</span>
-                <span>{{data.data_obj[fieldCode]}}</span>
-              </p>
+              <div class="row" ng-repeat="fieldCode in parentFieldCodes">
+                <span class="col-xs-6">{{parentFieldCodeLabels[fieldCode]}}</span>
+                <span class="col-xs-6">{{data.data_obj[fieldCode]}}</span>
+              </div>
             </div>
             <div class="panel-footer">
               <span class="col-sm-6">
@@ -71,19 +71,19 @@
         <div ng-if="!serverPage">
           <div class="panel panel-default" ng-repeat="item in submissions" ng-click="onSubmissionSelect(this, item)">
             <div class="panel-body" ng-class="{'outdated':(item.status=='outdated'), 'server-deleted':(item.status=='server-deleted'),'selected':selected, 'outdated':(item.status=='conflicted'), 'local':(item.status=='modified')}">
-              <p ng-if=" displayable_mobile_fields.length > 0" ng-repeat="field in displayable_mobile_fields">
-                <span class="col-xs-5 col-sm-5">{{field.label}}</span>
-                <span class="col-xs-7 col-sm-7">{{item.data[field.name]}}</span>
-              </p>
+              <div class="row" ng-if=" displayable_mobile_fields.length > 0" ng-repeat="field in displayable_mobile_fields">
+                <span class="col-xs-6">{{field.label}}</span>
+                <span class="col-xs-6">{{item.data[field.name]}}</span>
+              </div>
               <p ng-if=" displayable_mobile_fields.length == 0 ">
                 <span>created on {{ item.created | date: "MM/dd/yyyy 'at' hh:mm"}}</span>
               </p>
             </div>
             <div class="panel-footer">
-              <span class="col-sm-6">
+              <span class="col-xs-6 col-sm-6">
                 <a href ng-click="onView(item.submission_id, false, $index)"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
               </span>
-              <span class="col-sm-6">
+              <span class="col-xs-6 col-sm-6">
                 <a href ng-click="onSelect(data['current_index'])"><i class="fa fa-trash-o fa-fw"></i>&nbsp; Delete</a>
               </span>
             </div>
