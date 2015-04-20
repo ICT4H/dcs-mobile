@@ -1,5 +1,5 @@
 var changePasswordController = function($scope, $location, userDao, app, msg, dcsService) {
-    var defaultUrl = 'https://garner.twhosted.com';
+    var defaultUrl = 'https://www.collectdata.in';
     $scope.user = {'url': defaultUrl};
 
     $scope.changePassword = function(user) {
