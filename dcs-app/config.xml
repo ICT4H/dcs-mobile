@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.thoughtworks.dcs" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Garner</name>
+    <name>CollectData</name>
     <description>
-        Garner is a xlsform based data collection application.
+        CollectData is a xlsform based data collection application.
     </description>
     <author email="garner@thoughtworks.com" href="https://garner.twhosted.com">
-        Garner Team
+        CollectData Team
     </author>
     <content src="index.html" />
     <access origin="*" />
