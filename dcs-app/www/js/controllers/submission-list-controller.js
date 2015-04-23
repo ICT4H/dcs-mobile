@@ -9,7 +9,7 @@ var submissionListController = function($rootScope, app, $scope, $q, $routeParam
     $scope.project_uuid = $routeParams.project_uuid;
     $scope.showSearch = false;
     $scope.sub_title = contextService.getSecondaryTitleForListing();
-
+    $scope.showOnlySearch = $routeParams.fromChild == "true"? true:false;
     var searchStr = $routeParams.searchStr;
     var selectedSubmission = [];
 

@@ -66,7 +66,6 @@
             </div>
           </div>
         </div>
-        
         <div ng-if="!selectParentFlow" ng-init="selected=false" ng-class="{'list-group-item': true,}">
         <div ng-if="!serverPage">
           <div class="panel panel-default" ng-repeat="item in submissions" ng-click="onSubmissionSelect(this, item)">
@@ -80,7 +79,7 @@
               </p>
             </div>
             <div class="panel-footer">
-              <span class="col-xs-6 col-sm-6">
+              <span>
                 <a href ng-click="onView(item.submission_id, false, $index)"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
               </span>
               <span class="col-xs-6 col-sm-6">

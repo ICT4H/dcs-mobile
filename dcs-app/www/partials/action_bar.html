@@ -5,11 +5,11 @@
     </a>
 </div>
 
-<div class="btn-group pull-right" ng-show="actions.length > 1">
+<div class="btn-group pull-right" ng-show="actions.length > 1 || showOnlySearch">
     <a class='btn' ng-click="flipSearch();searchString=''" ng-show="!showSearch">
       <i class="fa fa-search fa-lg"></i>
     </a>
-    <a ui-turn-on='myDropdown' class='btn' >
+    <a ui-turn-on='myDropdown' class='btn' ng-hide="showOnlySearch">
       <i class="fa fa-ellipsis-v fa-lg"></i>
     </a>
     <ul 
