@@ -1,5 +1,5 @@
 var loginController = function($rootScope, $scope, $location, userDao, msg, app, dcsService, dialogService) {
-    $scope.title = "Garner";
+    $scope.title = "collectdata";
     $scope.users = [];
     var defaultUrl = 'https://www.collectdata.in';
     $scope.user = {'url': defaultUrl};

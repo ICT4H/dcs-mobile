@@ -12,7 +12,7 @@ var dialogService = function() {
         navigator.notification.confirm(
             message,
             onConfirm,
-            'Garner',   
+            'CollectData',
             ['Yes','No']
         );
     };

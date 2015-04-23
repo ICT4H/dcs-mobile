@@ -196,7 +196,7 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
 
     this.areItemSelected = function(selectedProject) {
         if(selectedProject.length ==0) {
-            navigator.notification.alert('You need to select atleast one item.', function() {}, "Garner");
+            navigator.notification.alert('You need to select atleast one item.', function() {}, "CollectData");
             return false;
         }
         return true;
