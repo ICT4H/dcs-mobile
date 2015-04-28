@@ -12,7 +12,7 @@
 
 .server-deleted {
   text-decoration: line-through !important;
-  background-color: #FFAD33  !important;
+  background-color: #FFAD33  !important;  
 }
 
 .help_text {
@@ -109,27 +109,30 @@
 }
 
 .navbar-app {
-  color: #333 !important;
-  background: #f78f31;
+  color: #fff !important;
 }
 
 .navbar-app .btn {
-  color: #333 !important;
+  color: #fff  !important;
 }
 
 .list-group-item.active {
-  background-color: #333;
-  border-color: #333;
+  background-color: #f78f31 ;
+  border-color: #f78f31;
 }
 
 .btn-primary {
-  color: #666666 !important ;
+  color: #000 !important ;
   background-color: #f0ba95;
   border-color: #f0ba95; 
 }
 
+.navbar-absolute-top {
+  background: #f78f31;  
+}
+
 .btn-primary.active, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
-  color: #666666 !important ;
+  color: #000 !important ;
   background-color: #f0ba95;
   border-color: #f0ba95; 
 }
@@ -143,5 +146,13 @@ button {
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6  {
-  font-family: 'Open Sans', Arial, sans-serif;  
+    font-family: 'Open Sans', Arial, sans-serif;  
+}
+
+.sidebar-left {
+  background: #f1f1f1;
+}
+
+.scrollable-header  {
+  color: #666;    
 }
