@@ -57,12 +57,14 @@
               </div>
             </div>
             <div class="panel-footer">
-              <span class="col-sm-6">
-                <a href ng-click="onView(data['submission_id'], false, data['current_index'])"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
-              </span>
-              <span class="col-sm-6">
-                <a href ng-click="onSelect(data['current_index'])"><i class="fa fa-check fa-lg fa-fw"></i>&nbsp; Select</a>
-              </span>
+              <div class="row">
+                <span class="col-xs-6">
+                  <a href ng-click="onView(data['submission_id'], false, data['current_index'])"><i class="fa fa-upload fa-fw"></i>&nbsp; View</a>
+                </span>
+                <span class="col-xs-6">
+                  <a href ng-click="onSelect(data['current_index'])"><i class="fa fa-check fa-lg fa-fw"></i>&nbsp; Select</a>
+                </span>
+              </div>
             </div>
           </div>
         </div>
