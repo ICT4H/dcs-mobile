@@ -122,9 +122,9 @@
 }
 
 .btn-primary {
-  color: #000 !important ;
-  background-color: #f0ba95;
-  border-color: #f0ba95; 
+  color: #fff !important ;
+  background-color: #f78f31;
+  border-color: #f78f31; 
 }
 
 .navbar-absolute-top {
@@ -132,9 +132,9 @@
 }
 
 .btn-primary.active, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
-  color: #000 !important ;
-  background-color: #f0ba95;
-  border-color: #f0ba95; 
+  color: #fff !important ;
+  background-color: #f78f31;
+  border-color: #f78f31; 
 }
 
 body {
@@ -156,3 +156,8 @@ button {
 .scrollable-header  {
   color: #666;    
 }
+
+#searchText::-webkit-input-placeholder {
+  color: #fff ;
+}
+
