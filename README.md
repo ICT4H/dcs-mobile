@@ -6,7 +6,7 @@
 
 This is __CollectData__ mobile application for Offline and Online Data Collection.
 
-[![Download App](https://developer.android.com/images/brand/en_app_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=co.thoughtworks.dcs)
+[![Download App](https://developer.android.com/images/brand/en_app_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=com.thoughtworks.dcs)
 
 ####Copyright and license
 
