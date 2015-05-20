@@ -123,8 +123,8 @@
 
 .btn-primary {
   color: #fff !important ;
-  background-color: #f78f31;
-  border-color: #f78f31; 
+  background-color: #3498db;
+  border-color: #3498db; 
 }
 
 .navbar-absolute-top {
@@ -133,8 +133,8 @@
 
 .btn-primary.active, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
   color: #fff !important ;
-  background-color: #f78f31;
-  border-color: #f78f31; 
+  background-color: #3498db;
+  border-color: #3498db; 
 }
 
 body {
