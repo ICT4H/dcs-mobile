@@ -16,10 +16,9 @@
 }
 
 .help_text {
-  font-family: Open Sans-serif;
-  font-weight: normal;
+  font-family: 'Open Sans', Arial, sans-serif;
   padding: 30px;
-  font-size: 15px;
+  font-size: 14px;
   font-style: italic;
 }
 
