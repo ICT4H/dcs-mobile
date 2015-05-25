@@ -66,7 +66,17 @@
             </div>
         </div>
         <div ng-if="!serverPage" class="well well-lg text-center">
-            <a href ng-click="loadServer()">Click here</a> to download more forms.
+            <span ng-show="projects.length == 0">
+                <a href ng-click="loadServer()">Click here</a> to download forms.
+            </span>
+            <span ng-show="projects.length > 0">
+                <a href ng-click="loadServer()">Click here</a> to download more forms.
+            </span>
+        </div>
+        <div ng-if="serverPage" class="well well-lg text-center">
+            <span ng-show="projects.length == 0">
+                No forms available, please contact the support team.
+            </span>
         </div>
     </div>  
 </div>
