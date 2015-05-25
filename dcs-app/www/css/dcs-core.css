@@ -31,6 +31,10 @@
   max-width: 66%;
 }
 
+.public-text {
+  color: #603E27 !important;
+}
+
 .app-content-loading {
   text-align: center;
   height: 100%;
@@ -111,13 +115,20 @@
   color: #fff !important;
 }
 
+.navbar-absolute-bottom {
+  color: #603E27 !important;
+}
+
 .navbar-app .btn {
   color: #fff  !important;
 }
 
 .list-group-item.active {
-  background-color: #f78f31 ;
-  border-color: #f78f31;
+  background-color: #603E27;
+}
+
+.navbar-absolute-bottom .btn {
+  color: #603E27 !important;
 }
 
 .btn-primary {
