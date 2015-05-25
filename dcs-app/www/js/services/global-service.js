@@ -88,6 +88,7 @@ dcsApp.service('app', ['$q', '$http', 'messageService', '$rootScope', function($
         options.fileKey = options.fileName;
         options.mimeType = filesInfo.type;
         options.headers = headersMap;
+        options.chunkedMode = false;
 
         var ft = new FileTransfer();
         ft.upload(filesInfo.path, encodeURI(serverUrl), win, fail, options);
