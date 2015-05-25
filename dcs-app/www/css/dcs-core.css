@@ -115,6 +115,12 @@
   color: #fff !important;
 }
 
+@media ( max-height: 380px ){
+  .navbar-absolute-bottom {
+    display: none;
+  }
+}
+
 .navbar-absolute-bottom {
   color: #603E27 !important;
 }
