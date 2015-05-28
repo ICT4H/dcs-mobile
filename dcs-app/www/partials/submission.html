@@ -11,25 +11,31 @@
   <div class="scrollable-content" ng-swipe-left="onPrevious()" ng-swipe-right="onNext()">
     <div ng-if="subTitle" class="well-custom well-sm project-title" style="max-width:100%">{{subTitle}}</div>
   <div class="panel">
-  		<div class="main">
-		<article class="paper" >
-			<section class="guidance">
-				<ul>
-					<li>Loading...</li>
-				</ul>
-			</section>
-			<header class="form-header clearfix">
-				<span class="form-language-selector"><span>Choose Language</span></span>
-			</header>
-			<!-- this is where the form will go -->
-						
-			<button id="validate-form" class="btn btn-primary btn-large" ></button>
-			<div class="enketo-power">
-        Powered by <img src="images/enketo_bare_100x37.png" alt="enketo logo" />
-			</div>
-		</article>
-	</div>
-  </div>
+    <div class="main">
+      <article class="paper" >
+      <section class="guidance">
+        <ul>
+          <li>Loading...</li>
+        </ul>
+      </section>
+        <header class="form-header clearfix">
+          <span class="form-language-selector"><span>Choose Language</span></span>
+        </header>
+        <div class="form-footer">
+          <div style="text-align: center; padding: 10px 0 10px 0;">
+            <a href="#" class="btn btn-primary previous-page disabled">Back</a>
+            <button id="validate-form" class="btn btn-primary">Validate</button>
+            <a href="#" class="btn btn-primary next-page disabled">Next</a>
+          </div>
+          <div style="text-align: center">
+            <a href="#" class="btn btn-default disabled first-page" style="width: 49%; border-radius: 0;">Return to Beginning</a>
+            <a href="#" class="btn btn-default disabled last-page" style="width: 49%; border-radius: 0;">Go to End</a>
+          </div>
+            <div class="enketo-power">
+              Powered by <img src="images/enketo_bare_100x37.png" alt="enketo logo" />
+            </div>
+      </article>
+    </div>
   <div ui-content-for="bottom">
     <div style="text-align:center;" ng-show="page.showPagination()">
     <span ng-hide="page.isFirstPage()" ng-click="page.onPrevious()" class="fa fa-lg fa-chevron-left btn" style="float: left;"></span>

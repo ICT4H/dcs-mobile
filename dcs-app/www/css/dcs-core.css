@@ -177,3 +177,10 @@ button {
   color: #fff ;
 }
 
+.form-footer .disabled{
+  display: none;
+}
+
+.panel-title {
+  text-align: inherit;
+}
