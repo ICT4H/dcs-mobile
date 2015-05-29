@@ -17,7 +17,7 @@
 
 .help_text {
   font-family: 'Open Sans', Arial, sans-serif;
-  padding: 30px;
+  padding: 5% 0 0 0;
   font-size: 14px;
   font-style: italic;
 }
@@ -183,4 +183,8 @@ button {
 
 .panel-title {
   text-align: inherit;
+}
+
+.navbar-absolute-bottom p {
+  margin: 0 0 2px;
 }
