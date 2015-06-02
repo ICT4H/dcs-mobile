@@ -29,7 +29,7 @@
                                     <a href ng-click="onDeleteProjectByUuid(project.project_uuid)"><i class="fa fa-trash-o fa-fw"></i></a>
                                 </div>
                                 <div class="col-xs-6">
-                                    &nbsp;{{ project.name }}
+                                    {{ project.name }}
                                 </div>
                                 <div class="col-xs-4" style="align: right;">
                                     <a href ng-click="onNewSurveyResponse(project)" ng-if="project.status=='updated'"><i class="fa fa-file-o fa-fw"></i>&nbsp; New</a>

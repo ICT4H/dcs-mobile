@@ -54,6 +54,7 @@
         return $('<button/>', {
             type  : 'button',
             html : options.label,
+            style : 'color: #333; background-color: #fff; border: 1px solid #ccc; margin-bottom: 7px; margin-right: 5px; border-radius: 4px;',
             on    : {
                 click: function() {
                     options.deviceHandle({

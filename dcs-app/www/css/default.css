@@ -498,7 +498,7 @@ button {
   border-top: none; }
 
 .question {
-  font-weight: bold;
+  font-weight: normal;
   display: block;
   margin: 0 0 9px 0;
   padding-top: 15px;
@@ -684,7 +684,7 @@ select {
   display: block; }
 
 .or-required-msg.active, .file-picker .file-feedback.warning, .or-constraint-msg.active, .file-picker .file-feedback.error {
-  font-weight: bold;
+  font-weight: normal;
   padding-top: 5px;
   font-size: 0.85em;
   color: #a94442; }

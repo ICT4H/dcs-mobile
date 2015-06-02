@@ -510,7 +510,7 @@ button {
 
 .question {
   font-family: Arial, sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   font-style: normal;
   display: block;
   margin: 0 0 9px 0;
@@ -702,7 +702,7 @@ select {
 
 .or-required-msg.active, .file-picker .file-feedback.warning, .or-constraint-msg.active, .file-picker .file-feedback.error {
   font-family: Arial, sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   font-style: normal;
   padding-top: 5px;
   font-size: 0.85em;
